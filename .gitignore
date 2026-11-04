@@ -1,0 +1,8 @@
+node_modules/
+.next/
+out/
+raw/
+public/data/
+*.log
+.DS_Store
+spa/dist/

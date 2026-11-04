@@ -1,0 +1,29 @@
+{
+  "name": "hadith-library",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Free, open-source hadith and Quran library in many languages.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "fetch": "node scripts/fetch-sources.mjs",
+    "data": "node --max-old-space-size=12000 scripts/build-data.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "npx serve out",
+    "preview": "node --max-old-space-size=8000 spa/build.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@fontsource/amiri": "^5.3.0",
+    "@fontsource/amiri-quran": "^5.3.0",
+    "@fontsource/noto-nastaliq-urdu": "^5.3.0",
+    "next": "^15.5.29",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

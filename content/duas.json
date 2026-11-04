@@ -1,0 +1,32 @@
+{
+  "note": "Each dua points to the hadith that contains it. The build finds the hadith whose Arabic contains `find` (normalised) and stores its number, so the Arabic and translations always come from the hadith data.",
+  "categories": [
+    { "id": "morning", "en": "Morning, evening & sleep", "ur": "صبح، شام اور نیند", "ar": "الصباح والمساء والنوم" },
+    { "id": "daily", "en": "Daily life", "ur": "روزمرہ زندگی", "ar": "الحياة اليومية" },
+    { "id": "prayer", "en": "Prayer & mosque", "ur": "نماز اور مسجد", "ar": "الصلاة والمسجد" },
+    { "id": "forgiveness", "en": "Forgiveness & remembrance", "ur": "استغفار اور ذکر", "ar": "الاستغفار والذكر" },
+    { "id": "hardship", "en": "Worry & hardship", "ur": "غم اور پریشانی", "ar": "الهم والكرب" },
+    { "id": "travel", "en": "Travel & weather", "ur": "سفر اور موسم", "ar": "السفر والمطر" }
+  ],
+  "duas": [
+    { "id": "sayyid-istighfar", "cat": "forgiveness", "en": "The master supplication for forgiveness", "ur": "سید الاستغفار", "ar": "سيد الاستغفار", "c": "bukhari", "find": "انت ربي لا اله الا انت خلقتني" },
+    { "id": "before-sleep", "cat": "morning", "en": "Before sleeping", "ur": "سونے سے پہلے", "ar": "عند النوم", "c": "bukhari", "find": "باسمك اللهم اموت واحيا" },
+    { "id": "waking-up", "cat": "morning", "en": "On waking up", "ur": "جاگنے پر", "ar": "عند الاستيقاظ", "c": "bukhari", "find": "الحمد لله الذي احيانا بعد ما اماتنا" },
+    { "id": "toilet", "cat": "daily", "en": "Entering the toilet", "ur": "بیت الخلاء میں داخل ہوتے وقت", "ar": "دخول الخلاء", "c": "bukhari", "find": "اعوذ بك من الخبث والخبايث" },
+    { "id": "leaving-home", "cat": "daily", "en": "Leaving the house", "ur": "گھر سے نکلتے وقت", "ar": "الخروج من المنزل", "c": "abudawud", "find": "بسم الله توكلت علي الله" },
+    { "id": "after-eating", "cat": "daily", "en": "After eating", "ur": "کھانے کے بعد", "ar": "بعد الطعام", "c": "abudawud", "find": "الحمد لله الذي اطعمني هذا" },
+    { "id": "sneezing", "cat": "daily", "en": "When sneezing", "ur": "چھینک آنے پر", "ar": "عند العطاس", "c": "bukhari", "find": "يهديكم الله ويصلح بالكم" },
+    { "id": "visiting-sick", "cat": "daily", "en": "Visiting the sick", "ur": "عیادت کے وقت", "ar": "عيادة المريض", "c": "bukhari", "find": "لا باس طهور ان شاء الله" },
+    { "id": "entering-mosque", "cat": "prayer", "en": "Entering the mosque", "ur": "مسجد میں داخل ہوتے وقت", "ar": "دخول المسجد", "c": "muslim", "find": "اللهم افتح لي ابواب رحمتك" },
+    { "id": "istikhara", "cat": "prayer", "en": "Seeking guidance (Istikhara)", "ur": "دعائے استخارہ", "ar": "دعاء الاستخارة", "c": "bukhari", "find": "اللهم اني استخيرك بعلمك" },
+    { "id": "after-prayer", "cat": "prayer", "en": "Help me remember You", "ur": "ذکر و شکر کی توفیق", "ar": "اللهم أعني على ذكرك", "c": "abudawud", "find": "اعني علي ذكرك وشكرك وحسن عبادتك" },
+    { "id": "subhanallah", "cat": "forgiveness", "en": "Two words beloved to the Most Merciful", "ur": "دو پیارے کلمے", "ar": "كلمتان حبيبتان إلى الرحمن", "c": "bukhari", "find": "سبحان الله وبحمده سبحان الله العظيم" },
+    { "id": "laylat-qadr", "cat": "forgiveness", "en": "You are Pardoning, You love to pardon", "ur": "اللهم انک عفو", "ar": "اللهم إنك عفو", "c": "tirmidhi", "find": "تحب العفو فاعف عني" },
+    { "id": "rabbana-atina", "cat": "forgiveness", "en": "Our Lord, give us good in this world", "ur": "ربنا آتنا فی الدنیا حسنہ", "ar": "ربنا آتنا في الدنيا حسنة", "c": "bukhari", "find": "ربنا اتنا في الدنيا حسنه" },
+    { "id": "heart-firm", "cat": "forgiveness", "en": "Keep my heart firm on Your religion", "ur": "دل کی ثابت قدمی کی دعا", "ar": "يا مقلب القلوب", "c": "tirmidhi", "find": "يا مقلب القلوب ثبت قلبي علي دينك" },
+    { "id": "distress", "cat": "hardship", "en": "In times of distress", "ur": "مصیبت کے وقت", "ar": "دعاء الكرب", "c": "bukhari", "find": "لا اله الا الله العظيم الحليم" },
+    { "id": "worry", "cat": "hardship", "en": "Refuge from worry and grief", "ur": "غم اور فکر سے پناہ", "ar": "الاستعاذة من الهم والحزن", "c": "bukhari", "find": "اعوذ بك من الهم والحزن" },
+    { "id": "travel", "cat": "travel", "en": "Setting out on a journey", "ur": "سفر کی دعا", "ar": "دعاء السفر", "c": "muslim", "find": "سبحان الذي سخر لنا هذا" },
+    { "id": "rain", "cat": "travel", "en": "When it rains", "ur": "بارش کے وقت", "ar": "عند نزول المطر", "c": "bukhari", "find": "صيبا نافعا" }
+  ]
+}
