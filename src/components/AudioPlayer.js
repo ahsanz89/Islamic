@@ -47,9 +47,9 @@ export function AudioBridge() {
   useEffect(() => {
     audio.configure({
       reciter: settings.reciter, repeat: settings.repeat, continuous: settings.continuous,
-      bismillah: settings.bismillah, volume: settings.volume, wordAudio: settings.wordAudio, wordHover: settings.wordHover, urdu: settings.urduTilawat
+      bismillah: settings.bismillah, volume: settings.volume, wordAudio: settings.wordAudio, wordHoverPlay: settings.wordHoverPlay, urdu: settings.urduTilawat
     });
-  }, [settings.reciter, settings.repeat, settings.continuous, settings.bismillah, settings.volume, settings.wordAudio, settings.wordHover, settings.urduTilawat]);
+  }, [settings.reciter, settings.repeat, settings.continuous, settings.bismillah, settings.volume, settings.wordAudio, settings.wordHoverPlay, settings.urduTilawat]);
   return toast ? <div className="audio-toast" role="status">{toast === 'offline' ? tx.offline : toast === 'urdu-unavailable' ? tx.urduUnavail : tx.wordUnavail}</div> : null;
 }
 
@@ -143,9 +143,9 @@ export const QuranWord = memo(function QuranWord({ s, v, pos, text, className = 
   const play = useCallback(() => audio.playWord(s, v, pos, text), [s, v, pos, text]);
   const canHover = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(hover: hover)').matches;
   const onEnter = () => {
-    if (!enabled || !settings.wordHover || !canHover) return;
+    if (!enabled || !settings.wordHoverPlay || !canHover) return;
     clearTimeout(timer.current);
-    timer.current = setTimeout(play, 260);
+    timer.current = setTimeout(play, 180);
   };
   const onLeave = () => clearTimeout(timer.current);
   const onTextClick = () => {
@@ -240,7 +240,7 @@ export function AudioSettings() {
       <ReciterSelect id="drawer-reciter" />
       <Toggle k="urduTilawat" label={tx.urduOn} />
       <Toggle k="wordAudio" label={tx.wordsOn} />
-      <Toggle k="wordHover" label={tx.hover} />
+      <Toggle k="wordHoverPlay" label={tx.hover} />
       <Toggle k="bismillah" label={tx.bismOn} />
       <Toggle k="continuous" label={tx.contOn} />
       <Toggle k="repeat" label={tx.repeatOn} />

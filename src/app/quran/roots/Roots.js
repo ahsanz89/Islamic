@@ -1,4 +1,5 @@
 'use client';
+import { Loader } from '@/components/ui';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -52,7 +53,7 @@ export default function Roots() {
         <p className="muted small">Quranic Arabic Corpus morphology · {roots ? Object.keys(roots).length : '…'} {t('roots').toLowerCase()}</p>
         <input className="input" style={{ maxWidth: 360 }} dir="rtl" value={f} onChange={(e) => setF(e.target.value)} placeholder={t('searchRoots')} aria-label={t('searchRoots')} />
       </div>
-      {!roots ? <div className="empty">{t('loading')}</div> : (
+      {!roots ? <Loader label={t('loading')} /> : (
         <div className="row">
           {list.slice(0, 600).map(([k, occ]) => (
             <button key={k} className="chip" onClick={() => router.push(`/quran/roots/?r=${encodeURIComponent(k)}`)}>

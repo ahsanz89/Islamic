@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useApp } from '@/components/Providers';
-import { CName, Icon, ReadingBar } from '@/components/ui';
+import { CName, Icon, Loader, ReadingBar } from '@/components/ui';
 import HadithCard from '@/components/HadithCard';
 import { getJSON } from '@/lib/client-data';
 
@@ -30,7 +30,7 @@ export default function SectionReader({ col, sec, prev, next }) {
         <p className="muted small" style={{ margin: '6px 0 0' }}>{sec.count} {t('hadiths')} · {sec.from}–{sec.to}</p>
       </div>
       {col.langs.length > 1 && <ReadingBar choices={col.langs.filter((l) => l !== 'ar')} />}
-      {items === null ? <div className="empty">{t('loading')}</div> : (
+      {items === null ? <Loader label={t('loading')} /> : (
         <div className="stack" style={{ gap: 16 }}>
           {items.slice(0, limit).map((h) => <HadithCard key={h.n} col={col} h={h} />)}
           {items.length > limit && <button className="btn" onClick={() => setLimit((l) => l + 20)}>{t('loadMore')} ({items.length - limit})</button>}

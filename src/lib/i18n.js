@@ -63,8 +63,8 @@ const en = {
   allResults: 'All',
   showing: 'Showing',
   of: 'of',
-  appName: 'Nur-ul-Haq',
-  tagline: 'Free · Open source · No ads',
+  appName: 'DALIL',
+  tagline: 'Islamic Knowledge. Without Boundaries.', taglineSecond: 'Explore. Learn. Understand.',
   heroTitle: 'Read the hadith of the Prophet ﷺ in your own language',
   heroSub: 'Sahih al-Bukhari, Sahih Muslim, the Sunan and 20+ more collections in Arabic, with translations in Urdu, English, Bengali, Indonesian, Turkish and more.',
   searchPlaceholder: 'Search by word or number, in any language',
@@ -216,8 +216,8 @@ const ur = {
   allResults: 'سب',
   showing: 'دکھائے جا رہے ہیں',
   of: 'از',
-  appName: 'نور الحق',
-  tagline: 'مفت · اوپن سورس · بغیر اشتہارات',
+  appName: 'دليل',
+  tagline: 'اسلامی علم۔ بغیر کسی سرحد کے۔', taglineSecond: 'دریافت کریں۔ سیکھیں۔ سمجھیں۔',
   heroTitle: 'نبی کریم ﷺ کی احادیث اپنی زبان میں پڑھیں',
   heroSub: 'صحیح بخاری، صحیح مسلم، سنن اور بیس سے زائد کتب عربی متن کے ساتھ، اردو، انگریزی، بنگلہ، انڈونیشی، ترکی اور دیگر زبانوں میں۔',
   searchPlaceholder: 'کسی بھی زبان میں لفظ یا نمبر سے تلاش کریں',
@@ -334,7 +334,7 @@ const ar = {
   allSurahs: 'كل السور', loadMore: 'عرض المزيد', topics: 'موضوعات شائعة', browse: 'تصفح', explore: 'استكشف',
   quranDesc: 'الرسم العثماني و13 ترجمة وكلمة بكلمة والجذور.', duasDesc: 'أدعية يومية من الأحاديث.', glossaryDesc: 'مصطلحات الحديث بالعربية والإنجليزية والأردية.',
   narratorsDesc: 'تراجم الرواة والأسانيد.', showFilters: 'التصفية', inBooks: 'كتب', allResults: 'الكل', showing: 'عرض', of: 'من',
-  appName: 'نور الحق', tagline: 'مجاني · مفتوح المصدر · بلا إعلانات',
+  appName: 'دليل', tagline: 'المعرفة الإسلامية. بلا حدود.', taglineSecond: 'استكشف. تعلّم. افهم.',
   heroTitle: 'اقرأ أحاديث النبي ﷺ بلغتك', heroSub: 'صحيح البخاري وصحيح مسلم والسنن وأكثر من عشرين كتابًا آخر، بالعربية مع ترجمات بلغات عديدة.',
   searchPlaceholder: 'ابحث بكلمة أو رقم بأي لغة', search: 'بحث', home: 'الرئيسية', collections: 'كتب الحديث', allCollections: 'جميع الكتب',
   quran: 'القرآن', glossary: 'المصطلحات', duas: 'الأدعية', namaz: 'كتاب الصلاة', narrators: 'الرواة', bookmarks: 'المحفوظات', about: 'عن الموقع والمصادر', settings: 'الإعدادات',
@@ -357,7 +357,7 @@ const ar = {
 };
 
 const bn = {
-  appName: 'Nur-ul-Haq', tagline: 'ফ্রি · ওপেন সোর্স · বিজ্ঞাপনমুক্ত', heroTitle: 'নবী ﷺ-এর হাদিস পড়ুন নিজের ভাষায়',
+  appName: 'DALIL', tagline: 'ইসলামি জ্ঞান। সীমানা ছাড়া।', taglineSecond: 'অন্বেষণ করুন। শিখুন। বুঝুন।', heroTitle: 'নবী ﷺ-এর হাদিস পড়ুন নিজের ভাষায়',
   heroSub: 'সহিহ বুখারি, সহিহ মুসলিম, সুনান ও আরও ২০টির বেশি গ্রন্থ আরবিতে, বাংলা, উর্দু, ইংরেজি সহ বিভিন্ন ভাষার অনুবাদসহ।',
   searchPlaceholder: 'যেকোনো ভাষায় শব্দ বা নম্বর দিয়ে খুঁজুন', search: 'খুঁজুন', home: 'হোম', collections: 'হাদিস গ্রন্থ', allCollections: 'সব গ্রন্থ', quran: 'কুরআন',
   glossary: 'পরিভাষা', duas: 'দোয়া', narrators: 'বর্ণনাকারী', bookmarks: 'সংরক্ষিত', about: 'পরিচিতি ও উৎস', settings: 'সেটিংস', hadith: 'হাদিস', hadiths: 'হাদিস',
@@ -369,7 +369,7 @@ const bn = {
 };
 
 const hi = {
-  appName: 'Nur-ul-Haq', tagline: 'मुफ़्त · ओपन सोर्स · विज्ञापन-मुक्त', heroTitle: 'नबी ﷺ की हदीसें अपनी भाषा में पढ़ें',
+  appName: 'DALIL', tagline: 'इस्लामी ज्ञान। बिना सीमाओं के।', taglineSecond: 'खोजें। सीखें। समझें।', heroTitle: 'नबी ﷺ की हदीसें अपनी भाषा में पढ़ें',
   heroSub: 'सहीह बुख़ारी, सहीह मुस्लिम, सुनन और 20 से अधिक किताबें अरबी में, कई भाषाओं के अनुवाद के साथ।', searchPlaceholder: 'किसी भी भाषा में शब्द या नंबर से खोजें',
   search: 'खोजें', home: 'होम', collections: 'हदीस की किताबें', allCollections: 'सभी किताबें', quran: 'क़ुरआन', glossary: 'शब्दावली', duas: 'दुआएँ', narrators: 'रावी',
   bookmarks: 'सहेजे गए', about: 'परिचय और स्रोत', settings: 'सेटिंग्स', hadith: 'हदीस', hadiths: 'हदीसें', hadithOfDay: 'आज की हदीस', arabic: 'अरबी', translations: 'अनुवाद',
@@ -380,7 +380,7 @@ const hi = {
 };
 
 const id = {
-  appName: 'Nur-ul-Haq', tagline: 'Gratis · Sumber terbuka · Tanpa iklan', heroTitle: 'Baca hadis Nabi ﷺ dalam bahasa Anda',
+  appName: 'DALIL', tagline: 'Ilmu Islam. Tanpa Batas.', taglineSecond: 'Jelajahi. Pelajari. Pahami.', heroTitle: 'Baca hadis Nabi ﷺ dalam bahasa Anda',
   heroSub: 'Sahih al-Bukhari, Sahih Muslim, kitab-kitab Sunan dan 20+ koleksi lain dalam bahasa Arab, dengan terjemahan berbagai bahasa.',
   searchPlaceholder: 'Cari dengan kata atau nomor, dalam bahasa apa pun', search: 'Cari', home: 'Beranda', collections: 'Koleksi', allCollections: 'Semua koleksi',
   quran: 'Al-Quran', glossary: 'Istilah', duas: 'Doa', narrators: 'Perawi', bookmarks: 'Tersimpan', about: 'Tentang & sumber', settings: 'Pengaturan', hadith: 'Hadis',
@@ -392,7 +392,7 @@ const id = {
 };
 
 const tr = {
-  appName: 'Nur-ul-Haq', tagline: 'Ücretsiz · Açık kaynak · Reklamsız', heroTitle: 'Peygamber ﷺ’in hadislerini kendi dilinizde okuyun',
+  appName: 'DALIL', tagline: 'İslami Bilgi. Sınırsız.', taglineSecond: 'Keşfet. Öğren. Anla.', heroTitle: 'Peygamber ﷺ’in hadislerini kendi dilinizde okuyun',
   heroSub: 'Sahih-i Buhari, Sahih-i Müslim, Sünenler ve 20’den fazla eser Arapça aslıyla, birçok dilde tercümeleriyle.', searchPlaceholder: 'Herhangi bir dilde kelime veya numara ile arayın',
   search: 'Ara', home: 'Ana sayfa', collections: 'Eserler', allCollections: 'Tüm eserler', quran: 'Kur’an', glossary: 'Terimler', duas: 'Dualar', narrators: 'Raviler',
   bookmarks: 'Kaydedilenler', about: 'Hakkında ve kaynaklar', settings: 'Ayarlar', hadith: 'Hadis', hadiths: 'hadis', books: 'kitap', book: 'Kitap', hadithOfDay: 'Günün hadisi',
@@ -404,7 +404,7 @@ const tr = {
 };
 
 const fr = {
-  appName: 'Nur-ul-Haq', tagline: 'Gratuit · Open source · Sans publicité', heroTitle: 'Lisez les hadiths du Prophète ﷺ dans votre langue',
+  appName: 'DALIL', tagline: 'Savoir islamique. Sans frontières.', taglineSecond: 'Explorez. Apprenez. Comprenez.', heroTitle: 'Lisez les hadiths du Prophète ﷺ dans votre langue',
   heroSub: 'Sahih al-Bukhari, Sahih Muslim, les Sunan et plus de 20 recueils en arabe, avec des traductions en plusieurs langues.', searchPlaceholder: 'Rechercher par mot ou numéro, dans toute langue',
   search: 'Rechercher', home: 'Accueil', collections: 'Recueils', allCollections: 'Tous les recueils', quran: 'Coran', glossary: 'Glossaire', duas: 'Invocations',
   narrators: 'Rapporteurs', bookmarks: 'Enregistrés', about: 'À propos et sources', settings: 'Paramètres', hadith: 'Hadith', hadiths: 'hadiths', books: 'livres', book: 'Livre',
@@ -416,7 +416,7 @@ const fr = {
 };
 
 const ru = {
-  appName: 'Nur-ul-Haq', tagline: 'Бесплатно · Открытый код · Без рекламы', heroTitle: 'Читайте хадисы Пророка ﷺ на своём языке',
+  appName: 'DALIL', tagline: 'Исламские знания. Без границ.', taglineSecond: 'Исследуйте. Учитесь. Понимайте.', heroTitle: 'Читайте хадисы Пророка ﷺ на своём языке',
   heroSub: 'Сахих аль-Бухари, Сахих Муслим, сборники Сунан и ещё более 20 книг на арабском с переводами на многие языки.', searchPlaceholder: 'Поиск по слову или номеру на любом языке',
   search: 'Искать', home: 'Главная', collections: 'Сборники', allCollections: 'Все сборники', quran: 'Коран', glossary: 'Термины', duas: 'Мольбы', narrators: 'Передатчики',
   bookmarks: 'Сохранённое', about: 'О проекте и источники', settings: 'Настройки', hadith: 'Хадис', hadiths: 'хадисов', books: 'книг', book: 'Книга', hadithOfDay: 'Хадис дня',
@@ -428,7 +428,7 @@ const ru = {
 };
 
 const ta = {
-  appName: 'Nur-ul-Haq', tagline: 'இலவசம் · திறந்த மூலம் · விளம்பரமில்லை', heroTitle: 'நபி ﷺ அவர்களின் ஹதீஸ்களை உங்கள் மொழியில் படியுங்கள்',
+  appName: 'DALIL', tagline: 'இஸ்லாமிய அறிவு. எல்லைகள் இல்லாமல்.', taglineSecond: 'ஆராயுங்கள். கற்றுக்கொள்ளுங்கள். புரிந்துகொள்ளுங்கள்.', heroTitle: 'நபி ﷺ அவர்களின் ஹதீஸ்களை உங்கள் மொழியில் படியுங்கள்',
   heroSub: 'ஸஹீஹ் புகாரி, ஸஹீஹ் முஸ்லிம், சுனன் மற்றும் 20க்கும் மேற்பட்ட நூல்கள் அரபியிலும் பல மொழி மொழிபெயர்ப்புகளுடனும்.', searchPlaceholder: 'எந்த மொழியிலும் சொல் அல்லது எண் மூலம் தேடுங்கள்',
   search: 'தேடு', home: 'முகப்பு', collections: 'நூல்கள்', allCollections: 'அனைத்து நூல்கள்', quran: 'குர்ஆன்', glossary: 'சொற்களஞ்சியம்', duas: 'துஆக்கள்', narrators: 'அறிவிப்பாளர்கள்',
   bookmarks: 'சேமித்தவை', about: 'பற்றி & மூலங்கள்', settings: 'அமைப்புகள்', hadith: 'ஹதீஸ்', hadiths: 'ஹதீஸ்கள்', hadithOfDay: 'இன்றைய ஹதீஸ்', arabic: 'அரபு',

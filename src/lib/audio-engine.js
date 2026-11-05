@@ -17,7 +17,7 @@ export const state = {
   word: { key: '', status: '' }, // status: loading | playing | fallback | error
   toast: ''
 };
-const cfg = { reciter: 'alafasy', repeat: false, continuous: true, bismillah: true, volume: 0.9, wordAudio: true, wordHover: false, urdu: false };
+const cfg = { reciter: 'alafasy', repeat: false, continuous: true, bismillah: true, volume: 0.9, wordAudio: true, wordHoverPlay: false, urdu: false };
 
 const subs = new Set();
 const tsubs = new Set();

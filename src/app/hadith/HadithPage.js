@@ -18,7 +18,7 @@ export default function HadithPage() {
     getHadith(c, n).then(setR).catch(() => setR({ error: true }));
   }, [c, n]);
   useEffect(() => {
-    if (r?.col) document.title = `${r.col.en} ${n} · Nur-ul-Haq`;
+    if (r?.col) document.title = `${r.col.en} ${n} · DALIL`;
     if (r?.hadith) setLastRead({ path: `/hadith/?c=${c}&n=${n}`, title: `${r.col.en} ${n}`, sub: r.sec?.title });
   }, [r, n]); // eslint-disable-line react-hooks/exhaustive-deps
 

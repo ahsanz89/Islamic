@@ -7,6 +7,11 @@ import { LANGUAGES, LANG_NAMES } from '@/lib/i18n';
 import { getJSON } from '@/lib/client-data';
 import { AudioSettings } from '@/components/AudioPlayer';
 
+/** Brand loading state (DALIL mark). */
+export function Loader({ label }) {
+  return <div className="dalil-loader" role="status">{Icon.logo}<span>{label}</span></div>;
+}
+
 /** Translated interface text. */
 export function T({ k, vars }) {
   const { t } = useApp();
@@ -50,21 +55,13 @@ export const Icon = {
   enter: S(<><path d="M20 6v6a3 3 0 0 1-3 3H5" /><path d="m9 11-4 4 4 4" /></>),
   logo: (
     <svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true">
-  <defs>
-    <linearGradient id="lg-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#0f7a5e"/><stop offset="1" stopColor="#06402f"/></linearGradient>
-    <linearGradient id="lg-n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#f6d77a"/><stop offset="1" stopColor="#c8922a"/></linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="16" fill="url(#lg-g)"/>
-  <g transform="translate(32 19)" fill="url(#lg-n)"><polygon points="0.00,-9.50 1.76,-4.25 6.72,-6.72 4.25,-1.76 9.50,0.00 4.25,1.76 6.72,6.72 1.76,4.25 0.00,9.50 -1.76,4.25 -6.72,6.72 -4.25,1.76 -9.50,0.00 -4.25,-1.76 -6.72,-6.72 -1.76,-4.25"/></g>
-  <circle cx="32" cy="19" r="2.4" fill="#06402f"/>
-  <g stroke="#f6d77a" strokeWidth="1.6" strokeLinecap="round" opacity=".75">
-    <path d="M32 6.2v-2.4M20.6 9.4l-1.6-1.8M43.4 9.4l1.6-1.8"/>
-  </g>
-  <path d="M32 50.5C25 45.6 17 45 9.5 47V28.5C17 26.6 25 27.4 32 32.4Z" fill="#fdf8ea"/>
-  <path d="M32 50.5C39 45.6 47 45 54.5 47V28.5C47 26.6 39 27.4 32 32.4Z" fill="#e9dfc2"/>
-  <path d="M32 32.4V50.5" stroke="#0a5c48" strokeWidth="1.4"/>
-  <path d="M13.5 33.2c5-.9 10 .1 14.5 3M13.5 38c5-.9 10 .1 14.5 3M50.5 33.2c-5-.9-10 .1-14.5 3M50.5 38c-5-.9-10 .1-14.5 3" stroke="#0a5c48" strokeWidth="1" strokeLinecap="round" fill="none" opacity=".55"/>
-</svg>
+      <rect width="64" height="64" rx="15" fill="#123f35" />
+      <g fill="none" stroke="#f7f5ef" strokeWidth="2.6" strokeLinejoin="miter">
+        <rect x="18.5" y="18.5" width="27" height="27" />
+        <rect x="18.5" y="18.5" width="27" height="27" transform="rotate(45 32 32)" />
+      </g>
+      <rect x="27.6" y="27.6" width="8.8" height="8.8" transform="rotate(45 32 32)" fill="#d5b779" />
+    </svg>
   )
 };
 
@@ -83,7 +80,6 @@ const NAV_MORE = [
 ];
 const NAV = [...NAV_MAIN, ...NAV_MORE.slice(0, 3)];
 const MORE = { en: 'More', ur: 'مزید', ar: 'المزيد' };
-const SLOGAN = { en: 'Quran & Sunnah', ur: 'قرآن و سنت', ar: 'القرآن والسنة' };
 
 function MoreMenu({ path }) {
   const { t, settings } = useApp();
@@ -148,11 +144,11 @@ export function Header() {
           {!isHome && (
             <button className="btn ghost icon" aria-label={t('back')} title={t('back')} onClick={() => router.back()}>{Icon.back}</button>
           )}
-          <Link href="/" className="brand" aria-label="Nur-ul-Haq">
+          <Link href="/" className="brand" aria-label="DALIL دليل">
             {Icon.logo}
             <span className="brand-text">
-              <span className="brand-name">Nur-ul-Haq</span>
-              <span className="brand-sub" lang="ar">نور الحق <i aria-hidden="true">·</i> <span lang={settings.ui}>{SLOGAN[settings.ui] || SLOGAN.en}</span></span>
+              <span className="brand-name">DALIL</span>
+              <span className="brand-sub" lang="ar">دليل</span>
             </span>
           </Link>
           <nav className="nav" aria-label="Main">
@@ -394,13 +390,26 @@ function ReadingControls() {
 }
 
 /** Sticky toolbar on reading pages: translations on/off, text size, vowel marks. */
-export function ReadingBar({ choices = TR_CHOICES, extra }) {
+const ALWAYS = { en: 'always shown', ur: 'ہمیشہ موجود', ar: 'يظهر دائمًا' };
+
+/** Reading controls. `field` picks which saved list holds the chosen translations ('tr' for hadith, 'qtr' for the Quran).
+ *  `arabicFixed` adds a locked "Arabic" badge: the Arabic text is never optional. */
+export function ReadingBar({ choices = TR_CHOICES, extra, field = 'tr', arabicFixed = false }) {
   const { settings, update, t } = useApp();
-  const toggle = (l) => update({ tr: settings.tr.includes(l) ? settings.tr.filter((x) => x !== l) : [...settings.tr, l] });
+  const sel = settings[field] || [];
+  const toggle = (l) => update({ [field]: sel.includes(l) ? sel.filter((x) => x !== l) : [...sel, l] });
   return (
     <div className="readbar" role="toolbar" aria-label={t('settings')}>
+      {arabicFixed && (
+        <>
+          <span className="chip fixed" aria-label={`${LANG_NAMES.ar}: ${ALWAYS[settings.ui] || ALWAYS.en}`} title={ALWAYS[settings.ui] || ALWAYS.en}>
+            <span lang="ar">العربية</span> ✓
+          </span>
+          <span className="readbar-label">{t('translations')}:</span>
+        </>
+      )}
       {choices.map((l) => (
-        <button key={l} className="chip" aria-pressed={settings.tr.includes(l)} onClick={() => toggle(l)} lang={l}>{LANG_NAMES[l]}</button>
+        <button key={l} className="chip" aria-pressed={sel.includes(l)} onClick={() => toggle(l)} lang={l}>{LANG_NAMES[l]}</button>
       ))}
       <span className="sep" />
       <button className="btn small" aria-pressed={settings.harakat} onClick={() => update({ harakat: !settings.harakat })} title={t('showHarakat')}>حَرَكَات</button>
@@ -416,7 +425,11 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <div className="container">
-        <span>{t('appName')} · {t('footerLicense')}</span>
+        <div className="brand-line">
+          <strong>DALIL <span lang="ar" style={{ letterSpacing: 0 }}>دليل</span></strong>
+          <span>{t('tagline')} {t('taglineSecond')}</span>
+          <span className="small">{t('footerLicense')}</span>
+        </div>
         <nav className="row" aria-label="Footer" style={{ gap: 16 }}>
           <Link href="/about/">{t('about')}</Link>
           <Link href="/about/#errors">{t('reportError')}</Link>

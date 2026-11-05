@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '@/components/Providers';
-import { BookmarkButton, CopyButton, Icon, ReadingBar } from '@/components/ui';
+import { BookmarkButton, CopyButton, Icon, Loader, ReadingBar } from '@/components/ui';
 import { getJSON } from '@/lib/client-data';
 import { stripDiacritics } from '@/lib/arabic.mjs';
 import { LANG_NAMES } from '@/lib/i18n';
@@ -84,12 +84,11 @@ export default function SurahReader({ surah, translators, prev, next }) {
   }, [surah.n]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const keys = [];
-  for (const l of settings.tr) {
+  for (const l of settings.qtr || []) {
     if (translators[l]) keys.push(l);
     if (second && translators[l + '2']) keys.push(l + '2');
   }
-  // while the Urdu audio is on, the Urdu text is always shown so it can be followed
-  if (settings.urduTilawat && translators.ur && !keys.includes('ur')) keys.push('ur');
+
   const keysKey = keys.join('|');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const keysStable = useMemo(() => keys, [keysKey]);
@@ -118,6 +117,8 @@ export default function SurahReader({ surah, translators, prev, next }) {
         <WholeNote />
       </header>
       <ReadingBar
+        field="qtr"
+        arabicFixed
         choices={Object.keys(translators).filter((k) => !k.endsWith('2'))}
         extra={<>
           <span className="sep" />
@@ -127,7 +128,7 @@ export default function SurahReader({ surah, translators, prev, next }) {
         </>}
       />
       {surah.n !== 1 && surah.n !== 9 && <p className="quran-ar bismillah" lang="ar">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ</p>}
-      {!verses ? <div className="empty">{t('loading')}</div> : (
+      {!verses ? <Loader label={t('loading')} /> : (
         <div className="stack" style={{ gap: 14 }}>
           {verses.map((v) => (
             <Verse key={v.v} v={v} surah={surah} keys={keysStable} translators={translators} wbw={wbw} harakat={settings.harakat} wordAudio={settings.wordAudio} />

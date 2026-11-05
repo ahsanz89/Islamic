@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useApp } from '@/components/Providers';
-import { CName, Icon } from '@/components/ui';
+import { CName, Icon, Loader } from '@/components/ui';
 import HadithCard from '@/components/HadithCard';
 import PrayerTimes from '@/components/PrayerTimes';
 import { getHadith } from '@/lib/client-data';
@@ -164,7 +164,7 @@ export default function Home({ collections }) {
 
       <section>
         <div className="section-head"><p className="eyebrow">{t('hadithOfDay')}</p></div>
-        {daily?.hadith ? <HadithCard col={daily.col} h={daily.hadith} /> : <div className="empty">{t('loading')}</div>}
+        {daily?.hadith ? <HadithCard col={daily.col} h={daily.hadith} /> : <Loader label={t('loading')} />}
       </section>
 
       <section>

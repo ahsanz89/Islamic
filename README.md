@@ -1,6 +1,10 @@
-# Nur-ul-Haq (نور الحق)
+# DALIL (دليل)
 
-Islam according to the Quran and Sunnah: a free, open-source hadith and Quran library.
+**Islamic Knowledge. Without Boundaries.** · Explore. Learn. Understand.
+
+DALIL is an independent global Islamic knowledge platform (Quran, Hadith, Duas, prayer guidance), not affiliated with any maslak, sect or organisation.
+
+Brand assets live in `public/brand/` (rebuild with `python3 scripts/brand/build-logo.py` then `node scripts/brand/build-png.mjs`); colours and fonts are the `--dalil-*` and `--font-*` tokens at the top of `src/app/globals.css`.
 
 A free, open-source, ad-free hadith and Quran library. Arabic text with translations in many languages, a multi-language interface (English, اردو, العربية, বাংলা, हिन्दी, Indonesia, Türkçe, Français, Русский, தமிழ்), light and dark themes, and right-to-left layout for Urdu and Arabic.
 

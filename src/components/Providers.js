@@ -16,7 +16,8 @@ const DEFAULTS = {
   continuous: true,
   bismillah: true,
   wordAudio: true,
-  wordHover: false
+  wordHoverPlay: true,
+  qtr: ['en']
 };
 
 const Ctx = createContext(null);
