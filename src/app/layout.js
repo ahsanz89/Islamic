@@ -1,6 +1,6 @@
 import './globals.css';
 import { Providers } from '@/components/Providers';
-import { Footer, Header } from '@/components/ui';
+import { Footer, Fx, Header } from '@/components/ui';
 
 export const metadata = {
   title: { default: 'Hadith Library', template: '%s · Hadith Library' },
@@ -21,6 +21,7 @@ export default function RootLayout({ children }) {
       <body>
         <Providers>
           <a href="#main" className="sr-only">Skip to content</a>
+          <Fx />
           <Header />
           <main id="main">{children}</main>
           <Footer />

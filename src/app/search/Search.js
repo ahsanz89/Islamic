@@ -363,7 +363,7 @@ export default function Search({ collections }) {
           {state.status === 'done' && !state.results.length && <div className="empty">{t('noResults')}</div>}
           {visible.slice(0, shown).map((r, i) =>
             scope === 'quran' ? (
-              <Link key={i} href={`/quran/${r.k.split(':')[0]}/#v${r.k.split(':')[1]}`} className="result">
+              <Link key={i} href={`/quran/${r.k.split(':')[0]}/#v${r.k.split(':')[1]}`} className="result spot">
                 <div className="top">
                   <span className="ref">{t('surah')} {r.k}</span>
                   {surahs && <span className="muted small">{surahs[Number(r.k.split(':')[0]) - 1]?.name}</span>}
@@ -371,9 +371,9 @@ export default function Search({ collections }) {
                 <p dir="auto" className={textClass}>{snippet(r.text, terms)}</p>
               </Link>
             ) : r.num ? (
-              <Link key={i} href={hadithHref(r.c, r.n)} className="result"><span className="ref"><CName c={colMap[r.c]} /> {r.n} →</span></Link>
+              <Link key={i} href={hadithHref(r.c, r.n)} className="result spot"><span className="ref"><CName c={colMap[r.c]} /> {r.n} →</span></Link>
             ) : (
-              <Link key={i} href={hadithHref(r.c, r.n)} className="result">
+              <Link key={i} href={hadithHref(r.c, r.n)} className="result spot">
                 <div className="top">
                   <span className="ref"><CName c={colMap[r.c]} /> {r.n}</span>
                   {r.g ? <span className={`badge ${gradeTone(GRADE_WORD[r.g])}`}>{t(GRADES.find((x) => x[0] === r.g)[1])}</span> : null}

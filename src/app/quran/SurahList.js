@@ -34,9 +34,9 @@ export default function SurahList({ surahs }) {
           <Link className="btn small" href="/search/?scope=quran">{Icon.search}{t('search')}</Link>
         </div>
       </div>
-      <div className="grid">
+      <div className="grid wide">
         {list.map((s) => (
-          <Link key={s.n} href={`/quran/${s.n}/`} className="colcard">
+          <Link key={s.n} href={`/quran/${s.n}/`} className="colcard spot">
             <span className="mono" style={{ fontFamily: 'var(--font-ui)', fontSize: 17, fontWeight: 800 }}>{s.n}</span>
             <span className="body">
               <span className="name">{s.name}</span>

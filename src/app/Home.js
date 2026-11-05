@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useApp } from '@/components/Providers';
 import { CName, Icon } from '@/components/ui';
 import HadithCard from '@/components/HadithCard';
@@ -23,6 +23,51 @@ export const TOPICS = [
   { en: 'Neighbours', ur: 'پڑوسی', ar: 'الجار', q: { en: 'neighbor', ur: 'پڑوسی', ar: 'جاره' } }
 ];
 
+/** Counts up to `value` once visible (instant when the user prefers reduced motion). */
+function CountUp({ value }) {
+  const ref = useRef(null);
+  const [n, setN] = useState(value);
+  useEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || typeof IntersectionObserver === 'undefined') return;
+    let raf = 0;
+    const io = new IntersectionObserver(([en]) => {
+      if (!en.isIntersecting) return;
+      io.disconnect();
+      const t0 = performance.now(), dur = 1100;
+      const tick = (t) => {
+        const k = Math.min(1, (t - t0) / dur);
+        setN(Math.round(value * (1 - Math.pow(1 - k, 3))));
+        if (k < 1) raf = requestAnimationFrame(tick);
+      };
+      setN(0);
+      raf = requestAnimationFrame(tick);
+    });
+    if (ref.current) io.observe(ref.current);
+    return () => { io.disconnect(); cancelAnimationFrame(raf); };
+  }, [value]);
+  return <span ref={ref}>{n.toLocaleString()}</span>;
+}
+
+/** Headline with its last words highlighted in the accent gradient. */
+function Headline({ text, words }) {
+  const parts = text.split(' ');
+  const k = Math.min(words, parts.length - 1);
+  return <>{parts.slice(0, parts.length - k).join(' ')} <em>{parts.slice(parts.length - k).join(' ')}</em></>;
+}
+
+function Tile({ href, cls = '', icon, title, text, go, bg }) {
+  return (
+    <Link href={href} className={`tile spot ${cls}`}>
+      {bg && <span className="bg-ar" aria-hidden="true">{bg}</span>}
+      <span className="icon">{icon}</span>
+      <h3>{title}</h3>
+      <p>{text}</p>
+      <span className="go">{go}{Icon.arrow}</span>
+    </Link>
+  );
+}
+
 function monogram(c) {
   const words = (c.ar || '').split(' ');
   const w = (words.length > 1 ? words[words.length - 1] : words[0] || '').replace(/^ال/, '');
@@ -32,7 +77,7 @@ function monogram(c) {
 export function CollectionCard({ c }) {
   const { t, settings } = useApp();
   return (
-    <Link href={`/c/${c.id}/`} className="colcard">
+    <Link href={`/c/${c.id}/`} className="colcard spot">
       <span className={`mono ${c.source === 'openiti' ? 'alt' : ''}`} aria-hidden="true">{monogram(c)}</span>
       <span className="body">
         <span className="name"><CName c={c} /></span>
@@ -64,8 +109,9 @@ export default function Home({ collections }) {
   return (
     <div className="container">
       <section className="hero">
-        <span className="badge">{t('tagline')}</span>
-        <h1>{t('heroTitle')}</h1>
+        <span className="hero-glow" aria-hidden="true" />
+        <span className="badge gold">{t('tagline')}</span>
+        <h1><Headline text={t('heroTitle')} words={settings.ui === 'ur' || settings.ui === 'ar' ? 2 : 3} /></h1>
         <p className="lead">{t('heroSub')}</p>
         <form className="searchbar" role="search" onSubmit={(e) => { e.preventDefault(); router.push(`/search/?q=${encodeURIComponent(q)}`); }}>
           <span className="lead">{Icon.search}</span>
@@ -73,16 +119,28 @@ export default function Home({ collections }) {
           <input id="hq" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('searchPlaceholder')} dir="auto" />
           <button className="btn primary" type="submit">{t('search')}</button>
         </form>
-        <div className="row" style={{ justifyContent: 'center' }}>
+        <div className="topics">
           {TOPICS.map((tp) => (
             <Link key={tp.en} className="chip" href={`/search/?q=${encodeURIComponent(tp.q[topicLang])}&lang=${topicLang}`}>{tp[settings.ui] || tp.en}</Link>
           ))}
         </div>
         <div className="stats">
-          <span><strong>{collections.length}</strong> {t('books')}</span>
-          <span><strong>{total.toLocaleString()}</strong> {t('hadiths')}</span>
-          <span><strong>114</strong> {t('surah').toLowerCase()}</span>
-          <span><strong>10</strong> {t('language').toLowerCase()}</span>
+          <div className="s"><strong><CountUp value={collections.length} /></strong><span className="l">{t('books')}</span></div>
+          <div className="s"><strong><CountUp value={total} /></strong><span className="l">{t('hadiths')}</span></div>
+          <div className="s"><strong><CountUp value={114} /></strong><span className="l">{t('surah')}</span></div>
+          <div className="s"><strong><CountUp value={10} /></strong><span className="l">{t('language')}</span></div>
+        </div>
+      </section>
+
+      <section>
+        <div className="bento">
+          <Tile href="/quran/" cls="green t-6 t-r2" icon={Icon.quran} title={t('quran')} text={t('quranDesc')} go={t('startReading')} bg="القرآن" />
+          <Tile href="/collections/" cls="t-6" icon={Icon.books} title={t('collections')} text={`${collections.length} ${t('books')} · ${total.toLocaleString()} ${t('hadiths')}`} go={t('allCollections')} />
+          <Tile href="/duas/" cls="t-3" icon={Icon.hands} title={t('duas')} text={t('duasDesc')} go={t('duas')} />
+          <Tile href="/namaz/" cls="sun t-3" icon={Icon.hands} title={t('tilePrayer')} text={t('namazDesc')} go={t('namazDownload')} />
+          <Tile href="/search/" cls="t-4" icon={Icon.search} title={t('tileSearch')} text={t('tileSearchDesc')} go={t('search')} />
+          <Tile href="/glossary/" cls="t-4" icon={Icon.glossary} title={t('glossary')} text={t('glossaryDesc')} go={t('glossary')} />
+          <Tile href="/narrators/" cls="t-4" icon={Icon.people} title={t('narrators')} text={t('narratorsDesc')} go={t('narrators')} />
         </div>
       </section>
 
@@ -111,32 +169,6 @@ export default function Home({ collections }) {
           <Link href="/collections/">{t('allCollections')} ({collections.length}) →</Link>
         </div>
         <div className="grid">{featured.map((c) => <CollectionCard key={c.id} c={c} />)}</div>
-      </section>
-
-      <section>
-        <div className="section-head"><h2>{t('explore')}</h2></div>
-        <div className="grid">
-          <Link href="/quran/" className="feature brand">
-            <span className="icon">{Icon.quran}</span>
-            <h3>{t('quran')}</h3>
-            <p>{t('quranDesc')}</p>
-          </Link>
-          <Link href="/duas/" className="feature">
-            <span className="icon">{Icon.hands}</span>
-            <h3>{t('duas')}</h3>
-            <p>{t('duasDesc')}</p>
-          </Link>
-          <Link href="/glossary/" className="feature">
-            <span className="icon">{Icon.glossary}</span>
-            <h3>{t('glossary')}</h3>
-            <p>{t('glossaryDesc')}</p>
-          </Link>
-          <Link href="/narrators/" className="feature">
-            <span className="icon">{Icon.people}</span>
-            <h3>{t('narrators')}</h3>
-            <p>{t('narratorsDesc')}</p>
-          </Link>
-        </div>
       </section>
 
       <section>

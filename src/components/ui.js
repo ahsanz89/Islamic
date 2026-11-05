@@ -1,9 +1,10 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from './Providers';
 import { LANGUAGES, LANG_NAMES } from '@/lib/i18n';
+import { getJSON } from '@/lib/client-data';
 
 /** Translated interface text. */
 export function T({ k, vars }) {
@@ -44,6 +45,8 @@ export const Icon = {
   close: S(<path d="M6 6l12 12M18 6 6 18" />),
   sun: S(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>),
   moon: S(<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" />),
+  arrow: S(<path d="M5 12h14M13 6l6 6-6 6" />, { className: 'flip-rtl' }),
+  enter: S(<><path d="M20 6v6a3 3 0 0 1-3 3H5" /><path d="m9 11-4 4 4 4" /></>),
   logo: (
     <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
       <rect x="1" y="1" width="30" height="30" rx="9" fill="var(--brand)" />
@@ -79,8 +82,18 @@ export function Header() {
   const path = usePathname() || '/';
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [q, setQ] = useState('');
+  const [cmd, setCmd] = useState(false);
   const isHome = path === '/';
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = (e.target?.tagName || '').toLowerCase();
+      const typing = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target?.isContentEditable;
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); setCmd((v) => !v); }
+      else if (e.key === '/' && !typing) { e.preventDefault(); setCmd(true); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   return (
     <>
       <header className="site-header">
@@ -95,18 +108,15 @@ export function Header() {
             ))}
           </nav>
           <div className="tools">
-            {!path.startsWith('/search') && (
-              <form className="header-search" role="search" onSubmit={(e) => { e.preventDefault(); router.push(`/search/?q=${encodeURIComponent(q)}`); }}>
-                {Icon.search}
-                <label htmlFor="hsq" className="sr-only">{t('search')}</label>
-                <input id="hsq" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('search') + '…'} dir="auto" />
-              </form>
-            )}
+            <button className="cmd-trigger" onClick={() => setCmd(true)} aria-label={t('search')} aria-keyshortcuts="Control+K Meta+K /">
+              {Icon.search}<span className="t">{t('search')}…</span><kbd>Ctrl K</kbd>
+            </button>
             <button className="btn ghost icon" aria-label={t('settings')} title={t('settings')} onClick={() => setOpen(true)}>{Icon.settings}</button>
           </div>
         </div>
         {open && <SettingsDrawer onClose={() => setOpen(false)} />}
       </header>
+      {cmd && <CommandPalette onClose={() => setCmd(false)} />}
       <nav className="tabbar" aria-label="Tabs">
         {TABS.map(([p, k, ic]) => (
           <Link key={p} href={p} aria-current={(p === '/' ? isHome : path.startsWith(p)) ? 'page' : undefined}>
@@ -116,6 +126,132 @@ export function Header() {
       </nav>
     </>
   );
+}
+
+/** Ctrl/Cmd+K or "/" : search, jump to any page or surah, switch theme or language. */
+function CommandPalette({ onClose }) {
+  const { t, settings, update } = useApp();
+  const router = useRouter();
+  const [q, setQ] = useState('');
+  const [sel, setSel] = useState(0);
+  const [surahs, setSurahs] = useState([]);
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
+  useEffect(() => { inputRef.current?.focus(); getJSON('q/surahs.json').then((d) => setSurahs(d.surahs || [])).catch(() => {}); }, []);
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  const go = useCallback((href) => { onClose(); router.push(href); }, [onClose, router]);
+  const items = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    const out = [];
+    if (term) out.push({ g: t('search'), label: `${t('searchFor')} “${q.trim()}”`, icon: Icon.search, run: () => go(`/search/?q=${encodeURIComponent(q.trim())}`) });
+    const pages = [['/', 'home', Icon.home], ...NAV.map(([p, k]) => [p, k, null]), ['/search/', 'search', Icon.search], ['/about/', 'about', null]];
+    const seen = new Set();
+    for (const [p, k, ic] of pages) {
+      const label = t(k);
+      if (seen.has(p) || (term && !`${label} ${k}`.toLowerCase().includes(term))) continue;
+      seen.add(p);
+      out.push({ g: t('goTo'), label, icon: ic || Icon.arrow, run: () => go(p) });
+    }
+    if (term) {
+      const sm = surahs.filter((x) => String(x.n) === term || `${x.name} ${x.en} ${x.ar}`.toLowerCase().includes(term)).slice(0, 6);
+      for (const x of sm) out.push({ g: t('quran'), label: `${x.n}. ${x.name}`, sub: `${x.en} · ${x.verses}`, icon: Icon.quran, run: () => go(`/quran/${x.n}/`) });
+    }
+    const acts = [
+      { label: settings.theme === 'dark' ? t('light') : t('dark'), icon: settings.theme === 'dark' ? Icon.sun : Icon.moon, run: () => { update({ theme: settings.theme === 'dark' ? 'light' : 'dark' }); onClose(); } },
+      ...LANGUAGES.map((l) => ({ label: l.native, sub: t('uiLanguage'), icon: Icon.arrow, run: () => { update({ ui: l.code }); onClose(); } }))
+    ].filter((a) => !term || `${a.label} ${a.sub || ''}`.toLowerCase().includes(term));
+    for (const a of acts) out.push({ g: t('actions'), ...a });
+    return out;
+  }, [q, surahs, t, settings.theme, go, update, onClose]);
+
+  useEffect(() => { setSel(0); }, [q]);
+  useEffect(() => { listRef.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' }); }, [sel]);
+
+  const onKey = (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); onClose(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); setSel((i) => Math.min(items.length - 1, i + 1)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setSel((i) => Math.max(0, i - 1)); }
+    else if (e.key === 'Enter') { e.preventDefault(); items[sel]?.run(); }
+  };
+  let lastG = null;
+  return (
+    <div className="cmdk-wrap" onMouseDown={onClose}>
+      <div className="cmdk" role="dialog" aria-modal="true" aria-label={t('search')} onMouseDown={(e) => e.stopPropagation()} onKeyDown={onKey}>
+        <div className="cmdk-input">
+          {Icon.search}
+          <input ref={inputRef} value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('cmdPlaceholder')} dir="auto" role="combobox" aria-expanded="true" aria-controls="cmdk-list" aria-label={t('search')} />
+          <kbd>Esc</kbd>
+        </div>
+        <div className="cmdk-list" id="cmdk-list" role="listbox" ref={listRef}>
+          {items.map((it, i) => {
+            const head = it.g !== lastG ? <div className="cmdk-group" key={`g${i}`}>{it.g}</div> : null;
+            lastG = it.g;
+            return (
+              <div key={i}>
+                {head}
+                <button className="cmdk-item" role="option" aria-selected={i === sel} onMouseEnter={() => setSel(i)} onClick={it.run}>
+                  {it.icon}<span>{it.label}</span>{it.sub && <span className="sub">{it.sub}</span>}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+        <div className="cmdk-foot"><span><kbd>↑</kbd> <kbd>↓</kbd> {t('hintMove')}</span><span><kbd>Enter</kbd> {t('hintOpen')}</span><span><kbd>Esc</kbd> {t('hintClose')}</span></div>
+      </div>
+    </div>
+  );
+}
+
+/** Ambient motion: scroll progress, reveal on scroll, pointer spotlight, page-in. Respects reduced motion via CSS. */
+export function Fx() {
+  const path = usePathname();
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const h = document.documentElement;
+        const max = h.scrollHeight - h.clientHeight;
+        h.style.setProperty('--sp', max > 0 ? Math.min(1, h.scrollTop / max).toFixed(4) : '0');
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const onMove = (e) => {
+      const el = e.target?.closest?.('.spot');
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    };
+    document.addEventListener('pointermove', onMove, { passive: true });
+    return () => { window.removeEventListener('scroll', onScroll); document.removeEventListener('pointermove', onMove); cancelAnimationFrame(raf); };
+  }, []);
+  useEffect(() => {
+    const main = document.getElementById('main');
+    if (main) { main.classList.remove('page-in'); void main.offsetWidth; main.classList.add('page-in'); }
+    if (typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver((entries) => {
+      for (const en of entries) if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+    const scan = () => {
+      document.querySelectorAll('main section, main .hadith, main .colcard, main .result, main .tile, main .feature, main .list, main .card.pad').forEach((el) => {
+        if (el.dataset.rv) return;
+        el.dataset.rv = '1';
+        el.classList.add('rv');
+        io.observe(el);
+      });
+    };
+    scan();
+    const t1 = setTimeout(scan, 350), t2 = setTimeout(scan, 1200);
+    return () => { clearTimeout(t1); clearTimeout(t2); io.disconnect(); };
+  }, [path]);
+  return <div className="scroll-bar" aria-hidden="true" />;
 }
 
 export function LanguageSelect({ id = 'ui-lang' }) {
