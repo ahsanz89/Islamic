@@ -1,4 +1,6 @@
-# Hadith Library
+# Nur-ul-Haq (نور الحق)
+
+Islam according to the Quran and Sunnah: a free, open-source hadith and Quran library.
 
 A free, open-source, ad-free hadith and Quran library. Arabic text with translations in many languages, a multi-language interface (English, اردو, العربية, বাংলা, हिन्दी, Indonesia, Türkçe, Français, Русский, தமிழ்), light and dark themes, and right-to-left layout for Urdu and Arabic.
 

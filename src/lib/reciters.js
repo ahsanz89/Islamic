@@ -4,6 +4,10 @@
 // Word audio: https://audio.qurancdn.com/wbw/<SSS>_<AAA>_<WWW>.mp3 (Quran.com word-by-word recordings).
 export const AUDIO_SOURCES = {
   ayah: (folder, s, v) => `https://everyayah.com/data/${folder}/${String(s).padStart(3, '0')}${String(v).padStart(3, '0')}.mp3`,
+  // Urdu spoken translation (Shamshad Ali Khan), one clip per ayah, hosted by EveryAyah.
+  urdu: (s, v) => `https://everyayah.com/data/translations/urdu_shamshad_ali_khan_46kbps/${String(s).padStart(3, '0')}${String(v).padStart(3, '0')}.mp3`,
+  // Reciters published as one file per surah (no per-ayah files): MP3Quran.
+  surahFile: (slug, s) => `https://cdn.mp3quran.net/download/audio/${slug}/r1/${String(s).padStart(3, '0')}.mp3`,
   word: (s, v, w) => `https://audio.qurancdn.com/wbw/${String(s).padStart(3, '0')}_${String(v).padStart(3, '0')}_${String(w).padStart(3, '0')}.mp3`
 };
 
@@ -19,6 +23,7 @@ export const RECITERS = [
   { id: 'rifai', folder: 'Hani_Rifai_192kbps', name: { en: 'Hani Ar-Rifai', ar: 'هاني الرفاعي', ur: 'ہانی الرفاعی' } },
   { id: 'dosari', folder: 'Yasser_Ad-Dussary_128kbps', name: { en: 'Yasser Al-Dosari', ar: 'ياسر الدوسري', ur: 'یاسر الدوسری' } }
 ];
+RECITERS.splice(1, 0, { id: 'badr', type: 'surah', slug: 'badr-turki', name: { en: 'Badr Al-Turki', ar: 'بدر التركي', ur: 'بدر الترکی' } });
 export const DEFAULT_RECITER = 'alafasy';
 export const reciterById = (id) => RECITERS.find((r) => r.id === id) || RECITERS[0];
 export const reciterName = (r, lang) => r.name[lang] || r.name.en;

@@ -4,8 +4,8 @@ import { AudioBridge, AudioPlayer } from '@/components/AudioPlayer';
 import { BackToTop, Footer, Fx, Header } from '@/components/ui';
 
 export const metadata = {
-  title: { default: 'Hadith Library', template: '%s · Hadith Library' },
-  description: 'Free, open-source hadith and Quran library: Arabic with translations in Urdu, English, Bengali, Indonesian, Turkish and more.'
+  title: { default: 'Nur-ul-Haq · Islam according to the Quran and Sunnah', template: '%s · Nur-ul-Haq' },
+  description: 'Nur-ul-Haq (نور الحق): Islam according to the Quran and Sunnah. A free, open-source hadith and Quran library: Arabic with translations in Urdu, English, Bengali, Indonesian, Turkish and more.'
 };
 
 export const viewport = { width: 'device-width', initialScale: 1 };

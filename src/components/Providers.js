@@ -4,6 +4,7 @@ import { isRTL, translate } from '@/lib/i18n';
 
 const DEFAULTS = {
   ui: 'en',
+  urduAudio: false,
   theme: 'system',
   harakat: true,
   arSize: 30,

@@ -742,3 +742,83 @@ body:has(.aplayer) main { padding-bottom: 130px; }
 .listen-bar .reciter-select { flex: 1 1 240px; max-width: 420px; }
 .reciter-select.compact { flex: 0 1 auto; }
 @media (max-width: 860px) { .ap-extra .ap-btn.hide-sm { display: none; } }
+
+/* ---------- Prayer book (readable on the page) ---------- */
+.nb-title { font-family: var(--font-ur, 'Noto Nastaliq Urdu', serif); line-height: 1.9; }
+.nb-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; position: sticky; top: 74px; z-index: 20; padding: 8px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-radius: 16px; max-height: 30vh; overflow: auto; }
+.nb { font-family: 'Noto Nastaliq Urdu', Amiri, serif; font-size: 18px; line-height: 2.5; color: var(--ink); }
+.nb p { margin: 6px 0; }
+.nb h2 { scroll-margin-top: 150px; font-size: 24px; line-height: 2.1; color: var(--brand); border-bottom: 2px solid var(--gold); margin: 34px 0 12px; padding-bottom: 4px; }
+.nb .ar { font-family: Amiri, 'Amiri Quran', serif; direction: rtl; text-align: center; font-size: 30px !important; line-height: 2.1; margin: 4px 0; color: var(--ink); }
+.nb .sal { font-family: Amiri, serif; font-size: 1.2em; line-height: 1; padding: 0 .08em; }
+.nb .card { margin: 0 0 16px; border: 1px solid var(--line, var(--border)); border-radius: 20px; background: var(--surface); overflow: hidden; }
+.nb .hd { display: flex; align-items: center; gap: 12px; padding: 6px 16px; background: var(--brand); color: var(--brand-ink); }
+.nb .hd .no { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--gold-soft); color: var(--gold); font-family: Amiri, serif; font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.nb .hd .t { font-size: 20px; font-weight: 600; line-height: 2.1; }
+.nb .bd { padding: 8px 18px 14px; }
+.nb .how { font-size: 18px; }
+.nb .dua { margin: 10px 0; padding: 8px 16px; background: var(--brand-soft); border-inline-start: 4px solid var(--brand); border-radius: 14px; }
+.nb .lb { font-size: 15px; font-weight: 700; color: var(--gold); }
+.nb .tr { font-size: 17px; line-height: 2.4; }
+.nb .ref { font-size: 14px; color: var(--muted); line-height: 2.1; }
+.nb .box { border: 1.5px solid var(--gold); border-radius: 16px; padding: 8px 18px; margin: 12px 0 18px; background: var(--gold-soft); font-size: 17px !important; }
+.nb .box b { color: var(--gold); }
+.nb table { width: 100%; border-collapse: collapse; font-size: 17px !important; margin: 10px 0; }
+.nb th, .nb td { border: 1px solid var(--line, var(--border)); padding: 2px 8px; text-align: center; }
+.nb th { background: var(--brand); color: var(--brand-ink); }
+.nb .verse { display: flex; gap: 10px; align-items: baseline; border-bottom: 1px dotted var(--line, var(--border)); padding: 2px 0; }
+.nb .verse .ar { flex: 1; text-align: right; font-size: 28px !important; }
+.nb .vn { font-family: Amiri, serif; font-size: 14px; color: var(--gold); direction: ltr; }
+.nb .vu { font-size: 15px; line-height: 2.2; text-align: right; }
+.nb [style*='font-size:13pt'] { font-size: 17px !important; }
+@media (max-width: 640px) { .nb { font-size: 17px; } .nb .ar { font-size: 26px !important; } .nb-toc { top: 66px; } }
+
+/* ---------- Nur-ul-Haq brand + redesigned navigation ---------- */
+.site-header { top: calc(env(safe-area-inset-top, 0px) + 8px); }
+.site-header .bar { border-radius: 24px; min-height: 68px; padding: 8px 12px 8px 14px; gap: 18px; border-top: 3px solid var(--gold); }
+html[dir='rtl'] .site-header .bar { padding: 8px 14px 8px 12px; }
+.brand { gap: 12px; }
+.brand svg { flex: none; border-radius: 12px; box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 35%, transparent); }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.brand-name { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; font-size: 22px; letter-spacing: -0.01em; color: var(--brand); }
+.brand-sub { font-size: 12.5px; font-weight: 600; letter-spacing: .04em; color: var(--gold); display: flex; gap: 6px; align-items: center; }
+.brand-sub i { font-style: normal; opacity: .6; }
+.nav { gap: 4px; }
+.nav > a, .nav-more-btn { position: relative; padding: 10px 14px; border-radius: 12px; color: var(--muted); font-weight: 600; font-size: 16px; background: none; border: 0; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; transition: color .2s, background .2s; }
+.nav > a:hover, .nav-more-btn:hover { color: var(--ink); background: var(--surface-3); }
+.nav > a[aria-current='page'], .nav-more-btn[aria-current='page'] { color: var(--brand); background: var(--brand-soft); }
+.nav > a[aria-current='page']::after, .nav-more-btn[aria-current='page']::after { content: ''; position: absolute; inset-inline: 30%; bottom: 3px; height: 3px; border-radius: 3px; background: var(--gold); }
+.nav-more { position: relative; }
+.nav-menu { position: absolute; inset-inline-start: 0; top: calc(100% + 10px); min-width: 190px; padding: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-lg); display: grid; z-index: 70; }
+.nav-menu a { padding: 10px 14px; border-radius: 10px; color: var(--ink); font-weight: 600; font-size: 15.5px; }
+.nav-menu a:hover { background: var(--surface-3); }
+.nav-menu a[aria-current='page'] { background: var(--brand-soft); color: var(--brand); }
+@media (max-width: 900px) { .nav { display: none; } }
+@media (max-width: 520px) { .brand-sub { display: none; } .brand-name { font-size: 20px; } .site-header .bar { min-height: 60px; } }
+
+/* ---------- Surah header ---------- */
+.surah-hero { margin: 8px 0 18px; }
+.sh-frame {
+  position: relative; text-align: center; padding: 34px 22px 20px; border-radius: 28px; overflow: hidden;
+  border: 2px solid var(--gold); outline: 1px solid var(--gold); outline-offset: -8px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--gold) 14%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--brand-soft), var(--surface));
+}
+.sh-num { position: absolute; top: 14px; inset-inline-start: 50%; transform: translateX(-50%); width: 46px; height: 46px; display: grid; place-items: center; font-weight: 800; font-size: 18px; color: var(--brand-ink); background: var(--brand); clip-path: polygon(50% 0, 62% 14%, 80% 8%, 86% 26%, 100% 32%, 92% 50%, 100% 68%, 86% 74%, 80% 92%, 62% 86%, 50% 100%, 38% 86%, 20% 92%, 14% 74%, 0 68%, 8% 50%, 0 32%, 14% 26%, 20% 8%, 38% 14%); }
+.sh-ar { font-size: clamp(40px, 8vw, 64px); line-height: 1.7; margin: 26px 0 0; color: var(--ink); }
+.sh-name { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(24px, 4vw, 32px); color: var(--brand); }
+.sh-en { margin: 2px 0 12px; color: var(--muted); font-size: 17px; }
+.sh-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.sh-facts li { padding: 3px 14px; border-radius: 999px; background: var(--gold-soft); color: var(--gold); font-weight: 700; font-size: 14px; }
+.sh-orn { position: absolute; top: 50%; width: 120px; height: 120px; margin-top: -60px; opacity: .22; background: conic-gradient(from 0deg, var(--gold) 0 12.5%, transparent 0 25%, var(--gold) 0 37.5%, transparent 0 50%, var(--gold) 0 62.5%, transparent 0 75%, var(--gold) 0 87.5%, transparent 0); border-radius: 50%; -webkit-mask: radial-gradient(circle, transparent 38%, #000 39% 41%, transparent 42% 56%, #000 57% 59%, transparent 60%); mask: radial-gradient(circle, transparent 38%, #000 39% 41%, transparent 42% 56%, #000 57% 59%, transparent 60%); }
+.sh-orn.l { inset-inline-start: -30px; } .sh-orn.r { inset-inline-end: -30px; }
+@media (max-width: 640px) { .sh-orn { display: none; } .sh-frame { padding: 30px 14px 16px; } }
+.surah-hero .listen-bar { margin-top: 14px; }
+.whole-note { margin: 8px 0 0; }
+.bismillah { text-align: center; font-size: 34px; margin: 6px 0 16px; padding: 10px; border-block: 1px solid var(--gold); color: var(--ink); }
+.tr-block.speaking { background: var(--brand-soft); border-radius: 14px; box-shadow: 0 0 0 2px var(--brand); transition: background .2s; }
+.sh-ar { text-align: center; display: block; }
+.sh-name { margin-bottom: 12px; }
+.sh-en { margin-bottom: 12px; }
+.sh-orn { display: none; }

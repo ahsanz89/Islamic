@@ -13,10 +13,11 @@ export const state = {
   err: '',
   time: 0,
   dur: 0,
+  phase: '',          // '' = recitation, 'urdu' = spoken Urdu translation of the current ayah
   word: { key: '', status: '' }, // status: loading | playing | fallback | error
   toast: ''
 };
-const cfg = { reciter: 'alafasy', repeat: false, continuous: true, bismillah: true, volume: 0.9, wordAudio: true, wordHover: false };
+const cfg = { reciter: 'alafasy', repeat: false, continuous: true, bismillah: true, volume: 0.9, wordAudio: true, wordHover: false, urdu: false };
 
 const subs = new Set();
 const tsubs = new Set();
@@ -64,19 +65,28 @@ function ensureEl() {
   ayahEl.addEventListener('error', () => {
     if (!state.q) return;
     const off = typeof navigator !== 'undefined' && navigator.onLine === false;
+    // a missing Urdu clip never blocks the recitation: skip it and carry on
+    if (state.phase === 'urdu' && !off) { toast('urdu-unavailable'); state.phase = ''; advance(); return; }
     set({ status: 'error', err: off ? 'offline' : 'unavailable' });
   });
   window.addEventListener('online', () => { if (state.status === 'error' && state.q) retry(); });
 }
 
-export const verseUrl = (reciterId, s, v) => AUDIO_SOURCES.ayah(reciterById(reciterId).folder, v === 0 ? 1 : s, v === 0 ? 1 : v);
+export const isWhole = (reciterId) => reciterById(reciterId).type === 'surah';
+export const verseUrl = (reciterId, s, v) => {
+  const r = reciterById(reciterId);
+  if (r.type === 'surah') return AUDIO_SOURCES.surahFile(r.slug, s);
+  return AUDIO_SOURCES.ayah(r.folder, v === 0 ? 1 : s, v === 0 ? 1 : v);
+};
 
 function load(surah, v, mode, autoplay = true) {
+  if (v < 0) v = 1;
   ensureEl();
   stopWord();
-  state.q = { surah, v, mode };
+  const whole = isWhole(cfg.reciter);
+  state.q = { surah, v: whole ? -1 : v, mode: whole ? 'surah' : mode, whole };
   state.time = 0; state.dur = 0; emitTime();
-  set({ status: 'loading', err: '' });
+  set({ status: 'loading', err: '', phase: '' });
   ayahEl.src = verseUrl(cfg.reciter, surah.n, v);
   ayahEl.volume = cfg.volume;
   if (autoplay) {
@@ -87,24 +97,47 @@ function load(surah, v, mode, autoplay = true) {
   mediaSession();
 }
 
-function prefetchNext() {
-  const q = state.q;
-  if (!q || q.mode !== 'surah' || !isBrowser) return;
-  const nv = q.v < q.surah.verses ? q.v + 1 : 0;
-  if (!nv) return;
+function prefetch(url) {
+  if (!isBrowser) return;
   prefetchEl = prefetchEl || new Audio();
   prefetchEl.preload = 'auto';
-  prefetchEl.src = verseUrl(cfg.reciter, q.surah.n, nv);
+  prefetchEl.src = url;
+}
+function prefetchNext() {
+  const q = state.q;
+  if (!q || q.whole || !isBrowser) return;
+  if (cfg.urdu && q.v >= 1) { prefetch(AUDIO_SOURCES.urdu(q.surah.n, q.v)); return; }
+  if (q.mode !== 'surah') return;
+  if (q.v < q.surah.verses) prefetch(verseUrl(cfg.reciter, q.surah.n, q.v + 1));
+}
+
+/** After the recitation (and the Urdu clip, if any): repeat, move to the next ayah, or finish. */
+function advance() {
+  const q = state.q;
+  if (!q) return;
+  if (cfg.repeat && !q.whole) { load(q.surah, q.v, q.mode); return; }
+  if (cfg.repeat && q.whole) { ayahEl.currentTime = 0; ayahEl.play().catch(() => {}); return; }
+  if (!q.whole && q.mode === 'surah' && cfg.continuous) {
+    if (q.v < q.surah.verses) { load(q.surah, q.v + 1, 'surah'); return; }
+  }
+  set({ status: 'ended', phase: '' });
 }
 
 function onEnded() {
   const q = state.q;
   if (!q) return;
-  if (cfg.repeat) { ayahEl.currentTime = 0; ayahEl.play().catch(() => {}); return; }
-  if (q.mode === 'surah' && cfg.continuous) {
-    if (q.v < q.surah.verses) { load(q.surah, q.v + 1, 'surah'); return; }
+  if (cfg.urdu && !q.whole && q.v >= 1 && state.phase !== 'urdu') {
+    // the spoken Urdu translation follows each ayah
+    state.phase = 'urdu';
+    state.time = 0; state.dur = 0; emitTime();
+    set({ status: 'loading', phase: 'urdu' });
+    ayahEl.src = AUDIO_SOURCES.urdu(q.surah.n, q.v);
+    ayahEl.play().catch(() => {});
+    if (q.mode === 'surah' && q.v < q.surah.verses) prefetch(verseUrl(cfg.reciter, q.surah.n, q.v + 1));
+    return;
   }
-  set({ status: 'ended' });
+  state.phase = '';
+  advance();
 }
 
 /** Play one ayah. `surah` = { n, name, ar, verses }. */
@@ -125,22 +158,26 @@ export function toggle() { if (state.status === 'playing' || state.status === 'l
 export function stop() {
   if (ayahEl) { ayahEl.pause(); ayahEl.removeAttribute('src'); ayahEl.load(); }
   state.q = null; state.time = 0; state.dur = 0; emitTime();
-  set({ status: 'idle', err: '' });
+  set({ status: 'idle', err: '', phase: '' });
 }
-export function replay() { if (ayahEl && state.q) { ayahEl.currentTime = 0; ayahEl.play().catch(() => {}); } }
+export function replay() {
+  if (!ayahEl || !state.q) return;
+  if (state.phase === 'urdu') { load(state.q.surah, state.q.v, state.q.mode); return; }
+  ayahEl.currentTime = 0; ayahEl.play().catch(() => {});
+}
 export function next() {
-  const q = state.q; if (!q) return;
+  const q = state.q; if (!q || q.whole) return;
   if (q.v < q.surah.verses) load(q.surah, q.v + 1, q.mode);
 }
 export function prev() {
   const q = state.q; if (!q) return;
-  if (ayahEl && ayahEl.currentTime > 3) { replay(); return; }
+  if (q.whole || (ayahEl && ayahEl.currentTime > 3)) { replay(); return; }
   const pv = q.v - 1;
   if (pv >= 1 || (pv === 0 && q.mode === 'surah' && cfg.bismillah && q.surah.n !== 1 && q.surah.n !== 9)) load(q.surah, pv, q.mode);
   else replay();
 }
 export function seek(t) { if (ayahEl && state.q && Number.isFinite(t)) { ayahEl.currentTime = Math.max(0, Math.min(t, state.dur || t)); state.time = ayahEl.currentTime; emitTime(); } }
-export function retry() { if (state.q) load(state.q.surah, state.q.v, state.q.mode); }
+export function retry() { if (state.q) load(state.q.surah, Math.max(state.q.v, 1), state.q.mode); }
 
 /** Keep the engine in sync with the saved settings (called from React). */
 export function configure(next) {
@@ -219,7 +256,7 @@ function mediaSession() {
   if (!isBrowser || !('mediaSession' in navigator) || !state.q) return;
   try {
     const { surah, v } = state.q;
-    navigator.mediaSession.metadata = new MediaMetadata({ title: `${surah.name} · ${v === 0 ? 'Bismillah' : v}`, artist: reciterById(cfg.reciter).name.en, album: 'Quran' });
+    navigator.mediaSession.metadata = new MediaMetadata({ title: `${surah.name}${v > 0 ? ` · ${v}` : v === 0 ? ' · Bismillah' : ''}`, artist: reciterById(cfg.reciter).name.en, album: 'Quran' });
     navigator.mediaSession.setActionHandler('play', resume);
     navigator.mediaSession.setActionHandler('pause', pause);
     navigator.mediaSession.setActionHandler('nexttrack', next);

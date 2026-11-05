@@ -23,3 +23,19 @@ Edit `src/lib/reciters.js` and add one object (`id`, `folder` from <https://ever
 
 - Word audio matches words by position. 58 verses whose word count differs from the recordings keep plain text without word controls (`na: true` in `public/data/q/*.json`, set by `scripts/build-data.mjs`).
 - If a word recording fails to load, the browser's Arabic voice is used when one is installed; otherwise a short message is shown. That voice is synthetic and only a fallback.
+
+
+## Badr Al-Turki (full-surah reciter)
+
+Badr Al-Turki is not on EveryAyah, so he is played from MP3Quran as one file per surah
+(`https://cdn.mp3quran.net/download/audio/badr-turki/r1/NNN.mp3`). Without per-ayah files the
+whole surah plays; the ayah buttons start it from the beginning, next/previous are disabled and a
+note says so. Reciters of this kind are declared with `type: 'surah'` and a `slug` in `src/lib/reciters.js`.
+The files could not be fetched from the build sandbox, so please play one surah after deploying.
+
+## Urdu translation audio
+
+With "Urdu translation audio" on, the spoken Urdu translation (Shamshad Ali Khan, EveryAyah folder
+`translations/urdu_shamshad_ali_khan_46kbps`) plays after each ayah, and the Urdu text is shown and
+highlighted while it speaks. A missing clip is skipped so the recitation never stops. The Bismillah
+line has no Urdu clip.

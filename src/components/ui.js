@@ -49,26 +49,72 @@ export const Icon = {
   arrow: S(<path d="M5 12h14M13 6l6 6-6 6" />, { className: 'flip-rtl' }),
   enter: S(<><path d="M20 6v6a3 3 0 0 1-3 3H5" /><path d="m9 11-4 4 4 4" /></>),
   logo: (
-    <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="1" y="1" width="30" height="30" rx="9" fill="var(--brand)" />
-      <g fill="none" stroke="var(--brand-ink)" strokeWidth="1.6">
-        <rect x="10" y="10" width="12" height="12" rx="1" />
-        <rect x="10" y="10" width="12" height="12" rx="1" transform="rotate(45 16 16)" />
-      </g>
-      <circle cx="16" cy="16" r="2.2" fill="var(--gold-soft)" />
-    </svg>
+    <svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#0f7a5e"/><stop offset="1" stopColor="#06402f"/></linearGradient>
+    <linearGradient id="lg-n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#f6d77a"/><stop offset="1" stopColor="#c8922a"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#lg-g)"/>
+  <g transform="translate(32 19)" fill="url(#lg-n)"><polygon points="0.00,-9.50 1.76,-4.25 6.72,-6.72 4.25,-1.76 9.50,0.00 4.25,1.76 6.72,6.72 1.76,4.25 0.00,9.50 -1.76,4.25 -6.72,6.72 -4.25,1.76 -9.50,0.00 -4.25,-1.76 -6.72,-6.72 -1.76,-4.25"/></g>
+  <circle cx="32" cy="19" r="2.4" fill="#06402f"/>
+  <g stroke="#f6d77a" strokeWidth="1.6" strokeLinecap="round" opacity=".75">
+    <path d="M32 6.2v-2.4M20.6 9.4l-1.6-1.8M43.4 9.4l1.6-1.8"/>
+  </g>
+  <path d="M32 50.5C25 45.6 17 45 9.5 47V28.5C17 26.6 25 27.4 32 32.4Z" fill="#fdf8ea"/>
+  <path d="M32 50.5C39 45.6 47 45 54.5 47V28.5C47 26.6 39 27.4 32 32.4Z" fill="#e9dfc2"/>
+  <path d="M32 32.4V50.5" stroke="#0a5c48" strokeWidth="1.4"/>
+  <path d="M13.5 33.2c5-.9 10 .1 14.5 3M13.5 38c5-.9 10 .1 14.5 3M50.5 33.2c-5-.9-10 .1-14.5 3M50.5 38c-5-.9-10 .1-14.5 3" stroke="#0a5c48" strokeWidth="1" strokeLinecap="round" fill="none" opacity=".55"/>
+</svg>
   )
 };
 
-const NAV = [
-  ['/collections/', 'collections'],
+// Main navigation: the four things people come for, then a "More" menu.
+const NAV_MAIN = [
   ['/quran/', 'quran'],
+  ['/collections/', 'collections'],
   ['/duas/', 'duas'],
-  ['/namaz/', 'namaz'],
+  ['/namaz/', 'namaz']
+];
+const NAV_MORE = [
   ['/narrators/', 'narrators'],
   ['/glossary/', 'glossary'],
-  ['/bookmarks/', 'bookmarks']
+  ['/bookmarks/', 'bookmarks'],
+  ['/about/', 'about']
 ];
+const NAV = [...NAV_MAIN, ...NAV_MORE.slice(0, 3)];
+const MORE = { en: 'More', ur: 'مزید', ar: 'المزيد' };
+const SLOGAN = { en: 'Quran & Sunnah', ur: 'قرآن و سنت', ar: 'القرآن والسنة' };
+
+function MoreMenu({ path }) {
+  const { t, settings } = useApp();
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const off = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('pointerdown', off);
+    document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('pointerdown', off); document.removeEventListener('keydown', esc); };
+  }, [open]);
+  useEffect(() => { setOpen(false); }, [path]);
+  const active = NAV_MORE.some(([p]) => path.startsWith(p));
+  return (
+    <div className="nav-more" ref={ref}>
+      <button type="button" className="nav-more-btn" aria-haspopup="menu" aria-expanded={open} aria-current={active ? 'page' : undefined} onClick={() => setOpen(!open)}>
+        {MORE[settings.ui] || MORE.en}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      {open && (
+        <div className="nav-menu" role="menu">
+          {NAV_MORE.map(([p, k]) => (
+            <Link key={p} href={p} role="menuitem" aria-current={path.startsWith(p) ? 'page' : undefined}>{t(k)}</Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const TABS = [
   ['/', 'home', 'home'],
@@ -79,7 +125,7 @@ const TABS = [
 ];
 
 export function Header() {
-  const { t } = useApp();
+  const { t, settings } = useApp();
   const path = usePathname() || '/';
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -102,11 +148,18 @@ export function Header() {
           {!isHome && (
             <button className="btn ghost icon" aria-label={t('back')} title={t('back')} onClick={() => router.back()}>{Icon.back}</button>
           )}
-          <Link href="/" className="brand">{Icon.logo}<span>{t('appName')}</span></Link>
+          <Link href="/" className="brand" aria-label="Nur-ul-Haq">
+            {Icon.logo}
+            <span className="brand-text">
+              <span className="brand-name">Nur-ul-Haq</span>
+              <span className="brand-sub" lang="ar">نور الحق <i aria-hidden="true">·</i> <span lang={settings.ui}>{SLOGAN[settings.ui] || SLOGAN.en}</span></span>
+            </span>
+          </Link>
           <nav className="nav" aria-label="Main">
-            {NAV.map(([p, k]) => (
+            {NAV_MAIN.map(([p, k]) => (
               <Link key={p} href={p} aria-current={path.startsWith(p) ? 'page' : undefined}>{t(k)}</Link>
             ))}
+            <MoreMenu path={path} />
           </nav>
           <div className="tools">
             <button className="cmd-trigger" onClick={() => setCmd(true)} aria-label={t('search')} aria-keyshortcuts="Control+K Meta+K /">

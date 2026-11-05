@@ -6,13 +6,14 @@ import { BookmarkButton, CopyButton, Icon, ReadingBar } from '@/components/ui';
 import { getJSON } from '@/lib/client-data';
 import { stripDiacritics } from '@/lib/arabic.mjs';
 import { LANG_NAMES } from '@/lib/i18n';
-import { AyahPlayButton, PlaySurahButton, QuranWord, ReciterSelect } from '@/components/AudioPlayer';
+import { AyahPlayButton, PlaySurahButton, QuranWord, ReciterSelect, UrduAudioToggle, WholeNote } from '@/components/AudioPlayer';
 import { useAudioState } from '@/lib/audio-engine';
 
 /** One verse. Re-renders only when its own playback state, text options or translations change. */
 const Verse = memo(function Verse({ v, surah, keys, translators, wbw, harakat, wordAudio }) {
   const key = `${surah.n}:${v.v}`;
   const status = useAudioState((x) => (x.q && x.q.surah.n === surah.n && x.q.v === v.v ? x.status : ''));
+  const urduNow = useAudioState((x) => (x.q && x.q.surah.n === surah.n && x.q.v === v.v && x.phase === 'urdu'));
   const surahMode = useAudioState((x) => !!(x.q && x.q.mode === 'surah'));
   const ref = useRef(null);
   const show = (t) => (harakat ? t : stripDiacritics(t));
@@ -61,7 +62,7 @@ const Verse = memo(function Verse({ v, surah, keys, translators, wbw, harakat, w
         )}
         {v.tl && <p className="muted small" style={{ margin: 0, fontStyle: 'italic' }}>{v.tl}</p>}
         {keys.map((k) => (
-          <div key={k} className="tr-block" lang={k.slice(0, 2)} dir={k.startsWith('ur') ? 'rtl' : 'ltr'}>
+          <div key={k} className={`tr-block ${urduNow && k.startsWith('ur') ? 'speaking' : ''}`} lang={k.slice(0, 2)} dir={k.startsWith('ur') ? 'rtl' : 'ltr'}>
             <div className="tr-label">{LANG_NAMES[k.slice(0, 2)]} · {translators[k]}</div>
             <p className={`tr-text ${k.startsWith('ur') ? 'tr-ur' : ''}`}>{v.t[k]}</p>
           </div>
@@ -87,27 +88,35 @@ export default function SurahReader({ surah, translators, prev, next }) {
     if (translators[l]) keys.push(l);
     if (second && translators[l + '2']) keys.push(l + '2');
   }
+  // while the Urdu audio is on, the Urdu text is always shown so it can be followed
+  if (settings.urduAudio && translators.ur && !keys.includes('ur')) keys.push('ur');
   const keysKey = keys.join('|');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const keysStable = useMemo(() => keys, [keysKey]);
 
   return (
     <div className="container narrow">
-      <div className="page-head">
+      <header className="surah-hero">
         <nav className="breadcrumb"><Link href="/quran/">{t('quran')}</Link><span>/</span></nav>
-        <div className="row" style={{ alignItems: 'center', gap: 16 }}>
-          <div style={{ flex: '1 1 260px' }}>
-            <p className="eyebrow">{t('surah')} {surah.n}</p>
-            <h1>{surah.name}</h1>
-            <p className="muted" style={{ margin: 0 }}>{surah.en} · {surah.verses} {t('verses')} · {surah.place === 'Mecca' ? t('meccan') : t('medinan')}</p>
-          </div>
-          <span className="quran-ar" style={{ fontSize: 40, color: 'var(--brand)', lineHeight: 1.5 }}>{surah.ar}</span>
+        <div className="sh-frame">
+          <span className="sh-num" aria-label={`${t('surah')} ${surah.n}`}>{surah.n}</span>
+          <p className="sh-ar quran-ar" lang="ar">{surah.ar}</p>
+          <h1 className="sh-name">{surah.name}</h1>
+          {surah.en !== surah.name && <p className="sh-en">{surah.en}</p>}
+          <ul className="sh-facts">
+            <li>{surah.place === 'Mecca' ? t('meccan') : t('medinan')}</li>
+            <li>{surah.verses} {t('verses')}</li>
+            {verses && <li>Juz {verses[0].juz}{verses[verses.length - 1].juz !== verses[0].juz ? `–${verses[verses.length - 1].juz}` : ''}</li>}
+            {verses && <li>p. {verses[0].page}</li>}
+          </ul>
         </div>
         <div className="listen-bar">
           <PlaySurahButton surah={surah} />
           <ReciterSelect id="surah-reciter" />
+          <UrduAudioToggle />
         </div>
-      </div>
+        <WholeNote />
+      </header>
       <ReadingBar
         choices={Object.keys(translators).filter((k) => !k.endsWith('2'))}
         extra={<>
@@ -117,7 +126,7 @@ export default function SurahReader({ surah, translators, prev, next }) {
           <Link className="btn small ghost" href="/quran/roots/">{t('roots')}</Link>
         </>}
       />
-      {surah.n !== 1 && surah.n !== 9 && <p className="quran-ar" style={{ textAlign: 'center' }}>بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ</p>}
+      {surah.n !== 1 && surah.n !== 9 && <p className="quran-ar bismillah" lang="ar">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ</p>}
       {!verses ? <div className="empty">{t('loading')}</div> : (
         <div className="stack" style={{ gap: 14 }}>
           {verses.map((v) => (

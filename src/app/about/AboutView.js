@@ -7,7 +7,7 @@ export default function AboutView({ collections, translators }) {
     <div className="container narrow">
       <div className="page-head">
         <h1>About &amp; sources</h1>
-        <p className="muted">Hadith Library is a free, open-source project with no ads. The code is MIT licensed. Each dataset keeps its own licence, listed below.</p>
+        <p className="muted">Nur-ul-Haq is a free, open-source project with no ads. The code is MIT licensed. Each dataset keeps its own licence, listed below.</p>
       </div>
 
       <section>
