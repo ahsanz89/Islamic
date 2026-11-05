@@ -60,6 +60,7 @@ const NAV = [
   ['/collections/', 'collections'],
   ['/quran/', 'quran'],
   ['/duas/', 'duas'],
+  ['/namaz/', 'namaz'],
   ['/narrators/', 'narrators'],
   ['/glossary/', 'glossary'],
   ['/bookmarks/', 'bookmarks']
