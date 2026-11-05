@@ -1,11 +1,75 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '@/components/Providers';
 import { BookmarkButton, CopyButton, Icon, ReadingBar } from '@/components/ui';
 import { getJSON } from '@/lib/client-data';
 import { stripDiacritics } from '@/lib/arabic.mjs';
 import { LANG_NAMES } from '@/lib/i18n';
+import { AyahPlayButton, PlaySurahButton, QuranWord, ReciterSelect } from '@/components/AudioPlayer';
+import { useAudioState } from '@/lib/audio-engine';
+
+/** One verse. Re-renders only when its own playback state, text options or translations change. */
+const Verse = memo(function Verse({ v, surah, keys, translators, wbw, harakat, wordAudio }) {
+  const key = `${surah.n}:${v.v}`;
+  const status = useAudioState((x) => (x.q && x.q.surah.n === surah.n && x.q.v === v.v ? x.status : ''));
+  const surahMode = useAudioState((x) => !!(x.q && x.q.mode === 'surah'));
+  const ref = useRef(null);
+  const show = (t) => (harakat ? t : stripDiacritics(t));
+  const words = wordAudio && !v.na; // verses whose word count disagrees with the recordings keep plain text
+
+  // while a whole surah plays, keep the current ayah in view
+  useEffect(() => {
+    if (status !== 'playing' || !surahMode || !ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    if (r.top < 90 || r.bottom > window.innerHeight - 150) {
+      ref.current.scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }
+  }, [status, surahMode]);
+
+  return (
+    <article ref={ref} id={`v${v.v}`} className={`hadith ${status ? 'is-playing' : ''} ${status === 'paused' ? 'is-paused' : ''}`}>
+      <div className="hadith-head">
+        <AyahPlayButton surah={surah} v={v.v} />
+        <span className="num">{key}</span>
+        <span className="muted small">Juz {v.juz} · p. {v.page}</span>
+        <span className="spacer" />
+        <BookmarkButton small iconOnly item={{ key: `q:${key}`, type: 'ayah', s: surah.n, v: v.v, title: `${surah.name} ${key}`, preview: v.t.en?.slice(0, 160) }} />
+        <CopyButton small iconOnly text={`${v.ar}\n\n${keys.map((k) => v.t[k]).join('\n\n')}\n\n— ${surah.name} ${key}`} />
+      </div>
+      <div className="hadith-body">
+        {wbw ? (
+          <div className="wbw">
+            {v.w.map((w, i) => (
+              <div className="word" key={i}>
+                {wordAudio && !v.na
+                  ? <span className="wa"><QuranWord s={surah.n} v={v.v} pos={i + 1} text={show(w.a)} /></span>
+                  : <span className="wa" lang="ar">{show(w.a)}</span>}
+                {w.tl && <span className="wt">{w.tl}</span>}
+                {w.en && <span className="we">{w.en}</span>}
+                {w.r && <Link className="wr" href={`/quran/roots/?r=${encodeURIComponent(w.r)}`}>{w.r}</Link>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="quran-ar" lang="ar" style={{ margin: 0 }}>
+            {words
+              ? v.w.map((w, i) => <span key={i}><QuranWord s={surah.n} v={v.v} pos={i + 1} text={show(w.a)} />{' '}</span>)
+              : show(v.ar)}{' '}
+            <span style={{ color: 'var(--gold)' }}>﴿{v.v.toLocaleString('ar-EG')}﴾</span>
+          </p>
+        )}
+        {v.tl && <p className="muted small" style={{ margin: 0, fontStyle: 'italic' }}>{v.tl}</p>}
+        {keys.map((k) => (
+          <div key={k} className="tr-block" lang={k.slice(0, 2)} dir={k.startsWith('ur') ? 'rtl' : 'ltr'}>
+            <div className="tr-label">{LANG_NAMES[k.slice(0, 2)]} · {translators[k]}</div>
+            <p className={`tr-text ${k.startsWith('ur') ? 'tr-ur' : ''}`}>{v.t[k]}</p>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+});
 
 export default function SurahReader({ surah, translators, prev, next }) {
   const { t, settings, setLastRead } = useApp();
@@ -23,7 +87,9 @@ export default function SurahReader({ surah, translators, prev, next }) {
     if (translators[l]) keys.push(l);
     if (second && translators[l + '2']) keys.push(l + '2');
   }
-  const show = (s) => (settings.harakat ? s : stripDiacritics(s));
+  const keysKey = keys.join('|');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const keysStable = useMemo(() => keys, [keysKey]);
 
   return (
     <div className="container narrow">
@@ -36,6 +102,10 @@ export default function SurahReader({ surah, translators, prev, next }) {
             <p className="muted" style={{ margin: 0 }}>{surah.en} · {surah.verses} {t('verses')} · {surah.place === 'Mecca' ? t('meccan') : t('medinan')}</p>
           </div>
           <span className="quran-ar" style={{ fontSize: 40, color: 'var(--brand)', lineHeight: 1.5 }}>{surah.ar}</span>
+        </div>
+        <div className="listen-bar">
+          <PlaySurahButton surah={surah} />
+          <ReciterSelect id="surah-reciter" />
         </div>
       </div>
       <ReadingBar
@@ -50,41 +120,9 @@ export default function SurahReader({ surah, translators, prev, next }) {
       {surah.n !== 1 && surah.n !== 9 && <p className="quran-ar" style={{ textAlign: 'center' }}>بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ</p>}
       {!verses ? <div className="empty">{t('loading')}</div> : (
         <div className="stack" style={{ gap: 14 }}>
-          {verses.map((v) => {
-            const key = `${surah.n}:${v.v}`;
-            return (
-              <article key={v.v} id={`v${v.v}`} className="hadith">
-                <div className="hadith-head">
-                  <span className="num">{key}</span>
-                  <span className="muted small">Juz {v.juz} · p. {v.page}</span>
-                  <span className="spacer" />
-                  <BookmarkButton small iconOnly item={{ key: `q:${key}`, type: 'ayah', s: surah.n, v: v.v, title: `${surah.name} ${key}`, preview: v.t.en?.slice(0, 160) }} />
-                  <CopyButton small iconOnly text={`${v.ar}\n\n${keys.map((k) => v.t[k]).join('\n\n')}\n\n— ${surah.name} ${key}`} />
-                </div>
-                <div className="hadith-body">
-                  {wbw ? (
-                    <div className="wbw">
-                      {v.w.map((w, i) => (
-                        <div className="word" key={i}>
-                          <span className="wa" lang="ar">{show(w.a)}</span>
-                          {w.tl && <span className="wt">{w.tl}</span>}
-                          {w.en && <span className="we">{w.en}</span>}
-                          {w.r && <Link className="wr" href={`/quran/roots/?r=${encodeURIComponent(w.r)}`}>{w.r}</Link>}
-                        </div>
-                      ))}
-                    </div>
-                  ) : <p className="quran-ar" lang="ar" style={{ margin: 0 }}>{show(v.ar)} <span style={{ color: 'var(--gold)' }}>﴿{v.v.toLocaleString('ar-EG')}﴾</span></p>}
-                  {v.tl && <p className="muted small" style={{ margin: 0, fontStyle: 'italic' }}>{v.tl}</p>}
-                  {keys.map((k) => (
-                    <div key={k} className="tr-block" lang={k.slice(0, 2)} dir={k.startsWith('ur') ? 'rtl' : 'ltr'}>
-                      <div className="tr-label">{LANG_NAMES[k.slice(0, 2)]} · {translators[k]}</div>
-                      <p className={`tr-text ${k.startsWith('ur') ? 'tr-ur' : ''}`}>{v.t[k]}</p>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            );
-          })}
+          {verses.map((v) => (
+            <Verse key={v.v} v={v} surah={surah} keys={keysStable} translators={translators} wbw={wbw} harakat={settings.harakat} wordAudio={settings.wordAudio} />
+          ))}
         </div>
       )}
       <div className="row" style={{ margin: '16px 0' }}>

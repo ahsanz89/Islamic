@@ -104,7 +104,7 @@ export default function Home({ collections }) {
   }, []);
 
   const total = collections.reduce((a, c) => a + c.count, 0);
-  const featured = collections.filter((c) => c.group === 'six' || c.id === 'malik' || c.id === 'ahmad' || c.id === 'mishkat').slice(0, 9);
+  const featured = collections.filter((c) => c.group === 'six' || c.id === 'malik' || c.id === 'ahmad' || c.id === 'mishkat' || c.id === 'mustadrak').slice(0, 12);
   const topicLang = settings.ui === 'ur' ? 'ur' : settings.ui === 'ar' ? 'ar' : 'en';
 
   return (

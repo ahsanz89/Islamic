@@ -1,5 +1,6 @@
 import './globals.css';
 import { Providers } from '@/components/Providers';
+import { AudioBridge, AudioPlayer } from '@/components/AudioPlayer';
 import { BackToTop, Footer, Fx, Header } from '@/components/ui';
 
 export const metadata = {
@@ -25,6 +26,8 @@ export default function RootLayout({ children }) {
           <Header />
           <main id="main">{children}</main>
           <Footer />
+          <AudioBridge />
+          <AudioPlayer />
           <BackToTop />
         </Providers>
       </body>

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from './Providers';
 import { LANGUAGES, LANG_NAMES } from '@/lib/i18n';
 import { getJSON } from '@/lib/client-data';
+import { AudioSettings } from '@/components/AudioPlayer';
 
 /** Translated interface text. */
 export function T({ k, vars }) {
@@ -300,6 +301,7 @@ export function SettingsDrawer({ onClose }) {
           </div>
         </div>
         <ReadingControls />
+        <AudioSettings />
         <div className="field">
           <span>{t('translationsShown')}</span>
           <TranslationChips />

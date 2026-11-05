@@ -7,7 +7,15 @@ const DEFAULTS = {
   theme: 'system',
   harakat: true,
   arSize: 30,
-  tr: ['ur', 'en'] // translations shown under each hadith / verse
+  tr: ['ur', 'en'], // translations shown under each hadith / verse
+  // Quran audio
+  reciter: 'alafasy',
+  volume: 0.9,
+  repeat: false,
+  continuous: true,
+  bismillah: true,
+  wordAudio: true,
+  wordHover: false
 };
 
 const Ctx = createContext(null);

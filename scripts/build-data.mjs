@@ -247,7 +247,7 @@ for (const ch of info.chapters) {
     });
     const t = {};
     for (const key of Object.keys(QNAMES)) t[key] = qtext[key].get(k) || '';
-    verses.push({ v: v.verse, ar: qtext.ar.get(k), tl: qtext.translit.get(k), t, w: words, juz: v.juz, page: v.page, sajda: !!v.sajda });
+    verses.push({ v: v.verse, ar: qtext.ar.get(k), tl: qtext.translit.get(k), t, w: words, juz: v.juz, page: v.page, sajda: !!v.sajda, ...(meanings.length && meanings.length !== arWords.length ? { na: true } : {}) });
   }
   write(`q/${ch.chapter}.json`, verses);
   surahs.push({ n: ch.chapter, name: ch.name, en: ch.englishname, ar: ch.arabicname, place: ch.revelation, verses: ch.verses.length });
