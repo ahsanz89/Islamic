@@ -25,9 +25,9 @@ const I = {
 };
 
 const TX = {
-  en: { player: 'Quran audio player', reciter: 'Reciter', play: 'Play', pause: 'Pause', stop: 'Close player', prev: 'Previous ayah', next: 'Next ayah', repeat: 'Repeat this ayah', cont: 'Play on to the next ayah', volume: 'Volume', seek: 'Seek', playSurah: 'Play surah', pauseSurah: 'Pause', resumeSurah: 'Resume', playAyah: 'Play ayah', pauseAyah: 'Pause ayah', playWord: 'Hear pronunciation', loading: 'Loading audio…', errUnavail: 'This recitation is not available right now.', errOffline: 'You are offline. Audio will resume when you reconnect.', retry: 'Retry', bism: 'Bismillah', ayah: 'Ayah', audio: 'Audio', wordsOn: 'Word pronunciation controls', hover: 'Play a word when the pointer rests on it', bismOn: 'Start surah with the Bismillah', contOn: 'Continue to the next ayah', repeatOn: 'Repeat each ayah', wordUnavail: 'Pronunciation for this word is not available right now.', offline: 'You are offline.', fallbackTitle: 'Fallback voice (recorded audio unavailable)', urdu: 'Urdu translation audio', urduNow: 'Urdu translation', urduOn: 'Play the Urdu translation after each ayah', urduUnavail: 'Urdu translation audio is not available for this ayah.', whole: 'This reciter is published as full surahs, so the whole surah plays.' },
-  ur: { player: 'قرآن آڈیو پلیئر', reciter: 'قاری', play: 'چلائیں', pause: 'روکیں', stop: 'پلیئر بند کریں', prev: 'پچھلی آیت', next: 'اگلی آیت', repeat: 'اسی آیت کو دہرائیں', cont: 'اگلی آیت پر چلتے رہیں', volume: 'آواز', seek: 'آگے پیچھے کریں', playSurah: 'پوری سورت سنیں', pauseSurah: 'روکیں', resumeSurah: 'جاری رکھیں', playAyah: 'آیت سنیں', pauseAyah: 'آیت روکیں', playWord: 'تلفظ سنیں', loading: 'آڈیو لوڈ ہو رہی ہے…', errUnavail: 'یہ تلاوت ابھی دستیاب نہیں۔', errOffline: 'آپ آف لائن ہیں۔ انٹرنیٹ آتے ہی آڈیو جاری ہو جائے گی۔', retry: 'دوبارہ کوشش', bism: 'بسم اللہ', ayah: 'آیت', audio: 'آڈیو', wordsOn: 'لفظ کے تلفظ کے بٹن', hover: 'لفظ پر ماؤس رکنے پر خود چلائیں', bismOn: 'سورت کا آغاز بسم اللہ سے کریں', contOn: 'اگلی آیت پر خود چلیں', repeatOn: 'ہر آیت دہرائیں', wordUnavail: 'اس لفظ کا تلفظ ابھی دستیاب نہیں۔', offline: 'آپ آف لائن ہیں۔', fallbackTitle: 'متبادل آواز (ریکارڈ شدہ آڈیو دستیاب نہیں)', urdu: 'اردو ترجمہ آڈیو', urduNow: 'اردو ترجمہ', urduOn: 'ہر آیت کے بعد اردو ترجمہ سنائیں', urduUnavail: 'اس آیت کا اردو ترجمہ آڈیو دستیاب نہیں۔', whole: 'اس قاری کی تلاوت مکمل سورت کی صورت میں ہے، اس لیے پوری سورت چلے گی۔' },
-  ar: { player: 'مشغّل القرآن', reciter: 'القارئ', play: 'تشغيل', pause: 'إيقاف مؤقت', stop: 'إغلاق المشغّل', prev: 'الآية السابقة', next: 'الآية التالية', repeat: 'تكرار هذه الآية', cont: 'المتابعة للآية التالية', volume: 'مستوى الصوت', seek: 'تقديم / تأخير', playSurah: 'تشغيل السورة', pauseSurah: 'إيقاف مؤقت', resumeSurah: 'استئناف', playAyah: 'تشغيل الآية', pauseAyah: 'إيقاف الآية', playWord: 'استماع النطق', loading: 'جارٍ تحميل الصوت…', errUnavail: 'هذه التلاوة غير متاحة الآن.', errOffline: 'أنت غير متصل. سيُستأنف الصوت عند عودة الاتصال.', retry: 'إعادة المحاولة', bism: 'البسملة', ayah: 'الآية', audio: 'الصوت', wordsOn: 'أزرار نطق الكلمات', hover: 'تشغيل الكلمة عند التوقف عليها بالمؤشر', bismOn: 'ابدأ السورة بالبسملة', contOn: 'المتابعة للآية التالية', repeatOn: 'تكرار كل آية', wordUnavail: 'نطق هذه الكلمة غير متاح الآن.', offline: 'أنت غير متصل.', fallbackTitle: 'صوت بديل (التسجيل غير متاح)', urdu: 'الترجمة الأردية صوتًا', urduNow: 'الترجمة الأردية', urduOn: 'تشغيل الترجمة الأردية بعد كل آية', urduUnavail: 'الترجمة الصوتية الأردية غير متاحة لهذه الآية.', whole: 'هذا القارئ متاح بسور كاملة، لذلك تُشغَّل السورة كاملة.' }
+  en: { player: 'Quran audio player', reciter: 'Reciter', play: 'Play', pause: 'Pause', stop: 'Close player', prev: 'Previous ayah', next: 'Next ayah', repeat: 'Repeat this ayah', cont: 'Play on to the next ayah', volume: 'Volume', seek: 'Seek', playSurah: 'Play surah', pauseSurah: 'Pause', resumeSurah: 'Resume', playAyah: 'Play ayah', pauseAyah: 'Pause ayah', playWord: 'Hear pronunciation', loading: 'Loading audio…', errUnavail: 'This recitation is not available right now.', errOffline: 'You are offline. Audio will resume when you reconnect.', retry: 'Retry', bism: 'Bismillah', ayah: 'Ayah', audio: 'Audio', wordsOn: 'Word pronunciation controls', hover: 'Play a word when the pointer rests on it', bismOn: 'Start surah with the Bismillah', contOn: 'Continue to the next ayah', repeatOn: 'Repeat each ayah', wordUnavail: 'Pronunciation for this word is not available right now.', offline: 'You are offline.', fallbackTitle: 'Fallback voice (recorded audio unavailable)', urdu: 'Urdu translation audio', urduNow: 'Urdu translation', urduOn: 'Play the Urdu translation after each ayah', urduUnavail: 'Urdu translation audio is not available for this ayah.', whole: 'This reciter is published as full surahs, so the whole surah plays.', wholeUrdu: 'Urdu translation audio plays after each ayah only with ayah-by-ayah reciters (for example Alafasy). Badr Al-Turki plays the whole surah.', on: 'On', off: 'Off' },
+  ur: { player: 'قرآن آڈیو پلیئر', reciter: 'قاری', play: 'چلائیں', pause: 'روکیں', stop: 'پلیئر بند کریں', prev: 'پچھلی آیت', next: 'اگلی آیت', repeat: 'اسی آیت کو دہرائیں', cont: 'اگلی آیت پر چلتے رہیں', volume: 'آواز', seek: 'آگے پیچھے کریں', playSurah: 'پوری سورت سنیں', pauseSurah: 'روکیں', resumeSurah: 'جاری رکھیں', playAyah: 'آیت سنیں', pauseAyah: 'آیت روکیں', playWord: 'تلفظ سنیں', loading: 'آڈیو لوڈ ہو رہی ہے…', errUnavail: 'یہ تلاوت ابھی دستیاب نہیں۔', errOffline: 'آپ آف لائن ہیں۔ انٹرنیٹ آتے ہی آڈیو جاری ہو جائے گی۔', retry: 'دوبارہ کوشش', bism: 'بسم اللہ', ayah: 'آیت', audio: 'آڈیو', wordsOn: 'لفظ کے تلفظ کے بٹن', hover: 'لفظ پر ماؤس رکنے پر خود چلائیں', bismOn: 'سورت کا آغاز بسم اللہ سے کریں', contOn: 'اگلی آیت پر خود چلیں', repeatOn: 'ہر آیت دہرائیں', wordUnavail: 'اس لفظ کا تلفظ ابھی دستیاب نہیں۔', offline: 'آپ آف لائن ہیں۔', fallbackTitle: 'متبادل آواز (ریکارڈ شدہ آڈیو دستیاب نہیں)', urdu: 'اردو ترجمہ آڈیو', urduNow: 'اردو ترجمہ', urduOn: 'ہر آیت کے بعد اردو ترجمہ سنائیں', urduUnavail: 'اس آیت کا اردو ترجمہ آڈیو دستیاب نہیں۔', whole: 'اس قاری کی تلاوت مکمل سورت کی صورت میں ہے، اس لیے پوری سورت چلے گی۔', wholeUrdu: 'اردو ترجمہ آڈیو ہر آیت کے بعد صرف آیت بہ آیت قاری کے ساتھ چلتا ہے (مثلاً العفاسی)۔ بدر الترکی پوری سورت سناتے ہیں۔', on: 'آن', off: 'آف' },
+  ar: { player: 'مشغّل القرآن', reciter: 'القارئ', play: 'تشغيل', pause: 'إيقاف مؤقت', stop: 'إغلاق المشغّل', prev: 'الآية السابقة', next: 'الآية التالية', repeat: 'تكرار هذه الآية', cont: 'المتابعة للآية التالية', volume: 'مستوى الصوت', seek: 'تقديم / تأخير', playSurah: 'تشغيل السورة', pauseSurah: 'إيقاف مؤقت', resumeSurah: 'استئناف', playAyah: 'تشغيل الآية', pauseAyah: 'إيقاف الآية', playWord: 'استماع النطق', loading: 'جارٍ تحميل الصوت…', errUnavail: 'هذه التلاوة غير متاحة الآن.', errOffline: 'أنت غير متصل. سيُستأنف الصوت عند عودة الاتصال.', retry: 'إعادة المحاولة', bism: 'البسملة', ayah: 'الآية', audio: 'الصوت', wordsOn: 'أزرار نطق الكلمات', hover: 'تشغيل الكلمة عند التوقف عليها بالمؤشر', bismOn: 'ابدأ السورة بالبسملة', contOn: 'المتابعة للآية التالية', repeatOn: 'تكرار كل آية', wordUnavail: 'نطق هذه الكلمة غير متاح الآن.', offline: 'أنت غير متصل.', fallbackTitle: 'صوت بديل (التسجيل غير متاح)', urdu: 'الترجمة الأردية صوتًا', urduNow: 'الترجمة الأردية', urduOn: 'تشغيل الترجمة الأردية بعد كل آية', urduUnavail: 'الترجمة الصوتية الأردية غير متاحة لهذه الآية.', whole: 'هذا القارئ متاح بسور كاملة، لذلك تُشغَّل السورة كاملة.', wholeUrdu: 'تُشغَّل الترجمة الأردية بعد كل آية مع القرّاء الذين يتوفرون آية بآية فقط (مثل العفاسي).', on: 'تشغيل', off: 'إيقاف' }
 };
 export const useAudioText = () => {
   const { settings } = useApp();
@@ -47,9 +47,9 @@ export function AudioBridge() {
   useEffect(() => {
     audio.configure({
       reciter: settings.reciter, repeat: settings.repeat, continuous: settings.continuous,
-      bismillah: settings.bismillah, volume: settings.volume, wordAudio: settings.wordAudio, wordHover: settings.wordHover, urdu: settings.urduAudio
+      bismillah: settings.bismillah, volume: settings.volume, wordAudio: settings.wordAudio, wordHover: settings.wordHover, urdu: settings.urduTilawat
     });
-  }, [settings.reciter, settings.repeat, settings.continuous, settings.bismillah, settings.volume, settings.wordAudio, settings.wordHover, settings.urduAudio]);
+  }, [settings.reciter, settings.repeat, settings.continuous, settings.bismillah, settings.volume, settings.wordAudio, settings.wordHover, settings.urduTilawat]);
   return toast ? <div className="audio-toast" role="status">{toast === 'offline' ? tx.offline : toast === 'urdu-unavailable' ? tx.urduUnavail : tx.wordUnavail}</div> : null;
 }
 
@@ -72,8 +72,8 @@ export function UrduAudioToggle() {
   const { settings, update } = useApp();
   const tx = useAudioText();
   return (
-    <button type="button" className="btn small" aria-pressed={!!settings.urduAudio} onClick={() => update({ urduAudio: !settings.urduAudio })} title={tx.urduOn}>
-      {I.vol}<span lang={settings.ui === 'ur' ? 'ur' : undefined}>{tx.urdu}</span>
+    <button type="button" className="btn small" aria-pressed={!!settings.urduTilawat} onClick={() => update({ urduTilawat: !settings.urduTilawat })} title={tx.urduOn}>
+      {I.vol}<span lang={settings.ui === 'ur' ? 'ur' : undefined}>{tx.urdu}: {settings.urduTilawat ? tx.on : tx.off}</span>
     </button>
   );
 }
@@ -82,7 +82,7 @@ export function UrduAudioToggle() {
 export function WholeNote() {
   const { settings } = useApp();
   const tx = useAudioText();
-  return reciterById(settings.reciter).type === 'surah' ? <p className="muted small whole-note">{tx.whole}</p> : null;
+  return reciterById(settings.reciter).type === 'surah' ? <p className="muted small whole-note">{settings.urduTilawat ? tx.wholeUrdu : tx.whole}</p> : null;
 }
 
 /** Play / pause button for one ayah. */
@@ -238,7 +238,7 @@ export function AudioSettings() {
     <div className="field audio-settings">
       <span>{tx.audio}</span>
       <ReciterSelect id="drawer-reciter" />
-      <Toggle k="urduAudio" label={tx.urduOn} />
+      <Toggle k="urduTilawat" label={tx.urduOn} />
       <Toggle k="wordAudio" label={tx.wordsOn} />
       <Toggle k="wordHover" label={tx.hover} />
       <Toggle k="bismillah" label={tx.bismOn} />

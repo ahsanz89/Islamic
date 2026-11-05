@@ -89,7 +89,7 @@ export default function SurahReader({ surah, translators, prev, next }) {
     if (second && translators[l + '2']) keys.push(l + '2');
   }
   // while the Urdu audio is on, the Urdu text is always shown so it can be followed
-  if (settings.urduAudio && translators.ur && !keys.includes('ur')) keys.push('ur');
+  if (settings.urduTilawat && translators.ur && !keys.includes('ur')) keys.push('ur');
   const keysKey = keys.join('|');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const keysStable = useMemo(() => keys, [keysKey]);
