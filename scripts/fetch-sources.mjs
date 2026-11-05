@@ -58,6 +58,10 @@ const QEDS = ['ara-quranuthmanienc', 'ara-quransimple', 'ara-quran-la', 'urd-fat
 await pool([...QEDS.map((e) => () => get(`${GH}/fawazahmed0/quran-api/1/editions/${e}.json`, path.join(RAW, 'quran', `${e}.json`))),
   () => get(`${GH}/fawazahmed0/quran-api/1/info.json`, path.join(RAW, 'quran', 'info.json'))]);
 
+// 3b. Narrator biographies: Ibn Hajar, Taqrib al-Tahdhib (OpenITI, CC BY-NC-SA 4.0)
+console.log('narrators (Taqrib al-Tahdhib)…');
+await get(`${GH}/OpenITI/0875AH/master/data/0852IbnHajarCasqalani/0852IbnHajarCasqalani.TaqribTahdhib/0852IbnHajarCasqalani.TaqribTahdhib.Shamela0008609-ara1`, path.join(RAW, 'rijal', 'taqrib'));
+
 // 4. Word-by-word meanings and roots (npm packages)
 const tmp = path.join(RAW, '.npm');
 if (!fs.existsSync(path.join(RAW, 'quran', 'wbw.json')) || !fs.existsSync(path.join(RAW, 'quran', 'morphology.json'))) {

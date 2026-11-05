@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useApp } from '@/components/Providers';
 import { CName, Icon } from '@/components/ui';
 import HadithCard from '@/components/HadithCard';
+import PrayerTimes from '@/components/PrayerTimes';
 import { getHadith } from '@/lib/client-data';
 import { LANGUAGES } from '@/lib/i18n';
 
@@ -110,6 +111,7 @@ export default function Home({ collections }) {
     <div className="container">
       <section className="hero">
         <span className="hero-glow" aria-hidden="true" />
+        <div className="hero-text">
         <span className="badge gold">{t('tagline')}</span>
         <h1><Headline text={t('heroTitle')} words={settings.ui === 'ur' || settings.ui === 'ar' ? 2 : 3} /></h1>
         <p className="lead">{t('heroSub')}</p>
@@ -130,6 +132,8 @@ export default function Home({ collections }) {
           <div className="s"><strong><CountUp value={114} /></strong><span className="l">{t('surah')}</span></div>
           <div className="s"><strong><CountUp value={10} /></strong><span className="l">{t('language')}</span></div>
         </div>
+        </div>
+        <PrayerTimes />
       </section>
 
       <section>

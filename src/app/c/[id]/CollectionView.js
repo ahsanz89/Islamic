@@ -11,60 +11,67 @@ export default function CollectionView({ col }) {
   const router = useRouter();
   const [num, setNum] = useState('');
   const [filter, setFilter] = useState('');
-  const sections = col.sections.filter((s) => !filter || (s.title + ' ' + s.sub).toLowerCase().includes(filter.toLowerCase()));
+  const q = filter.trim().toLowerCase();
+  const sections = col.sections.filter((s) => !q || `${s.id} ${s.title} ${s.tu || ''} ${s.sub || ''}`.toLowerCase().includes(q));
+  const maxCount = Math.max(...col.sections.map((s) => s.count));
+  const urFirst = settings.ui === 'ur';
+  const maxNum = Math.max(...col.sections.map((s) => s.to));
   return (
     <div className="container">
-      <div className="page-head">
-        <nav className="breadcrumb"><Link href="/collections/">{t('collections')}</Link><span>/</span></nav>
-        <div className="row" style={{ alignItems: 'center', gap: 16 }}>
-          <div style={{ flex: '1 1 300px', minWidth: 0 }}>
-            <h1><CName c={col} /></h1>
-            <p className="muted" style={{ margin: 0 }}>
-              {settings.ui === 'ar' || settings.ui === 'ur' ? col.authorAr : col.author}{col.death ? ` · d. ${col.death} AH` : ''}
-            </p>
+      <nav className="breadcrumb"><Link href="/collections/">{t('collections')}</Link><span>/</span></nav>
+
+      <header className="colhero spot">
+        <span className="bg-ar" aria-hidden="true">{col.ar}</span>
+        <div className="colhero-main">
+          <span className="ar colhero-ar" lang="ar">{col.ar}</span>
+          <h1><CName c={col} /></h1>
+          <p className="colhero-by">
+            {settings.ui === 'ar' || settings.ui === 'ur' ? col.authorAr : col.author}{col.death ? ` · d. ${col.death} AH` : ''}
+          </p>
+          <div className="colhero-langs">
+            {col.langs.map((l) => <span key={l} className="chip static" lang={l}>{LANG_NAMES[l]}</span>)}
           </div>
-          <span className="ar" style={{ fontSize: 34, color: 'var(--brand)', lineHeight: 1.4 }}>{col.ar}</span>
+          {col.source === 'openiti' && <p className="badge gold" style={{ marginTop: 12, display: 'inline-block', whiteSpace: 'normal', lineHeight: 1.6, padding: '6px 12px' }}>{t('partialNote')}</p>}
         </div>
-        <div className="row" style={{ marginTop: 14 }}>
-          <span className="badge">{col.count.toLocaleString()} {t('hadiths')}</span>
-          <span className="badge grey">{col.sections.length} {t('books')}</span>
-          {col.langs.map((l) => <span key={l} className="badge grey" lang={l}>{LANG_NAMES[l]}</span>)}
+        <dl className="colhero-stats">
+          <div><dt>{t('hadiths')}</dt><dd>{col.count.toLocaleString()}</dd></div>
+          <div><dt>{t('books')}</dt><dd>{col.sections.length}</dd></div>
+        </dl>
+      </header>
+
+      <div className="coltools card">
+        <form onSubmit={(e) => { e.preventDefault(); if (num) router.push(`/hadith/?c=${col.id}&n=${num}`); }}>
+          <label className="sr-only" htmlFor="num">{t('goToNumber')}</label>
+          <input id="num" className="input" inputMode="decimal" value={num} onChange={(e) => setNum(e.target.value)} placeholder={`${t('goToNumber')} (1 – ${maxNum})`} />
+          <button className="btn primary">{t('go')}</button>
+        </form>
+        <div className="coltools-filter">
+          <span className="lead" aria-hidden="true">{Icon.search}</span>
+          <label className="sr-only" htmlFor="flt">{t('chapterList')}</label>
+          <input id="flt" className="input" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={`${t('chapterList')}…`} dir="auto" />
         </div>
-        {col.source === 'openiti' && <p className="badge gold" style={{ marginTop: 12, display: 'inline-block', whiteSpace: 'normal', lineHeight: 1.6, padding: '6px 12px' }}>{t('partialNote')}</p>}
+        <Link className="btn" href={`/search/?c=${col.id}`}>{Icon.search}{t('search')}</Link>
       </div>
 
-      <div className="layout">
-        <aside className="side card filters">
-          <form className="group" onSubmit={(e) => { e.preventDefault(); if (num) router.push(`/hadith/?c=${col.id}&n=${num}`); }}>
-            <label className="group-title" htmlFor="num">{t('goToNumber')}</label>
-            <div className="row" style={{ flexWrap: 'nowrap' }}>
-              <input id="num" className="input" inputMode="decimal" value={num} onChange={(e) => setNum(e.target.value)} placeholder={`1 – ${Math.max(...col.sections.map((s) => s.to))}`} />
-              <button className="btn primary">{t('go')}</button>
-            </div>
-          </form>
-          <div className="group">
-            <label className="group-title" htmlFor="flt">{t('chapterList')}</label>
-            <input id="flt" className="input" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={t('search') + '…'} dir="auto" />
-          </div>
-          <div className="group">
-            <Link className="btn" href={`/search/?c=${col.id}`}>{Icon.search}{t('search')} · <CName c={col} /></Link>
-          </div>
-        </aside>
-        <div className="content card list">
-          {sections.map((s) => (
-            <Link key={s.id} href={`/c/${col.id}/${s.id}/`} className="item">
-              <span className="row" style={{ flexWrap: 'nowrap', gap: 14, minWidth: 0 }}>
-                <span className="idx">{s.id}</span>
-                <span style={{ minWidth: 0 }}>
-                  <strong style={{ display: 'block' }}>{s.title}</strong>
-                  {s.sub ? <span className="muted small" lang="ar" dir="rtl" style={{ display: 'block' }}>{s.sub}</span> : null}
-                </span>
+      <div className="chgrid" role="list">
+        {sections.map((s) => {
+          const en = <span className="ch-en">{s.title}</span>;
+          const ur = s.tu ? <span className="ch-ur" lang="ur" dir="rtl">{s.tu}</span> : null;
+          return (
+            <Link key={s.id} href={`/c/${col.id}/${s.id}/`} className="chcard spot" role="listitem">
+              <span className="ch-num">{s.id}</span>
+              <span className="ch-titles">
+                {urFirst ? <>{ur}{en}</> : <>{en}{ur}</>}
+                {s.sub ? <span className="ch-sub" lang="ar" dir="rtl">{s.sub}</span> : null}
               </span>
-              <span className="muted small" style={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{s.from}–{s.to}</span>
+              <span className="ch-meta">
+                <span className="ch-bar" aria-hidden="true"><i style={{ width: `${Math.max(6, (s.count / maxCount) * 100)}%` }} /></span>
+                <span className="ch-count">{s.count.toLocaleString()} {t('hadiths')} · {s.from}–{s.to}</span>
+              </span>
             </Link>
-          ))}
-          {!sections.length && <div className="empty" style={{ margin: 16 }}>{t('noResults')}</div>}
-        </div>
+          );
+        })}
+        {!sections.length && <div className="empty" style={{ gridColumn: '1 / -1' }}>{t('noResults')}</div>}
       </div>
     </div>
   );

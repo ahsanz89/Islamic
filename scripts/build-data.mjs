@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { COLLECTIONS, GROUPS, HADITH_API_LANGS, LANG3 } from './collections.config.mjs';
 import { parseOpenITI } from './lib/openiti-parse.mjs';
+import { parseTaqrib } from './lib/rijal-parse.mjs';
 import { findMatnStart, normalizeArabic, normalizeText } from '../src/lib/arabic.mjs';
 import { findSimilar } from './lib/takhrij.mjs';
 import { gradeClass } from '../src/lib/grades.mjs';
@@ -140,7 +141,12 @@ write('collections.json', { groups: GROUPS, collections: summary, built: new Dat
 log('collections written:', summary.length);
 
 // empty-but-ready datasets
-write('narrators/index.json', { narrators: [], note: 'Narrator profiles are not loaded yet. See docs/DATA.md for the schema.' });
+{
+  const f = path.join(RAW, 'rijal', 'taqrib');
+  const narrators = fs.existsSync(f) ? parseTaqrib(fs.readFileSync(f, 'utf8')).map((n) => ({ id: n.id, name: n.name, g: n.grade, r: n.ruling, t: n.tabaqah, d: n.death, b: n.books, x: n.text.startsWith(n.name) ? n.text.slice(n.name.length).trim() : n.text })) : [];
+  write('narrators/index.json', { source: 'Ibn Hajar al-Asqalani, Taqrib al-Tahdhib (OpenITI, CC BY-NC-SA 4.0)', narrators });
+  log('narrators written:', narrators.length);
+}
 write('commentary/index.json', { sources: [], note: 'No commentary is loaded yet. See docs/DATA.md for the schema.' });
 
 // ---------------------------------------------------------------- Quran

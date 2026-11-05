@@ -20,6 +20,7 @@
     "@fontsource/amiri": "^5.3.0",
     "@fontsource/amiri-quran": "^5.3.0",
     "@fontsource/noto-nastaliq-urdu": "^5.3.0",
+    "adhan": "^4.4.6",
     "next": "^15.5.29",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
