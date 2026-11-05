@@ -63,7 +63,8 @@ const tmp = path.join(RAW, '.npm');
 if (!fs.existsSync(path.join(RAW, 'quran', 'wbw.json')) || !fs.existsSync(path.join(RAW, 'quran', 'morphology.json'))) {
   console.log('word-by-word + morphology…');
   fs.mkdirSync(tmp, { recursive: true });
-  execSync('npm init -y >/dev/null && npm i --no-save @kmaslesa/holy-quran-word-by-word-full-data quran-search-engine', { cwd: tmp, stdio: 'inherit', shell: true });
+  fs.writeFileSync(path.join(tmp, 'package.json'), '{"name":"wbw-tmp","version":"1.0.0","private":true}');
+  execSync('npm i --no-save @kmaslesa/holy-quran-word-by-word-full-data quran-search-engine', { cwd: tmp, stdio: 'inherit', shell: true });
   fs.copyFileSync(path.join(tmp, 'node_modules/@kmaslesa/holy-quran-word-by-word-full-data/data.json'), path.join(RAW, 'quran', 'wbw.json'));
   const qse = await import(path.join(tmp, 'node_modules/quran-search-engine/dist/index.mjs'));
   const mm = await qse.loadMorphology();
