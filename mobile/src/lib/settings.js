@@ -1,0 +1,45 @@
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useColorScheme } from 'react-native';
+import { load, save } from './storage';
+import { STRINGS, isRTLUi } from './strings';
+import { DARK, LIGHT } from './theme';
+
+export const DEFAULTS = {
+  onboarded: false,
+  tr: 'en',          // translation shown with the Arabic ('' = Arabic only)
+  tr2: '',           // optional second translation
+  ui: 'en',          // app language: en | ur | ar
+  arSize: 30,
+  harakat: true,
+  theme: 'system',   // system | light | dark
+  reciter: 'alafasy',
+  urduAudio: false,
+  lastRead: null     // { type: 'surah'|'section', ... }
+};
+const KEY = 'dalil.settings.v1';
+const Ctx = createContext(null);
+
+export function SettingsProvider({ children }) {
+  const [settings, setSettings] = useState(DEFAULTS);
+  const [ready, setReady] = useState(false);
+  const scheme = useColorScheme();
+
+  useEffect(() => { load(KEY, {}).then((s) => { setSettings({ ...DEFAULTS, ...s }); setReady(true); }); }, []);
+  const update = useCallback((patch) => {
+    setSettings((prev) => { const next = { ...prev, ...patch }; save(KEY, next); return next; });
+  }, []);
+
+  const value = useMemo(() => {
+    const dark = settings.theme === 'system' ? scheme === 'dark' : settings.theme === 'dark';
+    const dict = STRINGS[settings.ui] || STRINGS.en;
+    const t = (k, vars) => {
+      let s = dict[k] ?? STRINGS.en[k] ?? k;
+      if (vars) for (const [a, b] of Object.entries(vars)) s = s.replace(`{${a}}`, b);
+      return s;
+    };
+    return { settings, update, ready, colors: dark ? DARK : LIGHT, dark, t, uiRtl: isRTLUi(settings.ui) };
+  }, [settings, update, ready, scheme]);
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+export const useApp = () => useContext(Ctx);

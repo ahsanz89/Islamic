@@ -6,3 +6,6 @@ public/data/
 *.log
 .DS_Store
 spa/dist/
+mobile/node_modules/
+mobile/dist/
+mobile/.expo/
