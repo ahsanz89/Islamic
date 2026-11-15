@@ -394,28 +394,75 @@ const ALWAYS = { en: 'always shown', ur: 'ہمیشہ موجود', ar: 'يظهر 
 
 /** Reading controls. `field` picks which saved list holds the chosen translations ('tr' for hadith, 'qtr' for the Quran).
  *  `arabicFixed` adds a locked "Arabic" badge: the Arabic text is never optional. */
-export function ReadingBar({ choices = TR_CHOICES, extra, field = 'tr', arabicFixed = false }) {
-  const { settings, update, t } = useApp();
-  const sel = settings[field] || [];
-  const toggle = (l) => update({ [field]: sel.includes(l) ? sel.filter((x) => x !== l) : [...sel, l] });
+function Pop({ label, summary, icon, children, wide }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const down = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const key = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('pointerdown', down); document.addEventListener('keydown', key);
+    return () => { document.removeEventListener('pointerdown', down); document.removeEventListener('keydown', key); };
+  }, [open]);
   return (
-    <div className="readbar" role="toolbar" aria-label={t('settings')}>
-      {arabicFixed && (
+    <div className={`rb-pop ${open ? 'open' : ''}`} ref={ref}>
+      <button className="rb-trigger" aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(!open)} aria-label={label}>
+        {icon}
+        <span className="rb-text"><span className="rb-label">{label}</span>{summary ? <span className="rb-sum">{summary}</span> : null}</span>
+        <svg className="rb-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      {open && (
         <>
-          <span className="chip fixed" aria-label={`${LANG_NAMES.ar}: ${ALWAYS[settings.ui] || ALWAYS.en}`} title={ALWAYS[settings.ui] || ALWAYS.en}>
-            <span lang="ar">العربية</span> ✓
-          </span>
-          <span className="readbar-label">{t('translations')}:</span>
+          <div className="rb-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />
+          <div className={`rb-panel ${wide ? 'wide' : ''}`} role="dialog" aria-label={label}>
+            <div className="rb-grab" aria-hidden="true" />
+            <div className="rb-head"><strong>{label}</strong><button className="rb-done" onClick={() => setOpen(false)}>{'\u2715'}</button></div>
+            {children}
+          </div>
         </>
       )}
-      {choices.map((l) => (
-        <button key={l} className="chip" aria-pressed={sel.includes(l)} onClick={() => toggle(l)} lang={l}>{LANG_NAMES[l]}</button>
-      ))}
-      <span className="sep" />
-      <button className="btn small" aria-pressed={settings.harakat} onClick={() => update({ harakat: !settings.harakat })} title={t('showHarakat')}>حَرَكَات</button>
-      <button className="btn small icon" onClick={() => update({ arSize: Math.max(20, settings.arSize - 2) })} aria-label="Smaller Arabic text">A−</button>
-      <button className="btn small icon" onClick={() => update({ arSize: Math.min(52, settings.arSize + 2) })} aria-label="Larger Arabic text">A+</button>
-      {extra}
+    </div>
+  );
+}
+
+export function ReadingBar({ choices = TR_CHOICES, extra, field = 'tr', arabicFixed = false }) {
+  const { settings, update, t } = useApp();
+  const sel = (settings[field] || []).filter((l) => choices.includes(l));
+  const toggle = (l) => {
+    const all = settings[field] || [];
+    update({ [field]: all.includes(l) ? all.filter((x) => x !== l) : [...all, l] });
+  };
+  const summary = sel.length === 0 ? (arabicFixed ? (LANG_NAMES.ar) : '—') : sel.length === 1 ? LANG_NAMES[sel[0]] : `${LANG_NAMES[sel[0]]} +${sel.length - 1}`;
+  const globe = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z" /></svg>;
+  return (
+    <div className="readbar" role="toolbar" aria-label={t('translations')}>
+      <Pop label={t('translations')} summary={summary} icon={globe}>
+        {arabicFixed && <p className="rb-note"><span lang="ar">العربية</span> ✓ {ALWAYS[settings.ui] || ALWAYS.en}</p>}
+        <ul className="rb-list">
+          {choices.map((l) => (
+            <li key={l}>
+              <label className="rb-opt">
+                <input type="checkbox" checked={sel.includes(l)} onChange={() => toggle(l)} />
+                <span className="rb-box" aria-hidden="true" />
+                <span lang={l}>{LANG_NAMES[l]}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+        <p className="rb-hint">{sel.length > 1 ? `${sel.length} ✓` : ''}</p>
+      </Pop>
+      <Pop label="Aa" icon={null} wide>
+        <div className="rb-row"><span>{t('showHarakat')}</span>
+          <button className="rb-switch" role="switch" aria-checked={settings.harakat} onClick={() => update({ harakat: !settings.harakat })}><span /></button>
+        </div>
+        <div className="rb-row"><span>Arabic size</span>
+          <span className="rb-step">
+            <button className="btn small icon" onClick={() => update({ arSize: Math.max(20, settings.arSize - 2) })} aria-label="Smaller Arabic text">A−</button>
+            <button className="btn small icon" onClick={() => update({ arSize: Math.min(52, settings.arSize + 2) })} aria-label="Larger Arabic text">A+</button>
+          </span>
+        </div>
+        {extra ? <div className="rb-extra">{extra}</div> : null}
+      </Pop>
     </div>
   );
 }

@@ -112,7 +112,6 @@ export default function SurahReader({ surah, translators, prev, next }) {
         <div className="listen-bar">
           <PlaySurahButton surah={surah} />
           <ReciterSelect id="surah-reciter" />
-          <UrduAudioToggle />
         </div>
         <WholeNote />
       </header>
@@ -121,7 +120,7 @@ export default function SurahReader({ surah, translators, prev, next }) {
         arabicFixed
         choices={Object.keys(translators).filter((k) => !k.endsWith('2'))}
         extra={<>
-          <span className="sep" />
+          <UrduAudioToggle />
           <button className="btn small" aria-pressed={wbw} onClick={() => setWbw(!wbw)}>{t('wordByWord')}</button>
           <button className="btn small" aria-pressed={second} onClick={() => setSecond(!second)}>+ {t('translationBy')}</button>
           <Link className="btn small ghost" href="/quran/roots/">{t('roots')}</Link>
