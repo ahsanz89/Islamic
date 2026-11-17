@@ -1,0 +1,67 @@
+name: Build Android APK (test)
+
+# Run by hand: GitHub > Actions > "Build Android APK (test)" > Run workflow.
+# Produces an installable test APK (signed with a debug key, NOT for Google Play) and attaches it to a GitHub Release.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Generate the native Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Allow more memory for Gradle
+        run: |
+          echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g" >> android/gradle.properties
+          echo "org.gradle.daemon=false" >> android/gradle.properties
+
+      - name: "Build the APK (phones only - arm64 and 32-bit arm)"
+        working-directory: mobile/android
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a --no-daemon
+
+      - name: Collect the APK
+        run: |
+          mkdir -p ../dist-apk
+          cp android/app/build/outputs/apk/release/*.apk ../dist-apk/DALIL-test.apk
+          ls -la ../dist-apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DALIL-test-apk
+          path: dist-apk/DALIL-test.apk
+
+      - name: Publish as a GitHub Release (easy download on a phone)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: DALIL test APK #${{ github.run_number }}
+          prerelease: true
+          body: |
+            Test build for installing on an Android phone. Not for Google Play (debug-signed).
+            Open this page on the phone, tap DALIL-test.apk, allow "install unknown apps" for your browser once, then install.
+          files: dist-apk/DALIL-test.apk
