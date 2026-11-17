@@ -27,7 +27,16 @@ export function stopLesson() {
   try { window.speechSynthesis?.cancel(); } catch {}
 }
 
-/** @returns {Promise<'recording'|'voice'|'none'>} */
+// No Arabic voice on this device (common on Windows): fall back to an online voice. Needs internet; the service is unofficial.
+async function playOnline(text) {
+  try {
+    current = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ar&q=${encodeURIComponent(text)}`);
+    await current.play();
+    return 'online';
+  } catch { return 'none'; }
+}
+
+/** @returns {Promise<'recording'|'voice'|'online'|'none'>} */
 export async function playLesson({ text, id, rate = 0.7 }) {
   stopLesson();
   if (id) {
@@ -40,9 +49,9 @@ export async function playLesson({ text, id, rate = 0.7 }) {
       } catch { /* fall through to the device voice */ }
     }
   }
-  if (typeof window === 'undefined' || !window.speechSynthesis || !text) return 'none';
-  const v = arabicVoice();
-  if (!v) return 'none';
+  if (typeof window === 'undefined' || !text) return 'none';
+  const v = window.speechSynthesis ? arabicVoice() : null;
+  if (!v) return playOnline(text);
   const u = new SpeechSynthesisUtterance(text);
   u.lang = v.lang; u.voice = v; u.rate = rate;
   window.speechSynthesis.speak(u);
