@@ -72,6 +72,12 @@ function ensureEl() {
   window.addEventListener('online', () => { if (state.status === 'error' && state.q) retry(); });
 }
 
+// Whole-surah reciters (Badr Al-Turki) have no per-ayah files. When the learner taps one ayah, that ayah plays in this
+// ayah-by-ayah reciter instead, so it starts at the right verse rather than at the beginning of the surah.
+const AYAH_FALLBACK = 'alafasy';
+let ayahFallback = false;
+const rid = () => (ayahFallback && reciterById(cfg.reciter).type === 'surah' ? AYAH_FALLBACK : cfg.reciter);
+
 export const isWhole = (reciterId) => reciterById(reciterId).type === 'surah';
 export const verseUrl = (reciterId, s, v) => {
   const r = reciterById(reciterId);
@@ -83,11 +89,11 @@ function load(surah, v, mode, autoplay = true) {
   if (v < 0) v = 1;
   ensureEl();
   stopWord();
-  const whole = isWhole(cfg.reciter);
+  const whole = isWhole(rid());
   state.q = { surah, v: whole ? -1 : v, mode: whole ? 'surah' : mode, whole };
   state.time = 0; state.dur = 0; emitTime();
   set({ status: 'loading', err: '', phase: '' });
-  ayahEl.src = verseUrl(cfg.reciter, surah.n, v);
+  ayahEl.src = verseUrl(rid(), surah.n, v);
   ayahEl.volume = cfg.volume;
   if (autoplay) {
     const p = ayahEl.play();
@@ -108,7 +114,7 @@ function prefetchNext() {
   if (!q || q.whole || !isBrowser) return;
   if (cfg.urdu && q.v >= 1) { prefetch(AUDIO_SOURCES.urdu(q.surah.n, q.v)); return; }
   if (q.mode !== 'surah') return;
-  if (q.v < q.surah.verses) prefetch(verseUrl(cfg.reciter, q.surah.n, q.v + 1));
+  if (q.v < q.surah.verses) prefetch(verseUrl(rid(), q.surah.n, q.v + 1));
 }
 
 /** After the recitation (and the Urdu clip, if any): repeat, move to the next ayah, or finish. */
@@ -133,7 +139,7 @@ function onEnded() {
     set({ status: 'loading', phase: 'urdu' });
     ayahEl.src = AUDIO_SOURCES.urdu(q.surah.n, q.v);
     ayahEl.play().catch(() => {});
-    if (q.mode === 'surah' && q.v < q.surah.verses) prefetch(verseUrl(cfg.reciter, q.surah.n, q.v + 1));
+    if (q.mode === 'surah' && q.v < q.surah.verses) prefetch(verseUrl(rid(), q.surah.n, q.v + 1));
     return;
   }
   state.phase = '';
@@ -141,9 +147,10 @@ function onEnded() {
 }
 
 /** Play one ayah. `surah` = { n, name, ar, verses }. */
-export function playAyah(surah, v, mode = 'ayah') { load(surah, v, mode); }
+export function playAyah(surah, v, mode = 'ayah') { ayahFallback = true; load(surah, v, mode); }
 /** Play a whole surah from `from` (default 1). Starts with the Bismillah when the setting is on. */
 export function playSurah(surah, from = 1) {
+  ayahFallback = false;
   const bism = cfg.bismillah && from === 1 && surah.n !== 1 && surah.n !== 9;
   load(surah, bism ? 0 : from, 'surah');
 }
@@ -256,7 +263,7 @@ function mediaSession() {
   if (!isBrowser || !('mediaSession' in navigator) || !state.q) return;
   try {
     const { surah, v } = state.q;
-    navigator.mediaSession.metadata = new MediaMetadata({ title: `${surah.name}${v > 0 ? ` · ${v}` : v === 0 ? ' · Bismillah' : ''}`, artist: reciterById(cfg.reciter).name.en, album: 'Quran' });
+    navigator.mediaSession.metadata = new MediaMetadata({ title: `${surah.name}${v > 0 ? ` · ${v}` : v === 0 ? ' · Bismillah' : ''}`, artist: reciterById(rid()).name.en, album: 'Quran' });
     navigator.mediaSession.setActionHandler('play', resume);
     navigator.mediaSession.setActionHandler('pause', pause);
     navigator.mediaSession.setActionHandler('nexttrack', next);

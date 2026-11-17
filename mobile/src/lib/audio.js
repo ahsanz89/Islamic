@@ -32,9 +32,12 @@ function ensure() {
   return player;
 }
 
+// Whole-surah reciters have no per-ayah files, so a single tapped ayah plays in this ayah-by-ayah reciter instead.
+let ayahFallback = false;
+const rid = () => (ayahFallback && reciterById(cfg.reciter).type === 'surah' ? 'alafasy' : cfg.reciter);
 export const isWhole = (id) => reciterById(id).type === 'surah';
 function srcFor(surah, v) {
-  const r = reciterById(cfg.reciter);
+  const r = reciterById(rid());
   if (r.type === 'surah') return AUDIO.surahFile(r.slug, surah.n);
   return AUDIO.ayah(r.folder, v === 0 ? 1 : surah.n, v === 0 ? 1 : v);
 }
@@ -48,7 +51,7 @@ function start(url) {
 }
 function load(surah, v, mode, autoplay = true) {
   if (v < 0) v = 1;
-  const whole = isWhole(cfg.reciter);
+  const whole = isWhole(rid());
   state.q = { surah, v: whole ? -1 : v, mode: whole ? 'surah' : mode, whole };
   set({ status: 'loading', err: '', phase: '' });
   if (autoplay) start(srcFor(surah, v)); else { ensure().replace({ uri: srcFor(surah, v) }); set({ status: 'paused' }); }
@@ -69,8 +72,9 @@ function onEnded() {
   advance();
 }
 
-export function playAyah(surah, v) { load(surah, v, 'ayah'); }
+export function playAyah(surah, v) { ayahFallback = true; load(surah, v, 'ayah'); }
 export function playSurah(surah, from = 1) {
+  ayahFallback = false;
   const bism = cfg.bismillah && from === 1 && surah.n !== 1 && surah.n !== 9;
   load(surah, bism ? 0 : from, 'surah');
 }
