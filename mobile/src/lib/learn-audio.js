@@ -1,4 +1,8 @@
+import { useSyncExternalStore } from 'react';
 import * as Speech from 'expo-speech';
+import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import files from './learn-audio-map';
+import { createLessonAudio } from './learn-audio-core';
 
 let voices = null;
 export async function hasArabicVoice() {
@@ -8,11 +12,15 @@ export async function hasArabicVoice() {
   } catch { return true; }
 }
 
-export function stopLesson() { try { Speech.stop(); } catch { /* ignore */ } }
+const engine = createLessonAudio({
+  files,
+  makePlayer: (src) => { setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'doNotMix' }).catch(() => {}); return createAudioPlayer(src, { updateInterval: 250 }); },
+  speak: (text, done) => Speech.speak(text, { language: 'ar-SA', rate: 0.6, pitch: 1, onDone: done, onStopped: done, onError: done }),
+  stopSpeak: () => Speech.stop()
+});
 
-/** Speaks Arabic text with the device voice. */
-export function playLesson({ text, rate = 0.6 }) {
-  stopLesson();
-  if (!text) return;
-  try { Speech.speak(text, { language: 'ar-SA', rate, pitch: 1 }); } catch { /* ignore */ }
-}
+export const stopLesson = () => engine.stop();
+/** Plays the bundled recording for the text (or the phone's Arabic voice). Returns 'recording' | 'voice' | 'none'. */
+export const playLesson = ({ text }) => engine.play({ text });
+/** Which text is playing right now ('' when idle), so a button can show Stop. */
+export const usePlayingText = () => useSyncExternalStore(engine.subscribe, () => engine.getState().text, () => '');

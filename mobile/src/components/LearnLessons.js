@@ -6,7 +6,7 @@ import { COMBOS, LETTER, LETTERS, LONG_VOWELS, LOOKALIKES, NON_JOINERS, SHORT_WO
 import { Button, Card, SectionTitle, T } from './ui';
 import { Ar, SoundBtn, Tile } from './LearnParts';
 
-const Wrap = ({ children, gap = 8 }) => <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap, justifyContent: 'center' }}>{children}</View>;
+const Wrap = ({ children, gap = 8 }) => <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap, justifyContent: 'flex-start' }}>{children}</View>;
 const Ru = ({ show, children }) => { const { colors } = useApp(); return show ? <View style={{ padding: 10, borderRadius: 12, backgroundColor: colors.goldSoft }}><T size={14}>{children}</T></View> : null; };
 const P = ({ children, muted }) => { const { colors } = useApp(); return <T color={muted ? colors.muted : undefined}>{children}</T>; };
 

@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useApp } from '../lib/settings';
-import { hasArabicVoice, playLesson } from '../lib/learn-audio';
+import { playLesson, stopLesson, usePlayingText } from '../lib/learn-audio';
 import { LETTERS, PASS_MARK, SHORT_WORDS, SUKOON_WORDS, SYLLABLE_LETTERS, TANWEEN, VOWELS, forms, pick, question, shuffle, syllable } from '../lib/learn-data';
 import { ArabicText, Button, Card, T } from './ui';
 
@@ -13,22 +13,26 @@ export function Ar({ children, size = 34, center = true, style }) {
 
 export function SoundBtn({ text, label = 'Listen' }) {
   const { colors } = useApp();
+  const playing = usePlayingText() === text;
+  const [failed, setFailed] = useState(false);
+  const go = () => {
+    if (playing) { stopLesson(); return; }
+    setFailed(playLesson({ text }) === 'none');
+  };
   return (
-    <Pressable onPress={() => playLesson({ text })} accessibilityRole="button" accessibilityLabel={`${label}: ${text}`}
-      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'center', minHeight: 44, paddingHorizontal: 16, borderRadius: 999, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, opacity: pressed ? 0.7 : 1 })}>
-      <Ionicons name="volume-high" size={20} color={colors.brand} />
-      <T weight="uiSemi" size={15} color={colors.brandDeep}>{label}</T>
-    </Pressable>
+    <View style={{ alignItems: 'center', gap: 6 }}>
+      <Pressable onPress={go} accessibilityRole="button" accessibilityState={{ selected: playing }} accessibilityLabel={`${playing ? 'Stop' : label}: ${text}`} testID="sound-btn"
+        style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'center', minHeight: 44, paddingHorizontal: 16, borderRadius: 999, borderWidth: 1, borderColor: playing ? colors.brand : colors.border, backgroundColor: playing ? colors.brandSoft : colors.surface, opacity: pressed ? 0.7 : 1 })}>
+        <Ionicons name={playing ? 'stop-circle' : 'volume-high'} size={20} color={colors.brand} />
+        <T weight="uiSemi" size={15} color={colors.brandDeep}>{playing ? 'Stop' : label}</T>
+      </Pressable>
+      {failed ? <T size={13} color={colors.danger} style={{ textAlign: 'center' }}>Sorry, this sound could not be played. Check that your phone volume is up and try again.</T> : null}
+    </View>
   );
 }
 
-export function VoiceNotice() {
-  const { colors } = useApp();
-  const [ok, setOk] = useState(true);
-  useEffect(() => { hasArabicVoice().then(setOk); }, []);
-  if (ok) return null;
-  return <View style={{ padding: 12, borderRadius: 12, backgroundColor: colors.goldSoft }}><T size={14}>No Arabic voice found. Install an Arabic text-to-speech voice in your phone settings so lesson audio can play.</T></View>;
-}
+/** Lesson sounds are bundled in the app, so no voice setup is needed any more. */
+export function VoiceNotice() { return null; }
 
 /** Tappable tile that plays the sound of whatever it shows. */
 export function Tile({ text, say, sub, size = 32, selected, onPress }) {
@@ -63,7 +67,7 @@ function Q({ q, chosen, onAnswer }) {
       <T weight="uiSemi" size={17} style={{ textAlign: 'center' }}>{q.prompt}</T>
       {q.big ? <Ar size={60}>{q.big}</Ar> : null}
       {q.audio ? <SoundBtn text={q.audio.text} label="Play again" /> : null}
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between', alignSelf: 'stretch' }}>
+      <View testID="options" style={{ flexDirection: q.options.some((o) => o.big) ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between', alignSelf: 'stretch' }}>
         {q.options.map((o) => <Opt key={o.key} o={o} disabled={locked} state={!locked ? '' : o.key === q.answer ? 'right' : o.key === chosen ? 'wrong' : ''} onPress={() => onAnswer(o.key)} />)}
       </View>
       {locked ? <T weight="uiSemi" color={chosen === q.answer ? colors.brandDeep : colors.danger} style={{ textAlign: 'center' }}>{chosen === q.answer ? 'Correct. ' : 'Not quite. '}{q.explain}</T> : null}

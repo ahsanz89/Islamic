@@ -1,16 +1,21 @@
 'use client';
 // Plays a lesson sound. Preference order:
-//  1. a recording in /learn-audio/<id>.mp3 (listed in manifest.json)
+//  1. a recording in /learn-audio/<soundKey(text)>.mp3 (listed in manifest.json; the build ships one for every lesson text)
 //  2. the voice the learner picked in "Sound help", if any
 //  3. an Arabic voice installed on the device
 //  4. an online voice (needs internet; unofficial services, may be blocked)
+import { soundKey } from './learn-key';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
 const VOICE_KEY = 'dalil.learn.voice';
 let manifest = null;
 let current = null;
+const listeners = new Set();
+const emit = (state) => listeners.forEach((f) => f(state));
+/** Subscribe to 'playing' / 'idle' changes (used to show Stop / Play on the button). */
+export function onLessonState(f) { listeners.add(f); return () => listeners.delete(f); }
 
 const loadManifest = () => {
-  if (!manifest) manifest = fetch(`${BASE}/learn-audio/manifest.json`).then((r) => (r.ok ? r.json() : [])).catch(() => []);
+  if (!manifest) manifest = fetch(`${BASE}/learn-audio/manifest.json`).then((r) => (r.ok ? r.json() : [])).then((l) => { if (typeof window !== 'undefined') window.__lqRecordings = l.length > 0; return new Set(l); }).catch(() => { if (typeof window !== 'undefined') window.__lqRecordings = false; return new Set(); });
   return manifest;
 };
 
@@ -34,7 +39,9 @@ export function saveVoiceName(n) { try { if (n) localStorage.setItem(VOICE_KEY, 
 
 export function stopLesson() {
   try { current?.pause(); } catch { /* ignore */ }
+  current = null;
   try { window.speechSynthesis?.cancel(); } catch { /* ignore */ }
+  emit('idle');
 }
 
 function playUrl(url) {
@@ -43,6 +50,7 @@ function playUrl(url) {
       const a = new Audio(url);
       current = a;
       a.addEventListener('error', () => resolve(false), { once: true });
+      a.addEventListener('ended', () => { if (current === a) { current = null; emit('idle'); } }, { once: true });
       a.play().then(() => resolve(true)).catch(() => resolve(false));
     } catch { resolve(false); }
   });
@@ -61,11 +69,14 @@ async function playOnline(text) {
 /** @returns {Promise<'recording'|'voice'|'online'|'none'>} */
 export async function playLesson({ text, id, rate = 0.7 }) {
   stopLesson();
-  if (id) {
-    const list = await loadManifest();
-    if (list.includes(id) && await playUrl(`${BASE}/learn-audio/${id}.mp3`)) return 'recording';
-  }
   if (typeof window === 'undefined' || !text) return 'none';
+  const list = await loadManifest();
+  const key = [soundKey(text), id].find((k) => k && list.has(k));
+  if (key) {
+    emit('playing');
+    if (await playUrl(`${BASE}/learn-audio/${key}.mp3`)) return 'recording';
+    emit('idle');
+  }
   if (window.speechSynthesis) {
     const vs = await loadVoices();
     const saved = savedVoiceName();
@@ -73,6 +84,8 @@ export async function playLesson({ text, id, rate = 0.7 }) {
     if (v) {
       const u = new SpeechSynthesisUtterance(text);
       u.voice = v; u.lang = v.lang; u.rate = rate;
+      u.onend = u.onerror = () => emit('idle');
+      emit('playing');
       window.speechSynthesis.speak(u);
       return 'voice';
     }

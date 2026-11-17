@@ -1,21 +1,28 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { arabicVoices, loadVoices, playLesson, saveVoiceName, savedVoiceName } from '@/lib/learn-audio';
+import { useEffect, useRef, useState } from 'react';
+import { arabicVoices, loadVoices, onLessonState, playLesson, saveVoiceName, savedVoiceName, stopLesson } from '@/lib/learn-audio';
 
 export function Sound({ text, id, label = 'Listen', className = '', children }) {
   const [failed, setFailed] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const me = useRef(false);
+  useEffect(() => onLessonState((st) => { if (st === 'idle') { me.current = false; setPlaying(false); } else setPlaying(me.current); }), []);
   const go = async (e) => {
     e?.stopPropagation?.();
+    if (playing) { stopLesson(); return; }
+    me.current = true;
+    setFailed(false);
     const r = await playLesson({ text, id });
+    if (r === 'none') { me.current = false; setPlaying(false); }
     setFailed(r === 'none');
   };
   return (
     <>
-      <button type="button" className={`lq-sound ${className}`} onClick={go} aria-label={`${label}: ${text}`}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" /></svg>
-        {children || <span>{label}</span>}
+      <button type="button" className={`lq-sound ${playing ? 'playing' : ''} ${className}`} onClick={go} aria-pressed={playing} aria-label={`${playing ? 'Stop' : label}: ${text}`} data-sound={text}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{playing ? <rect x="6" y="6" width="12" height="12" rx="2" /> : <><path d="M11 5 6 9H3v6h3l5 4V5Z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" /></>}</svg>
+        {children || <span>{playing ? 'Stop' : label}</span>}
       </button>
-      {failed && <p className="lq-warn" role="status">No sound could be played. Open “Sound help” at the top of this page to pick a voice or see how to add an Arabic voice.</p>}
+      {failed && <p className="lq-warn" role="alert">Sorry, this sound could not be played. Check your internet connection and try again, or open “Sound help” at the top of the page.</p>}
     </>
   );
 }
@@ -26,8 +33,8 @@ export function VoiceNotice() {
   const [pick, setPick] = useState('');
   useEffect(() => { loadVoices().then(setVoices); setPick(savedVoiceName()); }, []);
   if (voices === null) return null;
-  const ar = arabicVoices(voices);
-  if (ar.length) return null;
+  // Every lesson sound ships as a recording, so this help only matters if recordings fail to load (offline first visit).
+  if (arabicVoices(voices).length || window.__lqRecordings !== false) return null;
   return (
     <details className="lq-warn lq-help">
       <summary><strong>Sound help:</strong> this device has no Arabic voice</summary>

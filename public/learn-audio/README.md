@@ -1,11 +1,12 @@
-# Lesson recordings (optional)
+# Lesson recordings
 
-The Learn Quran lessons speak with the device's Arabic voice. To use real teacher recordings instead, put MP3 files here
-and add each file name (without `.mp3`) to `manifest.json`, for example `["letter-ba", "syl-ba-fatha"]`.
+Every sound in Learn Quran has an MP3 here, named `t<hash>.mp3` where the hash comes from the Arabic text
+(`soundKey()` in `src/lib/learn-key.js`). `manifest.json` lists them.
 
-Naming:
-- `letter-<id>.mp3` for each letter name: alif, ba, ta, tha, jeem, haa, khaa, dal, dhal, ra, zay, seen, sheen, sad, dad, taa, zaa, ain, ghain, fa, qaf, kaf, lam, meem, noon, waw, ha, hamza, ya
-- `syl-<letter>-<vowel>.mp3` for syllables (vowel: fatha, kasra, damma), e.g. `syl-ba-kasra.mp3`
-- `tw-<letter>-<tanween>.mp3` (fathatan, kasratan, dammatan)
+They are generated with the free eSpeak-NG Arabic voice so the sound works on every device with no setup:
 
-Only record material you own or have permission to use.
+    node scripts/learn-texts.mjs > texts.json
+    python3 scripts/gen-learn-audio.py texts.json public/learn-audio      # needs: pip install espeakng-loader, ffmpeg
+
+To use real teacher recordings instead, replace any file with an MP3 of the same name (only record material you own or have permission to use).
+Copy the folder to `mobile/assets/learn-audio/` and regenerate `mobile/src/lib/learn-audio-map.js` (one `require` per file).

@@ -194,7 +194,7 @@ export function question(level) {
     const a = pick(SYLLABLE_LETTERS, 1)[0], b = pick(SYLLABLE_LETTERS.filter((x) => x.id !== 'alif'), 1)[0], v = pick(VOWELS, 1)[0];
     const s = sukoonForm(a, b, v);
     const sw = (x) => ({ key: x, label: x });
-    return { prompt: 'The second letter has a sukoon (ْ). How is this read?', big: s.ar, audio: { text: s.ar, id: null }, options: shuffle([sw(s.roman), sw(s.roman + 'a'), sw(syllable(a, v).roman + SYL[b.id] + 'i'), sw(SYL[a.id] + 'a' + SYL[b.id])]).filter((o, i, arr) => arr.findIndex((q) => q.key === o.key) === i), answer: s.roman, explain: `${s.ar} = ${s.roman}: with sukoon the second letter stops, with no vowel.` };
+    return { prompt: 'The second letter has a sukoon (ْ). How is this read?', big: s.ar, audio: v.id === 'fatha' ? { text: s.ar, id: null } : undefined, options: shuffle([sw(s.roman), sw(s.roman + 'a'), sw(syllable(a, v).roman + SYL[b.id] + 'i'), sw(SYL[a.id] + 'a' + SYL[b.id])]).filter((o, i, arr) => arr.findIndex((q) => q.key === o.key) === i), answer: s.roman, explain: `${s.ar} = ${s.roman}: with sukoon the second letter stops, with no vowel.` };
   }
   // level 6
   const w = pick(SHORT_WORDS, 1)[0];

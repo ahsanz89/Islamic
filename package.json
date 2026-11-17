@@ -11,6 +11,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "npx serve out",
+    "test": "vitest run",
+    "test:e2e": "node tests/e2e/web.e2e.mjs && node tests/e2e/crawl.e2e.mjs",
     "preview": "node --max-old-space-size=8000 spa/build.mjs"
   },
   "dependencies": {
@@ -27,6 +29,11 @@
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "esbuild": "^0.28.2"
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@vitejs/plugin-react": "^6.3.0",
+    "esbuild": "^0.28.2",
+    "jsdom": "^31.0.1",
+    "vitest": "^2.1.9"
   }
 }
