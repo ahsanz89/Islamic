@@ -46,6 +46,7 @@ If either is taken, change it in `app.json` **before** the first store upload; i
 Required: Google ≥2 phone shots; Apple 6.7" (1290×2796) or 6.9". Easiest: run in the iOS Simulator / Android emulator / real phone and capture: (1) first-screen translation picker, (2) Home, (3) surah reader, (4) hadith list, (5) settings. Put them in `store/screenshots/`. Browser-rendered previews (`npm run export:web`) were used for development checks only, not as store screenshots.
 
 ## 7. Known limits
+- Learn Quran lesson sound uses the phone's built-in Arabic voice (expo-speech). Quality varies by device, and some phones have no Arabic voice installed (the app shows a notice). Real teacher recordings would need a bundled-audio step; the website already accepts them in `public/learn-audio/`.
 - Tested here as a web build only; **please test on a real Android phone and iPhone** (especially audio, background playback and RTL layout) before submitting.
 - Badr Al-Turki plays whole surahs only (the source has no ayah-level files), so the Urdu-after-ayah option is disabled for him.
 - Audio hosts are third-party and free; if one goes offline that audio stops.

@@ -13,6 +13,10 @@ DALIL (دليل) is a free, independent Islamic knowledge app. Explore. Learn. U
 CHOOSE YOUR TRANSLATION
 The first time you open DALIL you pick the language you want to read alongside the Arabic. Change it any time from the button at the top of every reading screen or from Settings. The Arabic is always shown; the translation is yours to choose, and you can add a second one.
 
+LEARN QURAN
+• A free step-by-step course from the first Arabic letter: alphabet, letter forms, short vowels, tanween, sukoon, and reading real words
+• Listen, practise, quizzes and progress tracking; Roman Urdu help for beginners
+
 QURAN
 • All 114 surahs in clear Quranic script
 • Translations in English, Urdu, Hindi, Bengali, Indonesian, Turkish, French, Russian and Tamil
@@ -34,7 +38,7 @@ MADE WITH CARE
 • Independent – not affiliated with any maslak, sect or organisation
 
 ## Keywords (iOS, 100 chars, comma separated)
-quran,hadith,islam,dua,bukhari,muslim,urdu,translation,tafsir,recitation,audio,sunnah
+quran,learn,hadith,islam,dua,bukhari,muslim,urdu,translation,tafsir,recitation,audio,sunnah
 
 ## Categories
 - iOS primary: **Reference**; secondary: **Lifestyle**

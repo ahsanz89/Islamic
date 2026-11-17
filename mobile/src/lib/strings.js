@@ -21,7 +21,7 @@ const en = {
   goToNumber: 'Go to hadith number', go: 'Go', notFound: 'Not found', chapters: 'Chapters', read: 'Read',
   about: 'About DALIL', aboutText: 'DALIL is an independent global Islamic knowledge platform. It is not affiliated with any maslak, sect or organisation.',
   privacy: 'Privacy policy', support: 'Help and feedback', version: 'Version', storage: 'Offline storage', clearCache: 'Clear downloaded content',
-  cleared: 'Downloaded content cleared.', on: 'On', off: 'Off', urduShort: 'Urdu audio', sources: 'Content sources', grade: 'Grade', narrated: 'Reference', copy: 'Copy', share: 'Share', copied: 'Copied',
+  cleared: 'Downloaded content cleared.', learn: 'Learn',  on: 'On', off: 'Off', urduShort: 'Urdu audio', sources: 'Content sources', grade: 'Grade', narrated: 'Reference', copy: 'Copy', share: 'Share', copied: 'Copied',
   playing: 'Now playing', urduNow: 'Urdu translation', reading: 'Reading', language: 'Language', quick: 'Translation:'
 };
 const ur = {
@@ -41,7 +41,7 @@ const ur = {
   hadithDesc: 'بخاری، مسلم اور ۲۰ سے زائد کتب', duasDesc: 'مستند دعائیں', goToNumber: 'حدیث نمبر پر جائیں', go: 'جائیں', notFound: 'نہیں ملا',
   chapters: 'ابواب', read: 'پڑھیں', about: 'دلیل کے بارے میں',
   aboutText: 'دلیل ایک آزاد عالمی اسلامی علمی پلیٹ فارم ہے۔ یہ کسی مسلک، فرقے یا تنظیم سے وابستہ نہیں۔', privacy: 'رازداری کی پالیسی',
-  support: 'مدد اور رائے', version: 'ورژن', storage: 'آف لائن ذخیرہ', clearCache: 'ڈاؤن لوڈ شدہ مواد صاف کریں', cleared: 'ڈاؤن لوڈ شدہ مواد صاف ہو گیا۔', on: 'آن', off: 'بند', urduShort: 'اردو آڈیو',
+  support: 'مدد اور رائے', version: 'ورژن', storage: 'آف لائن ذخیرہ', clearCache: 'ڈاؤن لوڈ شدہ مواد صاف کریں', cleared: 'ڈاؤن لوڈ شدہ مواد صاف ہو گیا۔', learn: 'سیکھیں', on: 'آن', off: 'بند', urduShort: 'اردو آڈیو',
   sources: 'مواد کے ماخذ', grade: 'درجہ', narrated: 'حوالہ', copy: 'کاپی', share: 'شیئر', copied: 'کاپی ہو گیا', playing: 'اب چل رہا ہے',
   urduNow: 'اردو ترجمہ', reading: 'مطالعہ', language: 'زبان', quick: 'ترجمہ:'
 };
@@ -61,7 +61,7 @@ const ar = {
   continueReading: 'تابع القراءة', hadithOfDay: 'حديث اليوم', exploreTitle: 'استكشف', quranDesc: '١١٤ سورة بالصوت', hadithDesc: 'البخاري ومسلم وأكثر من ٢٠ كتابًا',
   duasDesc: 'أدعية موثوقة', goToNumber: 'اذهب إلى رقم الحديث', go: 'اذهب', notFound: 'غير موجود', chapters: 'الأبواب', read: 'اقرأ', about: 'عن دليل',
   aboutText: 'دليل منصة إسلامية عالمية مستقلة، وليست تابعة لأي مذهب أو طائفة أو جهة.', privacy: 'سياسة الخصوصية', support: 'المساعدة والملاحظات',
-  version: 'الإصدار', storage: 'التخزين دون اتصال', clearCache: 'مسح المحتوى المحمّل', cleared: 'تم مسح المحتوى المحمّل.', on: 'تشغيل', off: 'إيقاف', urduShort: 'الصوت الأردي', sources: 'مصادر المحتوى',
+  version: 'الإصدار', storage: 'التخزين دون اتصال', clearCache: 'مسح المحتوى المحمّل', cleared: 'تم مسح المحتوى المحمّل.', learn: 'تعلّم', on: 'تشغيل', off: 'إيقاف', urduShort: 'الصوت الأردي', sources: 'مصادر المحتوى',
   grade: 'الدرجة', narrated: 'المرجع', copy: 'نسخ', share: 'مشاركة', copied: 'تم النسخ', playing: 'قيد التشغيل', urduNow: 'الترجمة الأردية',
   reading: 'القراءة', language: 'اللغة', quick: 'الترجمة:'
 };

@@ -47,6 +47,7 @@ export default function Home() {
         <SectionTitle>{t('exploreTitle')}</SectionTitle>
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <Tile dark icon="book" title={t('quran')} text={t('quranDesc')} to="/quran" />
+          <Tile icon="school" title="Learn Quran" text="Letters to reading, step by step" to="/learn" />
           <Tile icon="library" title={t('hadith')} text={t('hadithDesc')} to="/hadith" />
         </View>
         <View style={{ flexDirection: 'row', gap: 12 }}>
