@@ -7,14 +7,14 @@ import json, os, subprocess, sys, wave
 from piper import PiperVoice, SynthesisConfig
 src, out, md = sys.argv[1], sys.argv[2], sys.argv[3]
 v = PiperVoice.load(f'{md}/ar_JO-kareem-medium.onnx', config_path=f'{md}/ar_JO-kareem-medium.onnx.json')
-cfg = SynthesisConfig(length_scale=1.45, noise_scale=0.5, noise_w_scale=0.6)
+cfg = SynthesisConfig(length_scale=2.0, noise_scale=0.5, noise_w_scale=0.6)
 os.makedirs(out, exist_ok=True)
 keys = []
 for it in json.load(open(src)):
     wav = f"/tmp/{it['k']}.wav"
     with wave.open(wav, 'wb') as w: v.synthesize_wav(it['t'] + '.', w, syn_config=cfg)
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', wav, '-af',
-                    'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,loudnorm=I=-16:TP=-1.5,apad=pad_dur=0.15',
+                    'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,loudnorm=I=-16:TP=-1.5,adelay=60|60,apad=pad_dur=0.35',
                     '-ar', '22050', '-ac', '1', '-b:a', '48k', os.path.join(out, it['k'] + '.mp3')], check=True)
     os.remove(wav); keys.append(it['k'])
 json.dump(sorted(keys), open(os.path.join(out, 'manifest.json'), 'w'))

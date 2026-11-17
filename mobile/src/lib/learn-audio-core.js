@@ -1,7 +1,10 @@
 // Lesson-sound logic with no native imports, so it can be unit-tested. See learn-audio.js for the wiring.
 import { soundKey } from './learn-key';
 
-export function createLessonAudio({ files, makePlayer, speak, stopSpeak }) {
+/** Slow is the default for beginners (the recordings are already slow); Normal plays the same recording a little faster with the pitch kept. */
+export const SPEEDS = { slow: { rate: 1, speech: 0.5 }, normal: { rate: 1.3, speech: 0.8 } };
+
+export function createLessonAudio({ files, makePlayer, speak, stopSpeak, getSpeed = () => 'slow' }) {
   let player = null;
   let state = { status: 'idle', text: '' };
   const subs = new Set();
@@ -24,13 +27,14 @@ export function createLessonAudio({ files, makePlayer, speak, stopSpeak }) {
         const p = makePlayer(src);
         player = p;
         p.addListener?.('playbackStatusUpdate', (s) => { if (s?.didJustFinish && player === p) { dropPlayer(); set({ status: 'idle', text: '' }); } });
+        try { const r = SPEEDS[getSpeed()] || SPEEDS.slow; if (r.rate !== 1) p.setPlaybackRate?.(r.rate, 'high'); } catch { /* ignore */ }
         p.play();
         set({ status: 'playing', text });
         return 'recording';
       } catch { dropPlayer(); }
     }
     try {
-      speak(text, () => set({ status: 'idle', text: '' }));
+      speak(text, () => set({ status: 'idle', text: '' }), (SPEEDS[getSpeed()] || SPEEDS.slow).speech);
       set({ status: 'playing', text });
       return 'voice';
     } catch { return 'none'; }

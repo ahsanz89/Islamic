@@ -7,7 +7,7 @@ function setup({ manifest = [soundKey(TEXT)], audioFails = false, voices = [] } 
   audios = [];
   globalThis.fetch = vi.fn(async () => ({ ok: true, json: async () => manifest }));
   globalThis.Audio = class {
-    constructor(url) { this.url = url; this.l = {}; audios.push(this); }
+    constructor(url) { this.url = url; this.l = {}; this.playbackRate = 1; audios.push(this); }
     addEventListener(e, f) { this.l[e] = f; }
     play() { return audioFails ? Promise.reject(new Error('blocked')) : Promise.resolve(); }
     pause() { this.paused = true; }
@@ -18,6 +18,30 @@ function setup({ manifest = [soundKey(TEXT)], audioFails = false, voices = [] } 
   return spoken;
 }
 async function fresh() { vi.resetModules(); return import('@/lib/learn-audio'); }
+
+describe('playback speed', () => {
+  beforeEach(() => localStorage.clear());
+  it('defaults to slow learning and plays at natural pace', async () => {
+    setup(); const m = await fresh();
+    expect(m.getSpeed()).toBe('slow');
+    await m.playLesson({ text: TEXT });
+    expect(audios[0].playbackRate).toBe(1);
+  });
+  it('normal speed is faster, keeps pitch, and is remembered', async () => {
+    setup(); const m = await fresh();
+    m.setSpeed('normal');
+    await m.playLesson({ text: TEXT });
+    expect(audios[0].playbackRate).toBeGreaterThan(1);
+    expect(audios[0].preservesPitch).toBe(true);
+    expect(localStorage.getItem('dalil.learn.speed')).toBe('normal');
+  });
+  it('slow phone-voice fallback is slower than normal', async () => {
+    const spoken = setup({ manifest: [], voices: [{ name: 'Hoda', lang: 'ar-EG' }] }); const m = await fresh();
+    await m.playLesson({ text: TEXT }); m.setSpeed('normal'); await m.playLesson({ text: TEXT });
+    expect(spoken[0].rate).toBe(0.5);
+    expect(spoken[1].rate).toBe(0.8);
+  });
+});
 
 describe('playLesson', () => {
   beforeEach(() => localStorage.clear());

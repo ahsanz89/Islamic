@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useApp } from '../lib/settings';
-import { playLesson, stopLesson, usePlayingText } from '../lib/learn-audio';
+import { playLesson, setLessonSpeed, stopLesson, useLessonSpeed, usePlayingText } from '../lib/learn-audio';
 import { LETTERS, PASS_MARK, SHORT_WORDS, SUKOON_WORDS, SYLLABLE_LETTERS, TANWEEN, VOWELS, forms, pick, question, shuffle, syllable } from '../lib/learn-data';
 import { ArabicText, Button, Card, T } from './ui';
 
@@ -31,8 +31,22 @@ export function SoundBtn({ text, label = 'Listen' }) {
   );
 }
 
-/** Lesson sounds are bundled in the app, so no voice setup is needed any more. */
-export function VoiceNotice() { return null; }
+/** Slow learning (default) or Normal speed for every lesson sound. */
+export function SpeedToggle() {
+  const { colors } = useApp();
+  const sp = useLessonSpeed();
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }} accessibilityRole="radiogroup" accessibilityLabel="Sound speed">
+      <T size={13} color={colors.muted}>Sound speed:</T>
+      {[['slow', 'Slow learning'], ['normal', 'Normal']].map(([k, l]) => (
+        <Pressable key={k} onPress={() => setLessonSpeed(k)} accessibilityRole="radio" accessibilityState={{ selected: sp === k }} accessibilityLabel={l}
+          style={{ minHeight: 40, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, justifyContent: 'center', borderColor: sp === k ? colors.brand : colors.border, backgroundColor: sp === k ? colors.brand : colors.surface }}>
+          <T weight="uiSemi" size={14} color={sp === k ? '#fff' : colors.ink}>{l}</T>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
 
 /** Tappable tile that plays the sound of whatever it shows. */
 export function Tile({ text, say, sub, size = 32, selected, onPress }) {

@@ -6,7 +6,7 @@ import { LEVELS, PASS_MARK } from '../../src/lib/learn-data';
 import { useLearn } from '../../src/lib/learn-progress';
 import { Button, Chip, Header, Screen, T } from '../../src/components/ui';
 import { Lesson } from '../../src/components/LearnLessons';
-import { Match, PracticeQuestions, QuizRun, Repeat, VoiceNotice } from '../../src/components/LearnParts';
+import { Match, PracticeQuestions, QuizRun, Repeat, SpeedToggle } from '../../src/components/LearnParts';
 
 export default function LevelScreen() {
   const { colors } = useApp();
@@ -41,7 +41,7 @@ export default function LevelScreen() {
       </View>
       <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 4, paddingBottom: 60, gap: 14 }}>
         <T color={colors.muted}>{lv.goal}</T>
-        <VoiceNotice />
+        <SpeedToggle />
         {tab === 'learn' ? <><Lesson n={n} roman={s.roman} /><Button label="Continue to practice" onPress={() => setTab('practice')} /></> : null}
         {tab === 'practice' ? (
           <View style={{ gap: 12 }}>

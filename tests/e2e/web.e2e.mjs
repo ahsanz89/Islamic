@@ -38,6 +38,11 @@ for (const vp of [{ name: 'desktop', width: 1280, height: 900 }, { name: 'phone'
     await page.waitForTimeout(30);
   }
   ok(!(await page.evaluate(() => window.__playErr)), vp.name + ': audio play() never rejected: ' + await page.evaluate(() => window.__playErr));
+  // speed toggle: Slow learning is the default, Normal is faster
+  ok(await page.getByRole('button', { name: 'Slow learning' }).getAttribute('aria-pressed') === 'true', vp.name + ': Slow learning is the default');
+  await page.getByRole('button', { name: 'Normal', exact: true }).click();
+  ok(await page.evaluate(() => localStorage.getItem('dalil.learn.speed')) === 'normal', vp.name + ': Normal speed is remembered');
+  await page.getByRole('button', { name: 'Slow learning' }).click();
   // detail panel matches selection
   await page.locator('.lq-grid button').nth(17).click();
   ok(/Ain/.test(await page.locator('.lq-detail h3').innerText()), `${vp.name}: detail shows Ain for 18th letter`);

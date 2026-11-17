@@ -3,14 +3,15 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react-nativ
 import { LETTERS } from '../src/lib/learn-data';
 
 const mockPlay = jest.fn();
+const mockSpeed = jest.fn();
 jest.mock('../src/lib/settings', () => ({ useApp: () => ({ colors: new Proxy({}, { get: () => '#123456' }), s: {} }) }));
-jest.mock('../src/lib/learn-audio', () => ({ playLesson: (...a) => mockPlay(...a), stopLesson: jest.fn(), usePlayingText: () => '' }));
+jest.mock('../src/lib/learn-audio', () => ({ playLesson: (...a) => mockPlay(...a), stopLesson: jest.fn(), usePlayingText: () => '', useLessonSpeed: () => 'slow', setLessonSpeed: (v) => mockSpeed(v) }));
 jest.mock('expo-audio', () => ({ createAudioPlayer: jest.fn(), setAudioModeAsync: jest.fn(() => Promise.resolve()) }));
 jest.mock('../src/lib/audio', () => ({ useAudio: () => null }));
 jest.mock('expo-router', () => ({ useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }) }));
 
 const { Lesson } = require('../src/components/LearnLessons');
-const { PracticeQuestions, QuizRun, Repeat, Match } = require('../src/components/LearnParts');
+const { PracticeQuestions, QuizRun, Repeat, Match, SpeedToggle } = require('../src/components/LearnParts');
 
 test('alphabet grid starts at the right (row-reverse) and lists all 29 letters in order', async () => {
   await render(<Lesson n={1} roman />);
@@ -68,4 +69,10 @@ test('quiz runs 10 questions to a score and reports it', async () => {
 test('flashcards and match game render for every level', async () => {
   for (let n = 1; n <= 6; n++) { await render(<Repeat level={n} />); expect(screen.getByText('I repeated it')).toBeTruthy(); }
   await render(<Match />); expect(screen.getByText(/Tap a letter/)).toBeTruthy();
+});
+test('speed toggle offers Slow learning (selected by default) and Normal', async () => {
+  await render(<SpeedToggle />);
+  expect(screen.getByLabelText('Slow learning').props.accessibilityState.selected).toBe(true);
+  await fireEvent.press(screen.getByLabelText('Normal'));
+  expect(mockSpeed).toHaveBeenCalledWith('normal');
 });

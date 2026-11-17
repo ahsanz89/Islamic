@@ -2,13 +2,14 @@ import { createLessonAudio } from '../src/lib/learn-audio-core';
 import { soundKey } from '../src/lib/learn-key';
 
 const TEXT = 'بَاء';
-function make(files = { [soundKey(TEXT)]: 123 }, { throwPlayer = false, throwSpeak = false } = {}) {
+function make(files = { [soundKey(TEXT)]: 123 }, { throwPlayer = false, throwSpeak = false, speed = 'slow' } = {}) {
   const players = [], spoken = [];
   const eng = createLessonAudio({
     files,
-    makePlayer: (src) => { if (throwPlayer) throw new Error('boom'); const p = { src, l: null, played: false, paused: false, removed: false, addListener: (e, f) => { p.l = f; }, play: () => { p.played = true; }, pause: () => { p.paused = true; }, remove: () => { p.removed = true; } }; players.push(p); return p; },
+    makePlayer: (src) => { if (throwPlayer) throw new Error('boom'); const p = { src, l: null, played: false, paused: false, removed: false, addListener: (e, f) => { p.l = f; }, setPlaybackRate: (r, q) => { p.rate = r; p.q = q; }, play: () => { p.played = true; }, pause: () => { p.paused = true; }, remove: () => { p.removed = true; } }; players.push(p); return p; },
     speak: (t, done) => { if (throwSpeak) throw new Error('no voice'); spoken.push([t, done]); },
-    stopSpeak: () => {}
+    stopSpeak: () => {},
+    getSpeed: () => speed
   });
   return { eng, players, spoken };
 }
@@ -63,4 +64,22 @@ test('notifies subscribers', () => {
   const off = eng.subscribe((s) => seen.push(s.status));
   eng.play({ text: TEXT }); eng.stop(); off(); eng.play({ text: TEXT });
   expect(seen).toEqual(['playing', 'idle']);
+});
+
+test('slow learning (default) plays the recording at its natural slow pace', () => {
+  const { eng, players } = make();
+  eng.play({ text: TEXT });
+  expect(players[0].rate).toBeUndefined();
+});
+test('normal speed plays a little faster with pitch correction', () => {
+  const { eng, players } = make(undefined, { speed: 'normal' });
+  eng.play({ text: TEXT });
+  expect(players[0].rate).toBe(1.3);
+  expect(players[0].q).toBe('high');
+});
+test('the phone voice fallback is slower in slow mode', () => {
+  const slow = []; const fast = [];
+  const mk = (speed, sink) => createLessonAudio({ files: {}, makePlayer: () => {}, speak: (t, d, r) => sink.push(r), stopSpeak: () => {}, getSpeed: () => speed });
+  mk('slow', slow).play({ text: TEXT }); mk('normal', fast).play({ text: TEXT });
+  expect(slow[0]).toBeLessThan(fast[0]);
 });

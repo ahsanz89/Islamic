@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { arabicVoices, loadVoices, onLessonState, playLesson, saveVoiceName, savedVoiceName, stopLesson } from '@/lib/learn-audio';
+import { arabicVoices, getSpeed, loadVoices, onLessonState, onSpeedChange, setSpeed, playLesson, saveVoiceName, savedVoiceName, stopLesson } from '@/lib/learn-audio';
 
 export function Sound({ text, id, label = 'Listen', className = '', children }) {
   const [failed, setFailed] = useState(false);
@@ -51,5 +51,19 @@ export function VoiceNotice() {
       </ol>
       <p className="muted small">{voices.length} voices found on this device, none Arabic. The same lessons on the Android app use the phone&rsquo;s Arabic voice.</p>
     </details>
+  );
+}
+
+/** Slow (default) / Normal playback speed for every lesson sound. */
+export function SpeedToggle() {
+  const [sp, setSp] = useState('slow');
+  useEffect(() => { setSp(getSpeed()); return onSpeedChange(setSp); }, []);
+  return (
+    <div className="lq-speed" role="group" aria-label="Sound speed">
+      <span className="muted small">Sound speed:</span>
+      {[['slow', 'Slow learning'], ['normal', 'Normal']].map(([k, l]) => (
+        <button key={k} type="button" className={sp === k ? 'on' : ''} aria-pressed={sp === k} onClick={() => setSpeed(k)}>{l}</button>
+      ))}
+    </div>
   );
 }

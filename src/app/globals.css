@@ -1023,3 +1023,6 @@ html[dir='rtl'] .site-header .bar { padding: 8px 14px 8px 12px; }
 
 /* The decorative hero glow must never make the page scroll sideways on phones. */
 html, body { overflow-x: clip; }
+.lq-speed { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.lq-speed button { min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; }
+.lq-speed button.on { background: var(--brand); border-color: var(--brand); color: #fff; }

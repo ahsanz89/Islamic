@@ -5,7 +5,7 @@ import { LEVELS, PASS_MARK } from '@/lib/learn-data';
 import { useLearn } from '@/lib/learn-progress';
 import Lesson from '../Lessons';
 import { Match, PracticeQuestions, QuizRun, Repeat } from '../Practice';
-import { VoiceNotice } from '../parts';
+import { SpeedToggle, VoiceNotice } from '../parts';
 
 export default function LevelView({ n }) {
   const lv = LEVELS[n - 1];
@@ -41,6 +41,7 @@ export default function LevelView({ n }) {
         <span className="spacer" />
         <label className="lq-roman"><input type="checkbox" checked={s.roman} onChange={(e) => setRoman(e.target.checked)} /> Roman Urdu</label>
       </div>
+      <SpeedToggle />
       <VoiceNotice />
       {tab === 'learn' && (
         <>
