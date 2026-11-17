@@ -44,6 +44,7 @@ export const Icon = {
   home: S(<><path d="M3 11 12 4l9 7" /><path d="M5 10v10h14V10" /></>),
   books: S(<><path d="M4 4h5v16H4zM10 4h5v16h-5z" /><path d="m16 5 4 1-3 14-4-1" /></>),
   quran: S(<><path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5z" /><path d="M12 6v14" /></>),
+  learn: S(<><path d="M12 4 2 9l10 5 10-5z" /><path d="M6 11.5v4.5c0 1.5 3 3 6 3s6-1.5 6-3v-4.5" /><path d="M22 9v6" /></>),
   hands: S(<><path d="M7 11V6a2 2 0 0 1 4 0v5" /><path d="M13 11V6a2 2 0 0 1 4 0v8a6 6 0 0 1-12 0v-2" /></>),
   glossary: S(<><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M8 7h7M8 11h5" /></>),
   people: S(<><circle cx="9" cy="8" r="3" /><path d="M3 20a6 6 0 0 1 12 0" /><circle cx="17" cy="9" r="2.5" /><path d="M16 14a5 5 0 0 1 5 5" /></>),
@@ -68,6 +69,7 @@ export const Icon = {
 // Main navigation: the four things people come for, then a "More" menu.
 const NAV_MAIN = [
   ['/quran/', 'quran'],
+  ['/learn/', 'learn'],
   ['/collections/', 'collections'],
   ['/duas/', 'duas'],
   ['/namaz/', 'namaz']
@@ -116,7 +118,7 @@ const TABS = [
   ['/', 'home', 'home'],
   ['/collections/', 'collections', 'books'],
   ['/quran/', 'quran', 'quran'],
-  ['/search/', 'search', 'search'],
+  ['/learn/', 'learnTab', 'learn'],
   ['/bookmarks/', 'bookmarks', 'bookmark']
 ];
 
