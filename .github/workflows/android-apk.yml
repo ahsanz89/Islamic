@@ -37,6 +37,7 @@ jobs:
 
       - name: Allow more memory for Gradle
         run: |
+          printf "\n" >> android/gradle.properties
           echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g" >> android/gradle.properties
           echo "org.gradle.daemon=false" >> android/gradle.properties
 
