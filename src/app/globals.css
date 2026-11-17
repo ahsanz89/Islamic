@@ -1008,3 +1008,6 @@ html[dir='rtl'] .site-header .bar { padding: 8px 14px 8px 12px; }
 .lq-opt .quran-ar { font-size: inherit; line-height: 2; text-align: center; }
 .lq-xl { line-height: 2.1; padding-block: 4px; }
 .lq-vcard .lq-ar { margin-bottom: 6px; }
+.lq-help summary { cursor: pointer; }
+.lq-help ol { margin: 8px 0; padding-inline-start: 20px; display: grid; gap: 6px; }
+.lq-help select { display: block; margin-top: 6px; max-width: 100%; min-height: 40px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); padding: 0 8px; }
