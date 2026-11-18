@@ -1028,3 +1028,82 @@ html, body { overflow-x: clip; }
 .lq-speed button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
 .lq-wordrow { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
 .lq-wordrow .lq-tile { display: inline-flex; align-items: center; justify-content: center; gap: 2px; background: var(--card, #fff); border: 1px solid var(--line, #ddd); cursor: pointer; text-align: center; }
+
+/* ---------- Redesigned navigation ---------- */
+.site-header { transition: transform .28s var(--ease, ease); }
+.site-nav { display: flex; gap: 4px; align-items: center; margin-inline-start: 6px; }
+.nav-item-wrap { position: relative; }
+.nav-item-wrap.is-mega { position: static; }
+.site-nav .nav-top { position: relative; padding: 10px 13px; border-radius: 12px; color: var(--muted); font-weight: 600; font-size: 15.5px; background: none; border: 0; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; transition: color .2s, background .2s; white-space: nowrap; min-height: 44px; }
+.site-nav .nav-top:hover, .site-nav .nav-top[aria-expanded='true'] { color: var(--ink); background: var(--surface-3); }
+.site-nav .nav-top[aria-current='page'] { color: var(--brand); background: var(--brand-soft); }
+.site-nav .nav-top:focus-visible, .nav-item:focus-visible, .mm a:focus-visible, .mm summary:focus-visible, .la-word:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.site-nav .chev { transition: transform .2s; }
+.site-nav .nav-top[aria-expanded='true'] .chev { transform: rotate(180deg); }
+.site-nav .feature-link { color: var(--brand-ink); background: var(--brand); padding-inline: 14px 16px; margin-inline: 4px; box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--brand) 70%, transparent); }
+.site-nav .feature-link:hover { color: var(--brand-ink); background: var(--brand-deep); }
+.site-nav .feature-link[aria-current='page'] { color: var(--brand-ink); background: var(--brand-deep); box-shadow: 0 0 0 2px var(--gold-line); }
+.site-nav .nav-ic { display: inline-grid; place-items: center; }
+.site-nav .nav-ic svg { width: 18px; height: 18px; }
+.nav-panel { position: absolute; inset-inline-start: 0; top: calc(100% + 10px); min-width: 300px; padding: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-lg); z-index: 70; animation: nav-in .16s ease-out; }
+.nav-panel.mega { inset-inline: 0; margin-inline: auto; width: min(760px, calc(100vw - 32px)); inset-inline-start: auto; display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 10px; }
+.site-header { }
+.is-mega .nav-panel.mega { position: absolute; inset-inline-start: 50%; transform: translateX(-50%); margin: 0; }
+html[dir='rtl'] .is-mega .nav-panel.mega { transform: translateX(50%); }
+.nav-cols { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.mega .nav-cols { grid-template-columns: 1fr 1fr; }
+.nav-ctitle { margin: 6px 12px 4px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.nav-item { display: flex; flex-direction: column; gap: 2px; padding: 9px 12px; border-radius: 12px; color: var(--ink); transition: background .15s; }
+.nav-item:hover { background: var(--surface-3); color: var(--ink); }
+.nav-item[aria-current='page'] { background: var(--brand-soft); color: var(--brand); }
+.nav-item .nl { font-weight: 700; font-size: 15px; }
+.nav-item .nd { font-size: 13px; color: var(--muted); line-height: 1.35; }
+.nav-promo { display: flex; flex-direction: column; gap: 8px; justify-content: center; padding: 16px; border-radius: 14px; background: var(--brand); color: var(--brand-ink); }
+.nav-promo:hover { color: var(--brand-ink); }
+.nav-promo strong { font-size: 17px; line-height: 1.25; }
+.nav-promo span { font-size: 13.5px; opacity: .92; line-height: 1.4; }
+.nav-promo .go { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; opacity: 1; margin-top: 4px; }
+@keyframes nav-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.is-mega .nav-panel.mega { animation: nav-in-mega .16s ease-out; }
+@keyframes nav-in-mega { from { opacity: 0; margin-top: -4px; } to { opacity: 1; margin-top: 0; } }
+@media (prefers-reduced-motion: reduce) { .nav-panel, .is-mega .nav-panel.mega, .site-header { animation: none; transition: none; } }
+.nav-burger { display: none; }
+@media (max-width: 1100px) { .cmd-trigger span.t, .cmd-trigger kbd { display: none; } .cmd-trigger { padding: 0; width: 44px; justify-content: center; } }
+@media (max-width: 900px) {
+  .site-nav { display: none; }
+  .nav-burger { display: inline-grid; }
+  .site-header.hide { transform: translateY(-140%); }
+}
+/* mobile drawer */
+.mm-wrap { position: fixed; inset: 0; z-index: 90; background: rgba(10, 25, 20, .45); display: flex; justify-content: flex-end; }
+.mm { width: min(360px, 92vw); height: 100%; overflow-y: auto; background: var(--surface); padding: 12px 14px 28px; display: flex; flex-direction: column; gap: 6px; box-shadow: var(--shadow-lg); animation: mm-in .22s ease-out; overscroll-behavior: contain; }
+html[dir='rtl'] .mm-wrap { justify-content: flex-start; }
+@keyframes mm-in { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+html[dir='rtl'] .mm { animation-name: mm-in-rtl; }
+@keyframes mm-in-rtl { from { transform: translateX(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.mm-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 2px 8px; }
+.mm-promo { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: 16px; background: var(--brand); color: var(--brand-ink); margin-bottom: 6px; }
+.mm-promo:hover { color: var(--brand-ink); }
+.mm-promo strong { display: block; font-size: 16.5px; }
+.mm-promo small { display: block; font-size: 13px; opacity: .92; line-height: 1.35; margin-top: 2px; }
+.mm-promo .nav-ic { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--brand-ink) 16%, transparent); }
+.mm-link, .mm-sec > summary { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 12px; color: var(--ink); font-weight: 700; font-size: 16px; cursor: pointer; list-style: none; }
+.mm-sec > summary::-webkit-details-marker { display: none; }
+.mm-sec > summary .chev { margin-inline-start: auto; transition: transform .2s; }
+.mm-sec[open] > summary .chev { transform: rotate(180deg); }
+.mm-link:hover, .mm-sec > summary:hover { background: var(--surface-3); color: var(--ink); }
+.mm-link.on { background: var(--brand-soft); color: var(--brand); }
+.mm-items { display: grid; padding: 0 0 6px; margin-inline-start: 18px; border-inline-start: 2px solid var(--line, var(--border)); }
+.mm-items a { display: flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; color: var(--ink); font-weight: 600; font-size: 15.5px; }
+.mm-items a:hover { background: var(--surface-3); }
+.mm-items a[aria-current='page'] { background: var(--brand-soft); color: var(--brand); }
+/* home: Learn Arabic promo */
+.la-promo { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; align-items: center; padding: 26px; border-radius: var(--radius-lg, 22px); border: 1px solid var(--border); background: linear-gradient(180deg, var(--brand-soft), var(--surface)); margin-block: 8px; }
+.la-promo h2 { margin: 4px 0 8px; }
+.la-words { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+.la-word { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; min-width: 84px; padding: 8px 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; font-family: inherit; transition: border-color .2s, transform .2s; }
+.la-word:hover { border-color: var(--brand); transform: translateY(-2px); }
+.la-word .quran-ar { font-size: 28px; line-height: 1.9; }
+.la-word small { font-size: 12.5px; color: var(--muted); font-weight: 600; text-align: center; }
+.la-five .go { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+@media (max-width: 760px) { .la-promo { grid-template-columns: 1fr; padding: 18px; } }
