@@ -18,6 +18,8 @@ export function useAudio(selector) {
 let player = null;
 let guard = 0;        // ignores stale "finished" events after a source change
 let loadingTimer = null;
+let playId = 0;        // one id per clip started
+let finishedId = 0;    // the clip whose "finished" event was already handled (expo-audio can report it twice)
 
 function ensure() {
   if (player) return player;
@@ -25,7 +27,7 @@ function ensure() {
   player = createAudioPlayer(null, { updateInterval: 250 });
   player.addListener('playbackStatusUpdate', (s) => {
     if (!state.q) return;
-    if (s.didJustFinish && Date.now() > guard) { onEnded(); return; }
+    if (s.didJustFinish && Date.now() > guard) { if (finishedId !== playId) { finishedId = playId; onEnded(); } return; }
     if (s.isLoaded && s.playing && state.status !== 'playing') { clearTimeout(loadingTimer); set({ status: 'playing', err: '' }); }
     else if (s.isLoaded && !s.playing && state.status === 'playing' && !s.didJustFinish) set({ status: 'paused' });
   });
@@ -34,20 +36,31 @@ function ensure() {
 
 // Whole-surah reciters have no per-ayah files, so a single tapped ayah plays in this ayah-by-ayah reciter instead.
 let ayahFallback = false;
-const rid = () => (ayahFallback && reciterById(cfg.reciter).type === 'surah' ? 'alafasy' : cfg.reciter);
+// A whole-surah file has no ayah boundaries, so translation audio cannot follow each ayah. When spoken translation is on,
+// such a reciter's surah plays ayah by ayah in the fallback reciter instead.
+const rid = () => ((ayahFallback || cfg.urdu) && reciterById(cfg.reciter).type === 'surah' ? 'alafasy' : cfg.reciter);
 export const isWhole = (id) => reciterById(id).type === 'surah';
 function srcFor(surah, v) {
   const r = reciterById(rid());
   if (r.type === 'surah') return AUDIO.surahFile(r.slug, surah.n);
   return AUDIO.ayah(r.folder, v === 0 ? 1 : surah.n, v === 0 ? 1 : v);
 }
+const URDU_START_TIMEOUT = 12000;
 function start(url) {
   const p = ensure();
   guard = Date.now() + 600;
+  playId += 1;
+  const id = playId;
   p.replace({ uri: url });
   p.play();
   clearTimeout(loadingTimer);
-  loadingTimer = setTimeout(() => { if (state.status === 'loading') set({ status: 'error', err: 'unavailable' }); }, 20000);
+  const isUrdu = state.phase === 'urdu';
+  loadingTimer = setTimeout(() => {
+    if (id !== playId || state.status !== 'loading') return;
+    // a translation clip that never starts must not freeze the recitation: skip it
+    if (isUrdu) { state.phase = ''; advance(); return; }
+    set({ status: 'error', err: 'unavailable' });
+  }, isUrdu ? URDU_START_TIMEOUT : 20000);
 }
 function load(surah, v, mode, autoplay = true) {
   if (v < 0) v = 1;
@@ -97,7 +110,10 @@ export function retry() { if (state.q) load(state.q.surah, Math.max(state.q.v, 1
 export function configure(next) {
   const prevReciter = cfg.reciter;
   Object.assign(cfg, next);
-  if (next.reciter && next.reciter !== prevReciter && state.q) {
+  if (!state.q) return;
+  // While the translation clip plays, the reciter is irrelevant: let it finish; the next ayah uses the new reciter.
+  if (state.phase === 'urdu') return;
+  if (next.reciter && next.reciter !== prevReciter) {
     const was = state.status === 'playing' || state.status === 'loading';
     load(state.q.surah, Math.max(state.q.v, 1), state.q.mode, was);
   }

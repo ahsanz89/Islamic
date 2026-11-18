@@ -41,6 +41,9 @@ let toastTimer = 0;
 const wordCache = new Map(); // url → HTMLAudioElement (most recent 12)
 let curWordEl = null;
 let wordToken = 0;
+let urduTimer = 0;      // watchdog: a translation clip that never starts must not freeze the recitation
+const URDU_START_TIMEOUT = 12000;
+const clearUrduWatch = () => { clearTimeout(urduTimer); urduTimer = 0; };
 
 const set = (patch) => { Object.assign(state, patch); emit(); };
 const toast = (msg) => {
@@ -59,14 +62,15 @@ function ensureEl() {
   ayahEl.addEventListener('loadstart', () => { if (state.q && state.status !== 'paused') set({ status: 'loading', err: '' }); });
   ayahEl.addEventListener('waiting', () => { if (state.status === 'playing') set({ status: 'loading' }); });
   ayahEl.addEventListener('canplay', () => { if (state.status === 'loading' && !ayahEl.paused) set({ status: 'playing' }); });
-  ayahEl.addEventListener('playing', () => set({ status: 'playing', err: '' }));
+  ayahEl.addEventListener('playing', () => { clearUrduWatch(); set({ status: 'playing', err: '' }); });
   ayahEl.addEventListener('pause', () => { if (!ayahEl.ended && state.status !== 'idle' && state.status !== 'error' && state.status !== 'loading') set({ status: 'paused' }); });
   ayahEl.addEventListener('ended', onEnded);
   ayahEl.addEventListener('error', () => {
     if (!state.q) return;
     const off = typeof navigator !== 'undefined' && navigator.onLine === false;
     // a missing Urdu clip never blocks the recitation: skip it and carry on
-    if (state.phase === 'urdu' && !off) { toast('urdu-unavailable'); state.phase = ''; advance(); return; }
+    if (state.phase === 'urdu' && !off) { clearUrduWatch(); toast('urdu-unavailable'); state.phase = ''; advance(); return; }
+    clearUrduWatch();
     set({ status: 'error', err: off ? 'offline' : 'unavailable' });
   });
   window.addEventListener('online', () => { if (state.status === 'error' && state.q) retry(); });
@@ -76,7 +80,9 @@ function ensureEl() {
 // ayah-by-ayah reciter instead, so it starts at the right verse rather than at the beginning of the surah.
 const AYAH_FALLBACK = 'alafasy';
 let ayahFallback = false;
-const rid = () => (ayahFallback && reciterById(cfg.reciter).type === 'surah' ? AYAH_FALLBACK : cfg.reciter);
+// A whole-surah file has no ayah boundaries, so a translation clip can never be slotted in after each ayah. When spoken
+// translation is on, such a reciter's surah is therefore played ayah by ayah in the fallback reciter instead.
+const rid = () => ((ayahFallback || cfg.urdu) && reciterById(cfg.reciter).type === 'surah' ? AYAH_FALLBACK : cfg.reciter);
 
 export const isWhole = (reciterId) => reciterById(reciterId).type === 'surah';
 export const verseUrl = (reciterId, s, v) => {
@@ -89,6 +95,7 @@ function load(surah, v, mode, autoplay = true) {
   if (v < 0) v = 1;
   ensureEl();
   stopWord();
+  clearUrduWatch();
   const whole = isWhole(rid());
   state.q = { surah, v: whole ? -1 : v, mode: whole ? 'surah' : mode, whole };
   state.time = 0; state.dur = 0; emitTime();
@@ -133,15 +140,23 @@ function onEnded() {
   const q = state.q;
   if (!q) return;
   if (cfg.urdu && !q.whole && q.v >= 1 && state.phase !== 'urdu') {
-    // the spoken Urdu translation follows each ayah
+    // the spoken translation follows each ayah
     state.phase = 'urdu';
     state.time = 0; state.dur = 0; emitTime();
     set({ status: 'loading', phase: 'urdu' });
     ayahEl.src = AUDIO_SOURCES.urdu(q.surah.n, q.v);
-    ayahEl.play().catch(() => {});
+    const p = ayahEl.play();
+    if (p && p.catch) p.catch((e) => { if (e && e.name === 'NotAllowedError') { clearUrduWatch(); set({ status: 'paused' }); } });
+    // if the clip has not started after a while (stalled network), skip it and carry on with the recitation
+    clearUrduWatch();
+    const id = q;
+    urduTimer = setTimeout(() => {
+      if (state.q === id && state.phase === 'urdu' && state.status === 'loading') { toast('urdu-unavailable'); state.phase = ''; advance(); }
+    }, URDU_START_TIMEOUT);
     if (q.mode === 'surah' && q.v < q.surah.verses) prefetch(verseUrl(rid(), q.surah.n, q.v + 1));
     return;
   }
+  clearUrduWatch();
   state.phase = '';
   advance();
 }
@@ -163,6 +178,7 @@ export function resume() {
 }
 export function toggle() { if (state.status === 'playing' || state.status === 'loading') pause(); else resume(); }
 export function stop() {
+  clearUrduWatch();
   if (ayahEl) { ayahEl.pause(); ayahEl.removeAttribute('src'); ayahEl.load(); }
   state.q = null; state.time = 0; state.dur = 0; emitTime();
   set({ status: 'idle', err: '', phase: '' });
@@ -188,15 +204,21 @@ export function retry() { if (state.q) load(state.q.surah, Math.max(state.q.v, 1
 
 /** Keep the engine in sync with the saved settings (called from React). */
 export function configure(next) {
-  const prevReciter = cfg.reciter;
+  const prevReciter = cfg.reciter, prevUrdu = cfg.urdu;
   Object.assign(cfg, next);
   if (ayahEl) ayahEl.volume = cfg.volume;
   if (curWordEl) curWordEl.volume = cfg.volume;
-  if (next.reciter && next.reciter !== prevReciter && state.q && ayahEl) {
+  if (!state.q || !ayahEl) return;
+  // While the translation clip is playing the reciter is irrelevant: let it finish, the next ayah uses the new reciter.
+  if (state.phase === 'urdu') { if (next.reciter && next.reciter !== prevReciter) prefetchNext(); return; }
+  if (next.reciter && next.reciter !== prevReciter) {
     const wasPlaying = state.status === 'playing' || state.status === 'loading';
     load(state.q.surah, state.q.v, state.q.mode, wasPlaying);
     if (!wasPlaying) set({ status: 'paused' });
+    return;
   }
+  // Translation switched on while a whole-surah file is playing: that file cannot be interleaved, so say so; it applies from the next play.
+  if (next.urdu && !prevUrdu && state.q.whole) toast('whole-no-translation');
 }
 
 /* ---------------------------------------------------------------- word pronunciation */
