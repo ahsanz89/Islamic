@@ -18,9 +18,33 @@ export function createLessonAudio({ files, makePlayer, speak, stopSpeak, getSpee
   }
 
   /** @returns {'recording'|'voice'|'none'} */
-  function play({ text }) {
+  function speakIt(text) {
+    try {
+      speak(text, () => set({ status: 'idle', text: '' }), (SPEEDS[getSpeed()] || SPEEDS.slow).speech);
+      set({ status: 'playing', text });
+      return 'voice';
+    } catch { return 'none'; }
+  }
+
+  /** @param {{text:string,url?:string}} a  `url` = an online clip of exactly this text (e.g. a single Quran word); the phone voice is used if it cannot play. */
+  function play({ text, url }) {
     stop();
     if (!text) return 'none';
+    if (url) {
+      try {
+        const p = makePlayer({ uri: url });
+        player = p;
+        p.addListener?.('playbackStatusUpdate', (s) => {
+          if (player !== p) return;
+          if (s?.didJustFinish) { dropPlayer(); set({ status: 'idle', text: '' }); }
+          else if (s?.error) { dropPlayer(); speakIt(text); }
+        });
+        try { const r = SPEEDS[getSpeed()] || SPEEDS.slow; if (r.rate !== 1) p.setPlaybackRate?.(r.rate, 'high'); } catch { /* ignore */ }
+        p.play();
+        set({ status: 'playing', text });
+        return 'recording';
+      } catch { dropPlayer(); return speakIt(text); }
+    }
     const src = files[soundKey(text)];
     if (src) {
       try {
@@ -33,11 +57,7 @@ export function createLessonAudio({ files, makePlayer, speak, stopSpeak, getSpee
         return 'recording';
       } catch { dropPlayer(); }
     }
-    try {
-      speak(text, () => set({ status: 'idle', text: '' }), (SPEEDS[getSpeed()] || SPEEDS.slow).speech);
-      set({ status: 'playing', text });
-      return 'voice';
-    } catch { return 'none'; }
+    return speakIt(text);
   }
 
   return { play, stop, has: (text) => !!files[soundKey(text)], getState: () => state, subscribe: (f) => { subs.add(f); return () => subs.delete(f); } };

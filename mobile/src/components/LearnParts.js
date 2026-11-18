@@ -6,18 +6,19 @@ import { useApp } from '../lib/settings';
 import { playLesson, setLessonSpeed, stopLesson, useLessonSpeed, usePlayingText } from '../lib/learn-audio';
 import { LETTERS, PASS_MARK, SHORT_WORDS, SUKOON_WORDS, SYLLABLE_LETTERS, TANWEEN, VOWELS, forms, pick, question, shuffle, syllable } from '../lib/learn-data';
 import { ArabicText, Button, Card, T } from './ui';
+import { playWordRef } from '../lib/arabic-audio';
 
 export function Ar({ children, size = 34, center = true, style }) {
   return <ArabicText quran size={size} center={center} style={style}>{children}</ArabicText>;
 }
 
-export function SoundBtn({ text, label = 'Listen' }) {
+export function SoundBtn({ text, label = 'Listen', onPlay }) {
   const { colors } = useApp();
   const playing = usePlayingText() === text;
   const [failed, setFailed] = useState(false);
   const go = () => {
     if (playing) { stopLesson(); return; }
-    setFailed(playLesson({ text }) === 'none');
+    setFailed((onPlay ? onPlay() : playLesson({ text })) === 'none');
   };
   return (
     <View style={{ alignItems: 'center', gap: 6 }}>
@@ -75,12 +76,13 @@ function Opt({ o, state, disabled, onPress }) {
 function Q({ q, chosen, onAnswer }) {
   const { colors } = useApp();
   const locked = chosen !== null;
-  useEffect(() => { if (q.audio) playLesson({ text: q.audio.text }); }, [q]);
+  useEffect(() => { if (q.audio && !q.audio.ref) playLesson({ text: q.audio.text }); }, [q]);
   return (
     <Card style={{ gap: 12, alignItems: 'center' }}>
       <T weight="uiSemi" size={17} style={{ textAlign: 'center' }}>{q.prompt}</T>
       {q.big ? <Ar size={60}>{q.big}</Ar> : null}
-      {q.audio ? <SoundBtn text={q.audio.text} label="Play again" /> : null}
+      {q.audio && !q.audio.ref ? <SoundBtn text={q.audio.text} label="Play again" /> : null}
+      {q.audio && q.audio.ref ? <SoundBtn text={q.audio.text} label={q.audio.label || 'Listen'} onPlay={() => playWordRef(q.audio.ref, q.audio.text)} /> : null}
       <View testID="options" style={{ flexDirection: q.options.some((o) => o.big) ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between', alignSelf: 'stretch' }}>
         {q.options.map((o) => <Opt key={o.key} o={o} disabled={locked} state={!locked ? '' : o.key === q.answer ? 'right' : o.key === chosen ? 'wrong' : ''} onPress={() => onAnswer(o.key)} />)}
       </View>
@@ -89,26 +91,28 @@ function Q({ q, chosen, onAnswer }) {
   );
 }
 
-export function PracticeQuestions({ level }) {
+export function PracticeQuestions({ level, gen }) {
   const { colors } = useApp();
-  const [q, setQ] = useState(() => question(level));
+  const question_ = gen || question;
+  const [q, setQ] = useState(() => question_(level));
   const [chosen, setChosen] = useState(null);
   const [tally, setTally] = useState({ ok: 0, all: 0 });
-  useEffect(() => { setQ(question(level)); setChosen(null); setTally({ ok: 0, all: 0 }); }, [level]);
+  useEffect(() => { setQ(question_(level)); setChosen(null); setTally({ ok: 0, all: 0 }); }, [level]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <View style={{ gap: 12 }}>
       <T size={13} color={colors.muted}>Correct so far: {tally.ok} of {tally.all}</T>
       <Q q={q} chosen={chosen} onAnswer={(k) => { setChosen(k); setTally((t) => ({ ok: t.ok + (k === q.answer ? 1 : 0), all: t.all + 1 })); }} />
-      {chosen !== null ? <Button label="Next question" onPress={() => { setQ(question(level)); setChosen(null); }} /> : null}
+      {chosen !== null ? <Button label="Next question" onPress={() => { setQ(question_(level)); setChosen(null); }} /> : null}
     </View>
   );
 }
 
-export function QuizRun({ level, next, onFinish }) {
+export function QuizRun({ level, next, onFinish, gen, nextRoute, goLabel }) {
   const { colors } = useApp();
+  const question_ = gen || question;
   const router = useRouter();
   const N = 10;
-  const build = () => { const seen = new Set(); const out = []; let g = 0; while (out.length < N && g++ < 200) { const q = question(level); const k = q.prompt + (q.big || '') + q.answer; if (!seen.has(k)) { seen.add(k); out.push(q); } } return out; };
+  const build = () => { const seen = new Set(); const out = []; let g = 0; while (out.length < N && g++ < 200) { const q = question_(level); const k = q.prompt + (q.big || '') + q.answer; if (!seen.has(k)) { seen.add(k); out.push(q); } } return out; };
   const [qs, setQs] = useState(build);
   const [i, setI] = useState(0);
   const [chosen, setChosen] = useState(null);
@@ -122,7 +126,7 @@ export function QuizRun({ level, next, onFinish }) {
         <T weight="uiBlack" size={44} color={colors.brandDeep}>{score} / {qs.length}</T>
         <T style={{ textAlign: 'center' }}>{pass ? 'Level complete. Well done! The next level is now open.' : `You need ${Math.ceil(PASS_MARK * qs.length)} correct to pass. Review the lessons, practise, and try again.`}</T>
         <Button kind="ghost" label="Try again" onPress={again} />
-        {pass && next ? <Button label={`Go to Level ${next}`} onPress={() => router.replace(`/learn/${next}`)} /> : null}
+        {pass && next ? <Button label={goLabel ? goLabel(next) : `Go to Level ${next}`} onPress={() => router.replace(nextRoute ? nextRoute(next) : `/learn/${next}`)} /> : null}
         {pass && !next ? <Button label="Read Al-Fatiha" onPress={() => router.push('/surah/1')} /> : null}
       </Card>
     );

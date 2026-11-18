@@ -3,15 +3,18 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { LETTERS, LEVELS, PASS_MARK, SHORT_WORDS, SUKOON_WORDS, SYLLABLE_LETTERS, TANWEEN, VOWELS, forms, pick, question, shuffle, syllable } from '@/lib/learn-data';
 import { playLesson } from '@/lib/learn-audio';
+import { playWordRef } from '@/lib/arabic-audio';
 import { Sound } from './parts';
 
+const playAudio = (a) => (a.ref ? playWordRef(a.ref, a.text) : playLesson({ text: a.text, id: a.id }));
 function Q({ q, onAnswer, locked, chosen }) {
-  useEffect(() => { if (q.audio) playLesson({ text: q.audio.text, id: q.audio.id }); }, [q]);
+  useEffect(() => { if (q.audio && !q.audio.ref) playLesson({ text: q.audio.text, id: q.audio.id }); }, [q]);
   return (
     <div className="lq-q">
       <p className="lq-prompt">{q.prompt}</p>
       {q.big && <p className="lq-bigq quran-ar" lang="ar" dir="rtl">{q.big}</p>}
-      {q.audio && <Sound text={q.audio.text} id={q.audio.id} label="Play again" />}
+      {q.audio && !q.audio.ref && <Sound text={q.audio.text} id={q.audio.id} label="Play again" />}
+      {q.audio && q.audio.ref && <button type="button" className="lq-sound" onClick={() => playAudio(q.audio)} data-sound={q.audio.text}>{q.audio.label || 'Listen'}</button>}
       <div className="lq-opts" role="group" aria-label="Choices">
         {q.options.map((o) => {
           const state = !locked ? '' : o.key === q.answer ? 'right' : o.key === chosen ? 'wrong' : '';
@@ -28,30 +31,32 @@ function Q({ q, onAnswer, locked, chosen }) {
 }
 
 /** Endless practice: instant feedback, no score pressure. */
-export function PracticeQuestions({ level }) {
+export function PracticeQuestions({ level, gen }) {
+  const question_ = gen || question;
   const [q, setQ] = useState(null);
   const [chosen, setChosen] = useState(null);
   const [tally, setTally] = useState({ ok: 0, all: 0 });
-  useEffect(() => { setQ(question(level)); setChosen(null); setTally({ ok: 0, all: 0 }); }, [level]);
+  useEffect(() => { setQ(question_(level)); setChosen(null); setTally({ ok: 0, all: 0 }); }, [level]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!q) return null;
   return (
     <div>
       <p className="muted small">Correct so far: {tally.ok} of {tally.all}</p>
       <Q q={q} chosen={chosen} locked={chosen !== null} onAnswer={(k) => { setChosen(k); setTally((t) => ({ ok: t.ok + (k === q.answer ? 1 : 0), all: t.all + 1 })); }} />
-      {chosen !== null && <button className="btn primary lq-next" onClick={() => { setQ(question(level)); setChosen(null); }}>Next question</button>}
+      {chosen !== null && <button className="btn primary lq-next" onClick={() => { setQ(question_(level)); setChosen(null); }}>Next question</button>}
     </div>
   );
 }
 
 /** Scored quiz of 10 questions. */
-export function QuizRun({ level, onFinish, next }) {
+export function QuizRun({ level, onFinish, next, gen, nextHref, labels }) {
+  const question_ = gen || question;
   const N = 10;
   const [qs, setQs] = useState(null);
   const [i, setI] = useState(0);
   const [chosen, setChosen] = useState(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
-  const start = () => { const seen = new Set(); const out = []; let guard = 0; while (out.length < N && guard++ < 200) { const q = question(level); const k = q.prompt + (q.big || '') + q.answer; if (!seen.has(k)) { seen.add(k); out.push(q); } } setQs(out); setI(0); setChosen(null); setScore(0); setDone(false); };
+  const start = () => { const seen = new Set(); const out = []; let guard = 0; while (out.length < N && guard++ < 200) { const q = question_(level); const k = q.prompt + (q.big || '') + q.answer; if (!seen.has(k)) { seen.add(k); out.push(q); } } setQs(out); setI(0); setChosen(null); setScore(0); setDone(false); };
   useEffect(() => { start(); }, [level]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!qs) return null;
   if (done) {
@@ -62,7 +67,7 @@ export function QuizRun({ level, onFinish, next }) {
         <p>{pass ? 'Level complete. Well done! The next level is now open.' : `You need ${Math.ceil(PASS_MARK * qs.length)} correct to pass. Review the lessons, practise, and try again.`}</p>
         <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
           <button className="btn" onClick={start}>Try again</button>
-          {pass && next && <Link className="btn primary" href={`/learn/${next}/`}>Go to Level {next}</Link>}
+          {pass && next && <Link className="btn primary" href={nextHref ? nextHref(next) : `/learn/${next}/`}>{labels?.go ? labels.go(next) : `Go to Level ${next}`}</Link>}
           {pass && !next && <Link className="btn primary" href="/quran/1/">Read Al-Fatiha</Link>}
         </div>
       </div>

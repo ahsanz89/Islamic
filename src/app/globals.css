@@ -1026,3 +1026,5 @@ html, body { overflow-x: clip; }
 .lq-speed { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
 .lq-speed button { min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; }
 .lq-speed button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+.lq-wordrow { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+.lq-wordrow .lq-tile { display: inline-flex; align-items: center; justify-content: center; gap: 2px; background: var(--card, #fff); border: 1px solid var(--line, #ddd); cursor: pointer; text-align: center; }

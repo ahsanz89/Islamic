@@ -83,3 +83,16 @@ test('the phone voice fallback is slower in slow mode', () => {
   mk('slow', slow).play({ text: TEXT }); mk('normal', fast).play({ text: TEXT });
   expect(slow[0]).toBeLessThan(fast[0]);
 });
+
+test('online word clip: plays the url, and falls back to the phone voice when it errors', () => {
+  const { eng, players, spoken } = make();
+  expect(eng.play({ text: 'ٱللَّهِ', url: 'https://x/y.mp3' })).toBe('recording');
+  expect(players[0].src).toEqual({ uri: 'https://x/y.mp3' });
+  players[0].l({ error: 'network' });
+  expect(spoken[0][0]).toBe('ٱللَّهِ');
+});
+test('online word clip: voice when the player cannot be created', () => {
+  const { eng, spoken } = make({}, { throwPlayer: true });
+  expect(eng.play({ text: 'ٱللَّهِ', url: 'https://x/y.mp3' })).toBe('voice');
+  expect(spoken).toHaveLength(1);
+});

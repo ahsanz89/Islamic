@@ -29,6 +29,6 @@ const engine = createLessonAudio({
 
 export const stopLesson = () => engine.stop();
 /** Plays the bundled recording for the text (or the phone's Arabic voice). Returns 'recording' | 'voice' | 'none'. */
-export const playLesson = ({ text }) => engine.play({ text });
+export const playLesson = ({ text, url }) => engine.play({ text, url });
 /** Which text is playing right now ('' when idle), so a button can show Stop. */
 export const usePlayingText = () => useSyncExternalStore(engine.subscribe, () => engine.getState().text, () => '');

@@ -34,6 +34,11 @@ export default function LearnHub() {
         })}
       </ol>
       <section className="lq-after">
+        <h2>Learn Arabic <small lang="ur" className="muted">عربی سیکھیں</small></h2>
+        <p>Learn the words of the Quran and the prayer, with meanings in English or Urdu.</p>
+        <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}><Link className="btn primary" href="/learn-arabic/">Open Learn Arabic</Link></div>
+      </section>
+      <section className="lq-after">
         <h2>Then read the Quran</h2>
         <p>Once you finish, practise with real verses. Every surah has audio and translations in your language.</p>
         <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}><Link className="btn" href="/quran/1/">Al-Fatiha</Link><Link className="btn" href="/quran/">All surahs</Link></div>

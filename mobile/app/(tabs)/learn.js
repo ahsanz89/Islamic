@@ -38,6 +38,10 @@ export default function LearnHub() {
             </Pressable>
           );
         })}
+        <Card onPress={() => router.push('/learn-arabic')} accessibilityLabel="Open Learn Arabic">
+          <T weight="uiBold" size={17}>Learn Arabic · عربی سیکھیں</T>
+          <T size={14} color={colors.muted}>Words of the Quran and the prayer, with meanings in English or Urdu.</T>
+        </Card>
         <Button kind="ghost" label="I already read Arabic: unlock all levels" onPress={unlockAll} />
         <Pressable onPress={reset} accessibilityRole="button"><T size={13} color={colors.muted} style={{ textAlign: 'center' }}>Reset progress on this device</T></Pressable>
       </ScrollView>
