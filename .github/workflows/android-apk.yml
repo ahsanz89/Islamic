@@ -4,6 +4,10 @@ name: Build Android APK (test)
 # Produces an installable test APK (signed with a debug key, NOT for Google Play) and attaches it to a GitHub Release.
 on:
   workflow_dispatch:
+  # Also runs by itself whenever the phone app (or this file) changes, so a push is enough to get a new APK.
+  push:
+    branches: [main]
+    paths: ['mobile/**', '.github/workflows/android-apk.yml']
 
 permissions:
   contents: write
@@ -43,7 +47,21 @@ jobs:
 
       - name: "Build the APK (phones only - arm64 and 32-bit arm)"
         working-directory: mobile/android
-        run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a --no-daemon
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a --no-daemon --stacktrace 2>&1 | tee gradle.log
+
+      - name: Show why the build failed (as readable messages on the run page)
+        if: failure()
+        working-directory: mobile/android
+        shell: bash
+        run: |
+          [ -f gradle.log ] || { echo "::error title=No Gradle log::The build stopped before Gradle started."; exit 0; }
+          key=$(grep -n -E "What went wrong|Execution failed|error:|Could not|FAILURE|Caused by|Cannot|not found|Unresolved|Error:" gradle.log | head -25 | cut -c1-300)
+          tail=$(tail -n 40 gradle.log | cut -c1-300)
+          echo "::error title=Gradle key lines::${key//$'\n'/%0A}"
+          echo "::error title=Gradle last 40 lines::${tail//$'\n'/%0A}"
 
       - name: Collect the APK
         run: |
