@@ -48,7 +48,12 @@ jobs:
         env:
           K: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          echo "$K" | base64 -d > android/app/upload.jks
+          clean=$(printf '%s' "$K" | tr -cd 'A-Za-z0-9+/=')
+          echo "Pasted secret is ${#K} characters; ${#clean} are valid key characters (a correct paste is 3528)."
+          if ! printf '%s' "$clean" | base64 -d > android/app/upload.jks 2>/dev/null || [ ! -s android/app/upload.jks ]; then
+            echo "::error title=ANDROID_KEYSTORE_BASE64 is wrong::The secret is ${#K} characters long but should be 3528. Re-paste the WHOLE single line from dalil-upload-base64.txt (value only, no name, no quotes)."
+            exit 1
+          fi
           {
             echo ""
             echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g"
