@@ -56,8 +56,8 @@ export function wordItems3() {
 
 const keyOf = (it, lang) => ptext(it, lang);
 function pickOthers(pool, it, lang, n = 3) {
-  const seen = new Set([keyOf(it, lang)]); const out = [];
-  for (const o of shuffle(pool)) { const k = keyOf(o, lang); if (seen.has(k) || o.a === it.a) continue; seen.add(k); out.push(o); if (out.length === n) break; }
+  const seen = new Set([keyOf(it, lang)]); const seenA = new Set([it.a]); const out = [];
+  for (const o of shuffle(pool)) { const k = keyOf(o, lang); if (seen.has(k) || seenA.has(o.a)) continue; seen.add(k); seenA.add(o.a); out.push(o); if (out.length === n) break; }
   return out;
 }
 

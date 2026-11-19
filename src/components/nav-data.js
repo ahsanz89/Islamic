@@ -39,7 +39,15 @@ export const NAV = [
       ] }
     ]
   },
-  { id: 'duas', match: ['/duas/'], icon: 'hands', href: '/duas/', label: { en: 'Duas', ur: 'دعائیں', ar: 'الأدعية' } },
+  {
+    id: 'duas', match: ['/duas/'], icon: 'hands', href: '/duas/', label: { en: 'Duas', ur: 'دعائیں', ar: 'الأدعية' },
+    groups: [
+      { items: [
+        { href: '/duas/', label: { en: 'Daily duas', ur: 'روزمرہ دعائیں', ar: 'أدعية يومية' }, desc: { en: 'Morning, evening, travel, prayer and more', ur: 'صبح، شام، سفر، نماز اور مزید', ar: 'الصباح والمساء والسفر والصلاة وغيرها' } },
+        { href: '/duas/special/', label: { en: 'Special duas & accepted supplications', ur: 'خاص اور مقبول دعائیں', ar: 'أدعية خاصة ومستجابة' }, desc: { en: 'From the Quran and Sunnah, with sources and gradings', ur: 'قرآن و سنت سے، حوالہ اور درجے کے ساتھ', ar: 'من القرآن والسنة مع المصادر والدرجات' } }
+      ] }
+    ]
+  },
   {
     id: 'guidance', match: ['/namaz/', '/glossary/', '/about/', '/privacy/'], icon: 'glossary', href: '/namaz/', label: { en: 'Guidance', ur: 'رہنمائی', ar: 'إرشاد' },
     groups: [

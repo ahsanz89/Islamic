@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useApp } from '@/components/Providers';
 import { hadithHref } from '@/components/HadithCard';
 
-const linkFor = (b) => (b.type === 'hadith' ? hadithHref(b.c, b.n) : b.type === 'ayah' ? `/quran/${b.s}/#v${b.v}` : `/duas/#${b.id}`);
+const linkFor = (b) => (b.href ? b.href : b.type === 'hadith' ? hadithHref(b.c, b.n) : b.type === 'ayah' ? `/quran/${b.s}/#v${b.v}` : `/duas/#${b.id}`);
 
 export default function Bookmarks() {
   const { t, bookmarks, toggleBookmark } = useApp();

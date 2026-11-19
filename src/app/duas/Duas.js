@@ -52,6 +52,10 @@ export default function Duas({ data }) {
           ))}
         </div>
       </div>
+      <Link href="/duas/special/" className="sd-banner">
+        <strong>{settings.ui === 'ur' ? 'خاص دعائیں اور مقبول دعائیں' : 'Special Duas & Accepted Supplications'}</strong>
+        <span>{settings.ui === 'ur' ? 'قرآن اور مستند سنت سے، حوالہ اور درجے کے ساتھ' : 'From the Quran and authentic Sunnah, with sources and gradings'}</span>
+      </Link>
       <div className="stack" style={{ gap: 16 }}>{list.map((d) => <Dua key={d.id} d={d} />)}</div>
     </div>
   );

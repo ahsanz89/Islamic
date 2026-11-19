@@ -15,7 +15,13 @@ export default function Duas() {
   return (
     <Screen>
       <Header title={t('duas')} subtitle={t('duasDesc')} />
-      <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}><TranslationButton /></View>
+      <View style={{ paddingHorizontal: 16, paddingBottom: 8, gap: 10 }}>
+        <TranslationButton />
+        <Pressable onPress={() => router.push('/special-duas')} accessibilityRole="button" accessibilityLabel="Special Duas and Accepted Supplications" style={({ pressed }) => ({ padding: 16, borderRadius: 16, backgroundColor: colors.brand, opacity: pressed ? 0.85 : 1 })}>
+          <T weight="uiBold" size={16} color={colors.brandInk}>{settings.ui === 'ur' ? 'خاص دعائیں اور مقبول دعائیں' : 'Special Duas & Accepted Supplications'}</T>
+          <T size={13} color={colors.brandInk}>{settings.ui === 'ur' ? 'قرآن اور مستند سنت سے، حوالہ اور درجے کے ساتھ' : 'From the Quran and authentic Sunnah, with sources and gradings'}</T>
+        </Pressable>
+      </View>
       {loading ? <Loader /> : error ? <ErrorBox onRetry={reload} /> : (
         <SectionList sections={sections} keyExtractor={(d) => d.id} contentContainerStyle={{ padding: 16, paddingTop: 0, gap: 8, paddingBottom: 30 }} stickySectionHeadersEnabled={false}
           renderSectionHeader={({ section }) => <T weight="uiBold" size={13} color={colors.gold} style={{ letterSpacing: 1, textTransform: 'uppercase', marginTop: 14, marginBottom: 6 }}>{section.title}</T>}
