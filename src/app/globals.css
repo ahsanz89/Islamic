@@ -1125,3 +1125,5 @@ html[dir='rtl'] .mm { animation-name: mm-in-rtl; }
 .sd-table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin-top: 8px; }
 .sd-table th, .sd-table td { text-align: start; padding: 8px 10px; border-bottom: 1px solid var(--border); }
 .sd-title strong { font-size: 17px; }
+.nav a.nav-feature { background: var(--brand); color: var(--brand-ink); }
+.nav a.nav-feature:hover { background: var(--brand); color: var(--brand-ink); filter: brightness(1.08); }

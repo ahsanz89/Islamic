@@ -6,7 +6,6 @@ import { useApp } from './Providers';
 import { LANGUAGES, LANG_NAMES } from '@/lib/i18n';
 import { getJSON } from '@/lib/client-data';
 import { AudioSettings } from '@/components/AudioPlayer';
-import { DesktopNav, MobileMenu } from '@/components/SiteNav';
 
 /** Brand loading state (DALIL mark). */
 export function Loader({ label }) {
@@ -67,13 +66,60 @@ export const Icon = {
   )
 };
 
-const NAV = [['/quran/', 'quran'], ['/learn/', 'learn'], ['/learn-arabic/', 'learnArabic'], ['/collections/', 'collections'], ['/duas/', 'duas'], ['/namaz/', 'namaz'], ['/narrators/', 'narrators'], ['/glossary/', 'glossary'], ['/bookmarks/', 'bookmarks']];
+// Main navigation: the four things people come for, then a "More" menu.
+const NAV_MAIN = [
+  ['/quran/', 'quran'],
+  ['/learn/', 'learn'],
+  ['/learn-arabic/', 'learnArabic'],
+  ['/collections/', 'collections'],
+  ['/duas/', 'duas'],
+  ['/namaz/', 'namaz']
+];
+const NAV_MORE = [
+  ['/narrators/', 'narrators'],
+  ['/glossary/', 'glossary'],
+  ['/bookmarks/', 'bookmarks'],
+  ['/about/', 'about']
+];
+const NAV = [...NAV_MAIN, ...NAV_MORE.slice(0, 3)];
+const MORE = { en: 'More', ur: 'مزید', ar: 'المزيد' };
+
+function MoreMenu({ path }) {
+  const { t, settings } = useApp();
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const off = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('pointerdown', off);
+    document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('pointerdown', off); document.removeEventListener('keydown', esc); };
+  }, [open]);
+  useEffect(() => { setOpen(false); }, [path]);
+  const active = NAV_MORE.some(([p]) => path.startsWith(p));
+  return (
+    <div className="nav-more" ref={ref}>
+      <button type="button" className="nav-more-btn" aria-haspopup="menu" aria-expanded={open} aria-current={active ? 'page' : undefined} onClick={() => setOpen(!open)}>
+        {MORE[settings.ui] || MORE.en}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      {open && (
+        <div className="nav-menu" role="menu">
+          {NAV_MORE.map(([p, k]) => (
+            <Link key={p} href={p} role="menuitem" aria-current={path.startsWith(p) ? 'page' : undefined}>{t(k)}</Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const TABS = [
   ['/', 'home', 'home'],
   ['/collections/', 'collections', 'books'],
   ['/quran/', 'quran', 'quran'],
-  ['/learn', 'learnTab', 'learn'],
+  ['/learn/', 'learnTab', 'learn'],
   ['/bookmarks/', 'bookmarks', 'bookmark']
 ];
 
@@ -84,19 +130,6 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [cmd, setCmd] = useState(false);
   const isHome = path === '/';
-  const [hide, setHide] = useState(false);
-  useEffect(() => {
-    // On phones the header slides away while reading downwards and returns when scrolling up (more room for the Quran).
-    let last = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY, narrow = window.innerWidth <= 900;
-      setHide((h) => (narrow && y > last + 6 && y > 140 ? true : y < last - 6 || y < 60 ? false : h));
-      last = y;
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-  useEffect(() => { setHide(false); }, [path]);
   useEffect(() => {
     const onKey = (e) => {
       const tag = (e.target?.tagName || '').toLowerCase();
@@ -109,7 +142,7 @@ export function Header() {
   }, []);
   return (
     <>
-      <header className={`site-header ${hide ? 'hide' : ''}`}>
+      <header className="site-header">
         <div className="bar">
           {!isHome && (
             <button className="btn ghost icon" aria-label={t('back')} title={t('back')} onClick={() => router.back()}>{Icon.back}</button>
@@ -121,13 +154,17 @@ export function Header() {
               <span className="brand-sub" lang="ar">دليل</span>
             </span>
           </Link>
-          <DesktopNav path={path} />
+          <nav className="nav" aria-label="Main">
+            {NAV_MAIN.map(([p, k]) => (
+              <Link key={p} href={p} className={p === '/learn-arabic/' ? 'nav-feature' : undefined} aria-current={path.startsWith(p) ? 'page' : undefined}>{t(k)}</Link>
+            ))}
+            <MoreMenu path={path} />
+          </nav>
           <div className="tools">
             <button className="cmd-trigger" onClick={() => setCmd(true)} aria-label={t('search')} aria-keyshortcuts="Control+K Meta+K /">
               {Icon.search}<span className="t">{t('search')}…</span><kbd>Ctrl K</kbd>
             </button>
             <button className="btn ghost icon" aria-label={t('settings')} title={t('settings')} onClick={() => setOpen(true)}>{Icon.settings}</button>
-            <MobileMenu path={path} />
           </div>
         </div>
         {open && <SettingsDrawer onClose={() => setOpen(false)} />}
