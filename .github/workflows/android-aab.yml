@@ -47,11 +47,21 @@ jobs:
       - name: Add the release signing key
         env:
           K: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          SP: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KP: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KA: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           clean=$(printf '%s' "$K" | tr -cd 'A-Za-z0-9+/=')
-          echo "Pasted secret is ${#K} characters; ${#clean} are valid key characters (a correct paste is 3528)."
+          echo "Pasted key file is ${#K} characters; ${#clean} are valid (a correct paste is 3528)."
           if ! printf '%s' "$clean" | base64 -d > android/app/upload.jks 2>/dev/null || [ ! -s android/app/upload.jks ]; then
-            echo "::error title=ANDROID_KEYSTORE_BASE64 is wrong::The secret is ${#K} characters long but should be 3528. Re-paste the WHOLE single line from dalil-upload-base64.txt (value only, no name, no quotes)."
+            echo "::error title=ANDROID_KEYSTORE_BASE64 is wrong::Re-paste the WHOLE single line from dalil-upload-base64.txt (value only)."
+            exit 1
+          fi
+          # passwords and alias: remove any spaces / line breaks that came along with the paste
+          SP=$(printf '%s' "$SP" | tr -d '[:space:]'); KP=$(printf '%s' "$KP" | tr -d '[:space:]'); KA=$(printf '%s' "$KA" | tr -d '[:space:]')
+          echo "Password lengths: store ${#SP}, key ${#KP} (correct is 24 each). Alias: $KA"
+          if ! keytool -list -keystore android/app/upload.jks -storepass "$SP" -alias "$KA" >/dev/null 2>&1; then
+            echo "::error title=Signing password or alias is wrong::keytool could not open the key. Check ANDROID_KEYSTORE_PASSWORD (24 characters, value only) and ANDROID_KEY_ALIAS (dalil-upload)."
             exit 1
           fi
           {
@@ -59,9 +69,9 @@ jobs:
             echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g"
             echo "org.gradle.daemon=false"
             echo "DALIL_STORE_FILE=upload.jks"
-            echo "DALIL_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-            echo "DALIL_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}"
-            echo "DALIL_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}"
+            echo "DALIL_STORE_PASSWORD=$SP"
+            echo "DALIL_KEY_ALIAS=$KA"
+            echo "DALIL_KEY_PASSWORD=$KP"
           } >> android/gradle.properties
           python3 scripts/patch-signing.py
           grep -n "signingConfig" android/app/build.gradle
