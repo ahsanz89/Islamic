@@ -49,11 +49,11 @@ export default function SpecialDua() {
         <Sec h={t.grading}>
           <GradePill d={d} ui={ui} />
           {d.grade.note ? <T size={13} color={colors.muted}>{d.grade.note}</T> : null}
-          {d.grade.differ ? <View style={{ padding: 10, borderRadius: 10, backgroundColor: colors.brandSoft }}><T size={13.5}>{t.differ}</T></View> : null}
+          {d.grade.differ ? <View style={{ padding: 10, borderRadius: 12, backgroundColor: colors.tertiaryContainer }}><T size={13.5} color={colors.onTertiaryContainer}>{t.differ}</T></View> : null}
           {d.grade.graders.map(([who, g]) => <View key={who} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 }}><T size={14}>{who}</T><T size={14} weight="uiSemi">{g}</T></View>)}
         </Sec>
         <Sec h={t.audio}>{quran ? <Button kind="ghost" label={t.audioQuran} onPress={open} /> : <T color={colors.muted}>{t.audioNone}</T>}</Sec>
-        <View style={{ padding: 12, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line }}><T size={13.5} style={dir}>{t.note}</T></View>
+        <View style={{ padding: 14, borderRadius: 16, backgroundColor: colors.surfaceMid }}><T size={13.5} style={dir}>{t.note}</T></View>
       </ScrollView>
     </Screen>
   );

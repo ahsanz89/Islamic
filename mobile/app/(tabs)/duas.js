@@ -4,7 +4,10 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../../src/lib/settings';
 import { getDuas } from '../../src/lib/api';
-import { ErrorBox, Header, Loader, Screen, T, TranslationButton, useAsync } from '../../src/components/ui';
+import { ErrorBox, Loader, Screen, TranslationButton, useAsync } from '../../src/components/ui';
+import { T } from '../../src/components/text';
+import { ListItem, TopAppBar, openDrawer, ripple } from '../../src/components/m3';
+import { SHAPE } from '../../src/lib/theme';
 
 export default function Duas() {
   const { colors, t, settings } = useApp();
@@ -14,23 +17,27 @@ export default function Duas() {
   const sections = data ? data.categories.map((c) => ({ title: lab(c), data: data.duas.filter((d) => d.cat === c.id) })).filter((s) => s.data.length) : [];
   return (
     <Screen>
-      <Header title={t('duas')} subtitle={t('duasDesc')} />
-      <View style={{ paddingHorizontal: 16, paddingBottom: 8, gap: 10 }}>
-        <TranslationButton />
-        <Pressable onPress={() => router.push('/special-duas')} accessibilityRole="button" accessibilityLabel="Special Duas and Accepted Supplications" style={({ pressed }) => ({ padding: 16, borderRadius: 16, backgroundColor: colors.brand, opacity: pressed ? 0.85 : 1 })}>
-          <T weight="uiBold" size={16} color={colors.brandInk}>{settings.ui === 'ur' ? 'خاص دعائیں اور مقبول دعائیں' : 'Special Duas & Accepted Supplications'}</T>
-          <T size={13} color={colors.brandInk}>{settings.ui === 'ur' ? 'قرآن اور مستند سنت سے، حوالہ اور درجے کے ساتھ' : 'From the Quran and authentic Sunnah, with sources and gradings'}</T>
-        </Pressable>
-      </View>
+      <TopAppBar title={t('duas')} subtitle={t('duasDesc')} onMenu={openDrawer} />
       {loading ? <Loader /> : error ? <ErrorBox onRetry={reload} /> : (
-        <SectionList sections={sections} keyExtractor={(d) => d.id} contentContainerStyle={{ padding: 16, paddingTop: 0, gap: 8, paddingBottom: 30 }} stickySectionHeadersEnabled={false}
-          renderSectionHeader={({ section }) => <T weight="uiBold" size={13} color={colors.gold} style={{ letterSpacing: 1, textTransform: 'uppercase', marginTop: 14, marginBottom: 6 }}>{section.title}</T>}
+        <SectionList sections={sections} keyExtractor={(d) => d.id} contentContainerStyle={{ paddingBottom: 30 }} stickySectionHeadersEnabled={false}
+          ListHeaderComponent={(
+            <View style={{ paddingHorizontal: 16, paddingBottom: 8, gap: 12 }}>
+              <TranslationButton />
+              <Pressable onPress={() => router.push('/special-duas')} accessibilityRole="button" accessibilityLabel="Special Duas and Accepted Supplications" {...ripple(colors)}
+                style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: SHAPE.xl, backgroundColor: colors.tertiaryContainer, opacity: pressed ? 0.9 : 1 })}>
+                <Ionicons name="sparkles" size={28} color={colors.onTertiaryContainer} />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <T variant="titleMedium" color={colors.onTertiaryContainer}>{settings.ui === 'ur' ? 'خاص دعائیں اور مقبول دعائیں' : 'Special Duas & Accepted Supplications'}</T>
+                  <T variant="bodySmall" color={colors.onTertiaryContainer}>{settings.ui === 'ur' ? 'قرآن اور مستند سنت سے، حوالہ اور درجے کے ساتھ' : 'From the Quran and authentic Sunnah, with sources and gradings'}</T>
+                </View>
+                <Ionicons name="chevron-forward" size={22} color={colors.onTertiaryContainer} />
+              </Pressable>
+            </View>
+          )}
+          renderSectionHeader={({ section }) => <T variant="labelLarge" color={colors.primary} style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 6 }}>{section.title}</T>}
           renderItem={({ item: d }) => (
-            <Pressable onPress={() => router.push({ pathname: `/dua/${d.id}`, params: { c: d.c, n: String(d.n), sec: d.sec, title: lab(d) } })} accessibilityRole="button"
-              style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, marginBottom: 8, opacity: pressed ? 0.85 : 1 })}>
-              <T weight="uiSemi" size={16} style={{ flex: 1 }}>{lab(d)}</T>
-              <Ionicons name="chevron-forward" size={20} color={colors.muted} />
-            </Pressable>
+            <ListItem onPress={() => router.push({ pathname: `/dua/${d.id}`, params: { c: d.c, n: String(d.n), sec: d.sec, title: lab(d) } })} headline={lab(d)} divider
+              trailing={<Ionicons name="chevron-forward" size={20} color={colors.muted} />} />
           )} />
       )}
     </Screen>

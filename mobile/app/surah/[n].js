@@ -8,6 +8,7 @@ import * as audio from '../../src/lib/audio';
 import { useAudio } from '../../src/lib/audio';
 import { baseLang, choiceByKey } from '../../src/lib/languages';
 import { ArabicText, Chip, ErrorBox, Loader, MiniPlayer, Screen, T, TranslationButton, TranslationText, useAsync } from '../../src/components/ui';
+import { TopAppBar } from '../../src/components/m3';
 import { ReciterSheet, reciterLabel } from '../../src/components/ReciterSheet';
 import { FONTS } from '../../src/lib/theme';
 
@@ -16,10 +17,10 @@ const stripDiacritics = (s) => s.replace(/[ؐ-ًؚ-ٰٟۖ-ۭ࣓-ࣿ]/g, '');
 const Verse = memo(function Verse({ v, surah, trKeys, size, harakat, playing, urduNow, colors, onPlay, t }) {
   const ar = harakat ? v.ar : stripDiacritics(v.ar);
   return (
-    <View style={{ padding: 14, borderRadius: 16, gap: 10, backgroundColor: playing ? colors.playing : colors.surface, borderWidth: playing ? 2 : 1, borderColor: playing ? colors.brand : colors.line }}>
+    <View style={{ padding: 14, borderRadius: 20, gap: 10, backgroundColor: playing ? colors.primaryContainer : colors.surfaceMid }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <Pressable onPress={onPlay} accessibilityRole="button" accessibilityLabel={`${t('play')} ${t('ayah')} ${v.v}`} hitSlop={8}
-          style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: playing ? colors.brand : colors.brandSoft }}>
+          style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: playing ? colors.primary : colors.primaryContainer }}>
           <Ionicons name={playing ? 'pause' : 'play'} size={20} color={playing ? colors.brandInk : colors.brandDeep} />
         </Pressable>
         <T weight="uiBold" size={15} color={colors.brandDeep}>{surah.n}:{v.v}</T>
@@ -63,8 +64,8 @@ export default function SurahScreen() {
   const whole = settings.reciter === 'badr';
   const Header = surah ? (
     <View style={{ gap: 12, marginBottom: 6 }}>
-      <View style={{ alignItems: 'center', padding: 20, borderRadius: 24, borderWidth: 1, borderColor: colors.goldLine, backgroundColor: colors.brandSoft, gap: 4 }}>
-        <View style={{ minWidth: 40, height: 40, borderRadius: 20, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' }}><T weight="uiBold" color={colors.brandInk}>{surah.n}</T></View>
+      <View style={{ alignItems: 'center', padding: 20, borderRadius: 28, backgroundColor: colors.primaryContainer, gap: 4 }}>
+        <View style={{ minWidth: 40, height: 40, borderRadius: 20, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}><T weight="uiBold" color={colors.onPrimary}>{surah.n}</T></View>
         <T style={{ fontFamily: FONTS.quran, writingDirection: 'rtl' }} size={44} color={colors.ink}>{surah.ar}</T>
         <T weight="uiBold" size={22} color={colors.brandDeep}>{surah.name}</T>
         {surah.en !== surah.name ? <T size={15} color={colors.muted}>{surah.en}</T> : null}
@@ -86,10 +87,7 @@ export default function SurahScreen() {
   ) : null;
   return (
     <Screen>
-      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8 }}>
-        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Back"><Ionicons name="chevron-back" size={28} color={colors.brandDeep} /></Pressable>
-        <T weight="uiBold" size={18} color={colors.brandDeep} style={{ marginLeft: 6 }}>{t('quran')}</T>
-      </View>
+      <TopAppBar title={surah ? `${surah.n}. ${surah.name}` : t('quran')} subtitle={surah ? `${surah.en} · ${surah.verses} ${t('verses')}` : undefined} onBack={() => router.back()} />
       {verses.loading || meta.loading ? <Loader /> : verses.error ? <ErrorBox onRetry={verses.reload} /> : (
         <FlatList ref={ref} data={verses.data} keyExtractor={(v) => String(v.v)} contentContainerStyle={{ padding: 16, paddingTop: 4, gap: 12, paddingBottom: 30 }}
           ListHeaderComponent={Header} initialNumToRender={8} windowSize={9} onScrollToIndexFailed={() => {}}

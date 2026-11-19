@@ -1,11 +1,14 @@
 import React, { useMemo, useState } from 'react';
-import { FlatList, Pressable, TextInput, View } from 'react-native';
+import { FlatList, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../../src/lib/settings';
 import { SD, catName, matches, titleOf, tx } from '../../src/lib/special-duas';
 import { useDuaFavs } from '../../src/lib/dua-favs';
-import { Chip, Header, Screen, T } from '../../src/components/ui';
+import { Screen } from '../../src/components/ui';
+import { T } from '../../src/components/text';
+import { ChipRow, FilterChip, SearchBar, TopAppBar } from '../../src/components/m3';
+import { SHAPE } from '../../src/lib/theme';
 
 export function GradePill({ d, ui }) {
   const { colors } = useApp();
@@ -32,29 +35,31 @@ export default function SpecialDuas() {
   const dir = { writingDirection: rtl ? 'rtl' : 'ltr', textAlign: rtl ? 'right' : 'left' };
   return (
     <Screen>
-      <Header title={t.title} onBack={() => router.back()} />
+      <TopAppBar title={t.section} onBack={() => router.back()} />
       <FlatList
         data={list} keyExtractor={(d) => d.id} keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: 16, paddingTop: 0, gap: 10, paddingBottom: 40 }}
         ListHeaderComponent={(
-          <View style={{ gap: 10, paddingBottom: 6 }}>
-            <T color={colors.muted} style={dir}>{t.sub}</T>
-            <View style={{ padding: 12, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line }}><T size={13.5} style={dir}>{t.note}</T></View>
-            <TextInput value={q} onChangeText={setQ} placeholder={t.search} placeholderTextColor={colors.muted} accessibilityLabel={t.search} testID="search" style={[{ minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surface, paddingHorizontal: 14, color: colors.ink, fontSize: 16 }, dir]} />
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {[['all', t.all], ['hadith', t.fromHadith], ['quran', t.fromQuran]].map(([k, l]) => <Chip key={k} label={l} active={kind === k} onPress={() => setKind(k)} />)}
-              <Chip label={`${t.save} (${favs.length})`} active={onlyFav} onPress={() => setOnlyFav(!onlyFav)} />
+          <View style={{ gap: 12, paddingBottom: 6, marginHorizontal: -16 }}>
+            <View style={{ paddingHorizontal: 16, gap: 10 }}>
+              <T variant="bodyMedium" color={colors.muted} style={dir}>{t.sub}</T>
+              <SearchBar value={q} onChangeText={setQ} placeholder={t.search} testID="search" />
             </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              <Chip label={t.all} active={cat === 'all'} onPress={() => setCat('all')} />
-              {SD.cats.map((c) => <Chip key={c.id} label={catName(c, ui)} active={cat === c.id} onPress={() => setCat(c.id)} />)}
-            </View>
-            <T size={13} color={colors.muted} style={dir}>{t.count(list.length)}</T>
+            <ChipRow>
+              {[['all', t.all], ['hadith', t.fromHadith], ['quran', t.fromQuran]].map(([k, l]) => <FilterChip key={k} label={l} selected={kind === k} onPress={() => setKind(k)} />)}
+              <FilterChip label={`${t.save} (${favs.length})`} icon="bookmark-outline" selected={onlyFav} onPress={() => setOnlyFav(!onlyFav)} />
+            </ChipRow>
+            <ChipRow>
+              <FilterChip label={t.all} selected={cat === 'all'} onPress={() => setCat('all')} />
+              {SD.cats.map((c) => <FilterChip key={c.id} label={catName(c, ui)} selected={cat === c.id} onPress={() => setCat(c.id)} />)}
+            </ChipRow>
+            <View style={{ marginHorizontal: 16, padding: 12, borderRadius: SHAPE.m, backgroundColor: colors.tertiaryContainer }}><T variant="bodySmall" color={colors.onTertiaryContainer} style={dir}>{t.note}</T></View>
+            <T variant="bodySmall" color={colors.muted} style={[dir, { paddingHorizontal: 16 }]}>{t.count(list.length)}</T>
           </View>
         )}
         ListEmptyComponent={<T color={colors.muted} style={{ textAlign: 'center', padding: 24 }}>{t.none}</T>}
         renderItem={({ item: d }) => (
-          <Pressable onPress={() => router.push(`/special-duas/${d.id}`)} accessibilityRole="button" accessibilityLabel={titleOf(d, ui)} style={({ pressed }) => ({ padding: 14, borderRadius: 16, gap: 8, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, opacity: pressed ? 0.8 : 1 })}>
+          <Pressable onPress={() => router.push(`/special-duas/${d.id}`)} accessibilityRole="button" accessibilityLabel={titleOf(d, ui)} style={({ pressed }) => ({ padding: 16, borderRadius: SHAPE.l, gap: 10, backgroundColor: colors.surfaceMid, opacity: pressed ? 0.85 : 1 })}>
             <View style={{ flexDirection: rtl ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
               <T weight="uiBold" size={16} style={[{ flex: 1 }, dir]}>{titleOf(d, ui)}</T>
               <GradePill d={d} ui={ui} />
@@ -62,7 +67,7 @@ export default function SpecialDuas() {
                 <Ionicons name={isFav(d.id) ? 'bookmark' : 'bookmark-outline'} size={22} color={colors.brand} />
               </Pressable>
             </View>
-            <T quran lang="ar" size={22} style={{ textAlign: 'right', writingDirection: 'rtl', lineHeight: 40 }} numberOfLines={2}>{d.ar}</T>
+            <T lang="ar" size={22} style={{ fontFamily: 'AmiriQuran_400Regular', textAlign: 'right', writingDirection: 'rtl', lineHeight: 40 }} numberOfLines={2}>{d.ar}</T>
             <T size={12.5} color={colors.muted}>{d.src.book} {d.src.ref}</T>
           </Pressable>
         )}
