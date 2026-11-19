@@ -106,7 +106,7 @@ export default function SurahScreen() {
   return (
     <Screen>
       <TopAppBar title={surah ? `${surah.n}. ${surah.name}` : t('quran')} subtitle={surah ? `${surah.en} · ${surah.verses} ${t('verses')}` : undefined} onBack={() => router.back()}
-        actions={<IconButton icon="book-outline" label="Open in the 15-line Mushaf view" testID="to-mushaf" onPress={() => { update({ quranMode: 'mushaf' }); router.replace(`/mushaf/${pageOfVerse(Number(n), topAyah.current)}`); }} />} />
+        actions={<><IconButton icon="mic-outline" label="Practice reciting this surah" testID="to-practice" onPress={() => router.push(`/practice/${n}`)} /><IconButton icon="book-outline" label="Open in the 15-line Mushaf view" testID="to-mushaf" onPress={() => { update({ quranMode: 'mushaf' }); router.replace(`/mushaf/${pageOfVerse(Number(n), topAyah.current)}`); }} /></>} />
       {verses.loading || meta.loading ? <Loader /> : verses.error ? <ErrorBox onRetry={verses.reload} /> : (
         <FlatList ref={ref} data={verses.data} keyExtractor={(v) => String(v.v)} contentContainerStyle={{ padding: 16, paddingTop: 4, gap: 12, paddingBottom: 30 }}
           ListHeaderComponent={Header} onViewableItemsChanged={onViewable} viewabilityConfig={{ itemVisiblePercentThreshold: 40 }} initialNumToRender={8} windowSize={9} onScrollToIndexFailed={() => {}}

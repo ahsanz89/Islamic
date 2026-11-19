@@ -19,6 +19,7 @@ export const DEFAULTS = {
   readHadith: null,  // { col, sec, n, title, at }
   lastActivity: null, // 'quran' | 'hadith'
   quranMode: 'standard', // 'standard' | 'mushaf' (15-line)
+  recitationDone: {},
   mushafZoom: 1      // 1 = fit the page; larger = zoom, pan sideways
 };
 const KEY = 'dalil.settings.v1';

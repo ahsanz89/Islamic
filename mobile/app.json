@@ -64,6 +64,13 @@
           "recordAudioAndroid": false,
           "enableBackgroundPlayback": true
         }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "DALIL uses the microphone only while you recite an ayah, to check the words. Recordings are not saved.",
+          "speechRecognitionPermission": "DALIL uses speech recognition to check the words of your recitation."
+        }
       ]
     ],
     "experiments": {

@@ -60,12 +60,12 @@ export function Chip({ label, active, onPress, icon }) {
 }
 
 /** M3 buttons: primary = filled, tonal, secondary = outlined, ghost = text. */
-export function Button({ label, onPress, kind = 'primary', icon, disabled, style }) {
+export function Button({ label, onPress, kind = 'primary', icon, disabled, style, testID }) {
   const { colors } = useApp();
   const filled = kind === 'primary', tonal = kind === 'tonal', outlined = kind === 'secondary';
   const fg = filled ? colors.onPrimary : tonal ? colors.onPrimaryContainer : colors.primary;
   return (
-    <Pressable onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityLabel={label} {...ripple(colors)}
+    <Pressable testID={testID} onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityLabel={label} {...ripple(colors)}
       style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 48, paddingHorizontal: 24, borderRadius: SHAPE.full, backgroundColor: filled ? colors.primary : tonal ? colors.primaryContainer : 'transparent', borderWidth: outlined ? 1 : 0, borderColor: colors.outline, opacity: disabled ? 0.45 : pressed ? 0.88 : 1 }, style]}>
       {icon ? <Ionicons name={icon} size={20} color={fg} /> : null}
       <T variant="labelLarge" size={15} weight="uiSemi" color={fg}>{label}</T>
