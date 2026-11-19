@@ -14,7 +14,12 @@ export const DEFAULTS = {
   theme: 'system',   // system | light | dark
   reciter: 'alafasy',
   urduAudio: false,
-  lastRead: null     // { type: 'surah'|'section', ... }
+  lastRead: null,    // old single history (read-only, kept so earlier saved progress is not lost)
+  readQuran: null,   // { surah, ayah, page?, name, at }
+  readHadith: null,  // { col, sec, n, title, at }
+  lastActivity: null, // 'quran' | 'hadith'
+  quranMode: 'standard', // 'standard' | 'mushaf' (15-line)
+  mushafZoom: 1      // 1 = fit the page; larger = zoom, pan sideways
 };
 const KEY = 'dalil.settings.v1';
 const Ctx = createContext(null);

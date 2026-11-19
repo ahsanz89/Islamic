@@ -8,7 +8,9 @@ import * as audio from '../../src/lib/audio';
 import { useAudio } from '../../src/lib/audio';
 import { baseLang, choiceByKey } from '../../src/lib/languages';
 import { ArabicText, Chip, ErrorBox, Loader, MiniPlayer, Screen, T, TranslationButton, TranslationText, useAsync } from '../../src/components/ui';
-import { TopAppBar } from '../../src/components/m3';
+import { IconButton, TopAppBar } from '../../src/components/m3';
+import { saveQuran } from '../../src/lib/reading-progress';
+import { pageOfVerse } from '../../src/lib/mushaf-core';
 import { ReciterSheet, reciterLabel } from '../../src/components/ReciterSheet';
 import { FONTS } from '../../src/lib/theme';
 
@@ -38,7 +40,7 @@ const Verse = memo(function Verse({ v, surah, trKeys, size, harakat, playing, ur
 });
 
 export default function SurahScreen() {
-  const { n } = useLocalSearchParams();
+  const { n, ayah: ayahParam } = useLocalSearchParams();
   const { colors, t, settings, update } = useApp();
   const router = useRouter();
   const ref = useRef(null);
@@ -52,9 +54,25 @@ export default function SurahScreen() {
   const surah = meta.data;
   const trKeys = useMemo(() => [settings.tr, settings.tr2].filter(Boolean), [settings.tr, settings.tr2]);
 
+  const topAyah = useRef(Number(ayahParam) > 0 ? Number(ayahParam) : 1);
+  const [savedTick, setSavedTick] = useState(0);
+  const onViewable = useRef(({ viewableItems }) => {
+    const first = viewableItems.filter((x) => x.item && x.isViewable).map((x) => x.item.v).sort((a, b) => a - b)[0];
+    if (first && first !== topAyah.current) { topAyah.current = first; setSavedTick((x) => x + 1); }
+  }).current;
+  // save the exact ayah a moment after the reader stops moving (Quran history only; Hadith history is separate)
   useEffect(() => {
-    if (surah) update({ lastRead: { href: `/surah/${surah.n}`, title: `${surah.n}. ${surah.name}` } });
-  }, [surah?.n]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!surah) return undefined;
+    const id = setTimeout(() => { const patch = saveQuran({ surah: surah.n, ayah: topAyah.current, name: surah.name }); if (patch) update(patch); }, 600);
+    return () => clearTimeout(id);
+  }, [surah?.n, savedTick]); // eslint-disable-line react-hooks/exhaustive-deps
+  // reopen at the saved ayah
+  useEffect(() => {
+    const target = Number(ayahParam);
+    if (!verses.data || !(target > 1)) return;
+    const i = verses.data.findIndex((x) => x.v === target);
+    if (i > 0) setTimeout(() => { try { ref.current?.scrollToIndex({ index: i, animated: false, viewPosition: 0 }); } catch { /* not measured yet */ } }, 350);
+  }, [verses.data, ayahParam]);
   useEffect(() => {
     if (!surahMode || playingV == null || playingV < 1 || status !== 'playing' || !verses.data) return;
     const i = playingV - 1;
@@ -87,10 +105,11 @@ export default function SurahScreen() {
   ) : null;
   return (
     <Screen>
-      <TopAppBar title={surah ? `${surah.n}. ${surah.name}` : t('quran')} subtitle={surah ? `${surah.en} · ${surah.verses} ${t('verses')}` : undefined} onBack={() => router.back()} />
+      <TopAppBar title={surah ? `${surah.n}. ${surah.name}` : t('quran')} subtitle={surah ? `${surah.en} · ${surah.verses} ${t('verses')}` : undefined} onBack={() => router.back()}
+        actions={<IconButton icon="book-outline" label="Open in the 15-line Mushaf view" testID="to-mushaf" onPress={() => { update({ quranMode: 'mushaf' }); router.replace(`/mushaf/${pageOfVerse(Number(n), topAyah.current)}`); }} />} />
       {verses.loading || meta.loading ? <Loader /> : verses.error ? <ErrorBox onRetry={verses.reload} /> : (
         <FlatList ref={ref} data={verses.data} keyExtractor={(v) => String(v.v)} contentContainerStyle={{ padding: 16, paddingTop: 4, gap: 12, paddingBottom: 30 }}
-          ListHeaderComponent={Header} initialNumToRender={8} windowSize={9} onScrollToIndexFailed={() => {}}
+          ListHeaderComponent={Header} onViewableItemsChanged={onViewable} viewabilityConfig={{ itemVisiblePercentThreshold: 40 }} initialNumToRender={8} windowSize={9} onScrollToIndexFailed={() => {}}
           extraData={[playingV, status, phase, trKeys.join(), settings.arSize, settings.harakat, colors.dark]}
           renderItem={({ item: v }) => (
             <Verse v={v} surah={surah} trKeys={trKeys} size={settings.arSize} harakat={settings.harakat} colors={colors} t={t}

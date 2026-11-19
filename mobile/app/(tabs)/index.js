@@ -9,6 +9,7 @@ import { T } from '../../src/components/text';
 import { IconButton, TopAppBar, openDrawer, ripple } from '../../src/components/m3';
 import { FONTS, SHAPE } from '../../src/lib/theme';
 import HadithCard from '../../src/components/HadithCard';
+import { continueTarget, histories, quranRoute } from '../../src/lib/reading-progress';
 import DATA from '../../src/lib/arabic-data.json';
 import { playWordRef } from '../../src/lib/arabic-audio';
 
@@ -34,7 +35,9 @@ export default function Home() {
   const router = useRouter();
   const day = Math.floor(Date.now() / 86400000);
   const daily = useAsync(() => getHadith('bukhari', DAILY[day % DAILY.length]), [day]);
-  const last = settings.lastRead;
+  const go = continueTarget(settings);                       // follows the most recent activity (Quran or Hadith)
+  const { quran: savedQ, hadith: savedH } = histories(settings);
+  const other = go && savedQ && savedH ? (go.type === 'quran' ? { type: 'hadith', href: continueTarget({ ...settings, lastActivity: 'hadith' }).href, title: savedH.title } : { type: 'quran', ...quranRoute(savedQ, settings.quranMode) }) : null;
   const ur = settings.ui === 'ur';
   const words = wordsOfDay(day);
   const mean = (w) => (ur && w.ur) || w.en;
@@ -48,20 +51,31 @@ export default function Home() {
       />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 16 }}>
         {/* Hero: the one thing to do next */}
-        <Pressable onPress={() => router.push(last ? last.href : '/quran')} accessibilityRole="button" accessibilityLabel={last ? t('continueReading') : t('quran')} {...ripple(colors)}
+        <Pressable onPress={() => router.push(go ? go.href : '/quran')} accessibilityRole="button" accessibilityLabel={go ? `${t('continueReading')}: ${go.title}. ${go.detail || ''}` : t('quran')} {...ripple(colors)}
           style={({ pressed }) => ({ borderRadius: SHAPE.xl, padding: 24, minHeight: 168, backgroundColor: colors.heroFrom, justifyContent: 'space-between', opacity: pressed ? 0.94 : 1, overflow: 'hidden' })}>
           <Image source={require('../../assets/logo-mark.png')} style={{ position: 'absolute', right: -24, top: -24, width: 150, height: 150, opacity: 0.08 }} />
           <View style={{ gap: 4 }}>
-            <T variant="labelLarge" color="#D5B779">{last ? t('continueReading') : t('exploreTitle')}</T>
-            <T variant="headlineSmall" color="#FFFFFF" numberOfLines={2}>{last ? last.title : t('quran')}</T>
-            <T variant="bodyMedium" color="#CFE3DA">{last ? t('quranDesc') : t('quranDesc')}</T>
+            <T variant="labelLarge" color="#D5B779">{go ? `${t('continueReading')} · ${go.type === 'hadith' ? t('hadith') : t('quran')}` : t('exploreTitle')}</T>
+            <T variant="headlineSmall" color="#FFFFFF" numberOfLines={2}>{go ? go.title : t('quran')}</T>
+            <T variant="bodyMedium" color="#CFE3DA">{go ? go.detail : t('quranDesc')}</T>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', paddingHorizontal: 18, height: 40, borderRadius: SHAPE.full, backgroundColor: '#FFFFFF' }}>
-            <Ionicons name="book" size={18} color="#123F35" />
-            <T variant="labelLarge" color="#123F35">{last ? t('continueReading') : t('quran')}</T>
+            <Ionicons name={go && go.type === 'hadith' ? 'library' : 'book'} size={18} color="#123F35" />
+            <T variant="labelLarge" color="#123F35">{go ? t('continueReading') : t('quran')}</T>
           </View>
         </Pressable>
 
+        {other ? (
+          <Pressable onPress={() => router.push(other.href)} accessibilityRole="button" accessibilityLabel={`${other.type === 'hadith' ? t('hadith') : t('quran')}: ${t('continueReading')}. ${other.title}`} {...ripple(colors)}
+            style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: SHAPE.l, backgroundColor: colors.secondaryContainer, opacity: pressed ? 0.88 : 1 })}>
+            <Ionicons name={other.type === 'hadith' ? 'library-outline' : 'book-outline'} size={22} color={colors.onSecondaryContainer} />
+            <View style={{ flex: 1 }}>
+              <T variant="labelMedium" color={colors.onSecondaryContainer}>{other.type === 'hadith' ? t('hadith') : t('quran')}</T>
+              <T variant="titleSmall" color={colors.onSecondaryContainer} numberOfLines={1}>{other.title}</T>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.onSecondaryContainer} />
+          </Pressable>
+        ) : null}
         <TranslationButton />
 
         {/* Shortcuts: one swipeable row instead of a wall of tiles */}

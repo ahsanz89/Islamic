@@ -52,6 +52,13 @@ export default function Settings() {
           <ListItem divider={false} headline={t('harakat')} trailing={sw(settings.harakat, (v) => update({ harakat: v }), t('harakat'))} style={{ borderTopWidth: 1, borderTopColor: colors.outlineVariant }} />
         </ListGroup>
 
+        <ListGroup title="Quran reading layout">
+          <View style={{ padding: 16, gap: 8 }}>
+            <Segmented value={settings.quranMode === 'mushaf' ? 'mushaf' : 'standard'} onChange={(v) => update({ quranMode: v })} options={[['standard', 'Standard view'], ['mushaf', '15-line Mushaf']]} />
+            <T variant="bodySmall" color={colors.muted}>The 15-line Mushaf shows the Quran page by page, line by line, like the printed Madinah Mushaf. Your place is kept when you switch.</T>
+          </View>
+        </ListGroup>
+
         <ListGroup title={t('quran')}>
           <ListItem onPress={() => setSheet('reciter')} leading={<LeadingBadge icon="mic" />} headline={t('reciter')} supporting={reciterLabel(settings.reciter)} divider />
           <ListItem headline={t('urduAudio')} supporting={t('urduAudioHint')} trailing={sw(settings.urduAudio, (v) => update({ urduAudio: v }), t('urduAudio'))} />
