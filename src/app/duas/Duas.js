@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useApp } from '@/components/Providers';
-import { BookmarkButton, CName, CopyButton } from '@/components/ui';
+import { BookmarkButton, CName, CopyButton, ReadingBar } from '@/components/ui';
 import { Translations, hadithHref } from '@/components/HadithCard';
 import { getHadith } from '@/lib/client-data';
 import { stripDiacritics } from '@/lib/arabic.mjs';
@@ -52,6 +52,7 @@ export default function Duas({ data }) {
           ))}
         </div>
       </div>
+      <ReadingBar />
       <Link href="/duas/special/" className="sd-banner">
         <strong>{settings.ui === 'ur' ? 'خاص دعائیں اور مقبول دعائیں' : 'Special Duas & Accepted Supplications'}</strong>
         <span>{settings.ui === 'ur' ? 'قرآن اور مستند سنت سے، حوالہ اور درجے کے ساتھ' : 'From the Quran and authentic Sunnah, with sources and gradings'}</span>

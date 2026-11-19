@@ -1,11 +1,42 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApp } from '@/components/Providers';
-import { BookmarkButton, Icon, ShareButton } from '@/components/ui';
+import { BookmarkButton, Icon, ReadingBar, ShareButton } from '@/components/ui';
+import { LANG_NAMES } from '@/lib/i18n';
+import { getHadith, getJSON } from '@/lib/client-data';
 import { hadithHref } from '@/components/HadithCard';
 import { SD, catName, pick, shareText, titleOf, tx } from '@/lib/special-duas';
 import { GradeBadge } from '../parts';
+
+// Translation in every language the reader picks. English and Urdu hadith duas use the exact words cut from the narration;
+// other languages show the translation of the whole narration (we cannot cut a sentence out of a translation we did not write).
+function Translated({ d, ui }) {
+  const { settings } = useApp();
+  const quran = d.kind === 'quran';
+  const langs = (quran ? settings.qtr : settings.tr) || [];
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    let live = true;
+    if (quran) getJSON(`q/${d.src.s}.json`).then((vs) => live && setData(vs.filter((x) => x.v >= d.src.v && x.v <= (d.src.to || d.src.v)))).catch(() => {});
+    else getHadith(d.src.c, d.src.n).then((r) => live && setData(r.hadith?.t || {})).catch(() => {});
+    return () => { live = false; };
+  }, [d.id]);
+  if (!langs.length) return <p className="muted small">{ui === 'ur' ? 'اوپر سے ترجمے کی زبان منتخب کریں۔' : 'Choose a translation language above.'}</p>;
+  return langs.map((l) => {
+    let text = null, whole = false;
+    if (quran) text = data ? data.map((x) => x.t?.[l]).filter(Boolean).join(' ') : (l === 'en' ? d.en : null);
+    else if (l === 'en' && d.en) text = d.en;
+    else if (l === 'ur' && d.ur) text = d.ur;
+    else if (data) { text = data[l]; whole = true; }
+    return (
+      <div key={l} className="tr-block" lang={l} dir={l === 'ur' || l === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="tr-label">{LANG_NAMES[l]}{whole && text ? ' · ' + (ui === 'ur' ? 'پوری روایت کا ترجمہ' : 'translation of the whole narration') : ''}</div>
+        <p className={`tr-text ${l === 'ur' ? 'tr-ur' : ''}`}>{text || (data ? (ui === 'ur' ? 'اس زبان میں ترجمہ دستیاب نہیں۔' : 'No translation in this language.') : '…')}</p>
+      </div>
+    );
+  });
+}
 
 function Sec({ h, children }) { return <section className="sd-sec"><h2>{h}</h2>{children}</section>; }
 
@@ -33,13 +64,11 @@ export default function DuaDetail({ id }) {
 
       <Sec h={t.arabic}><p className="ar sd-ar" lang="ar" dir="rtl">{d.ar}</p></Sec>
       {d.tl && <Sec h={t.translit}><p className="sd-tl" dir="ltr">{d.tl}</p>{d.kind === 'dua' && <p className="muted small">{t.translitNote}</p>}</Sec>}
-      {(d.en || d.ur) && (
-        <Sec h={t.translation}>
-          <p dir={ui === 'ur' && d.ur ? 'rtl' : 'ltr'} lang={ui === 'ur' && d.ur ? 'ur' : 'en'}>{ui === 'ur' && d.ur ? d.ur : d.en}</p>
-          {d.enSrc && <p className="muted small">English translation: {d.enSrc}.</p>}
-          {ui === 'ur' && !d.ur && <p className="muted small">The translation is in English. Open the full hadith for the Urdu translation.</p>}
-        </Sec>
-      )}
+      <Sec h={t.translation}>
+        <ReadingBar choices={['ur', 'en', 'bn', 'hi', 'id', 'tr', 'fr', 'ru', 'ta']} field={quran ? 'qtr' : 'tr'} />
+        <Translated d={d} ui={ui} />
+        {d.enSrc && <p className="muted small">English translation: {d.enSrc}.</p>}
+      </Sec>
       <Sec h={t.occasion}><p>{pick(d.occ, ui)}</p></Sec>
       <Sec h={t.virtue}><p>{pick(d.virt, ui)}</p></Sec>
 
