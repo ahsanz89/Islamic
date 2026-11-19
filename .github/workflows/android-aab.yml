@@ -1,0 +1,83 @@
+name: Build Play Store bundle (AAB)
+
+# Run by hand: GitHub > Actions > "Build Play Store bundle (AAB)" > Run workflow.
+# Produces a release-signed .aab to upload in Google Play Console. Needs the 4 signing secrets (see mobile/docs/PLAY_UPLOAD.md).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  aab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Check the signing secrets exist
+        env:
+          K: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          P: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          [ -n "$K" ] && [ -n "$P" ] || { echo "::error title=Missing secrets::Add ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_PASSWORD and ANDROID_KEY_ALIAS in Settings > Secrets and variables > Actions."; exit 1; }
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Version code (must go up with every Play upload)
+        run: |
+          node -e "const f='app.json';const a=require('./'+f);a.expo.android.versionCode=100+Number(process.env.GITHUB_RUN_NUMBER);require('fs').writeFileSync(f,JSON.stringify(a,null,2));console.log('versionCode',a.expo.android.versionCode)"
+
+      - name: Generate the native Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Add the release signing key
+        env:
+          K: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$K" | base64 -d > android/app/upload.jks
+          {
+            echo ""
+            echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g"
+            echo "org.gradle.daemon=false"
+            echo "DALIL_STORE_FILE=upload.jks"
+            echo "DALIL_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+            echo "DALIL_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}"
+            echo "DALIL_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}"
+          } >> android/gradle.properties
+          python3 scripts/patch-signing.py
+          grep -n "signingConfig" android/app/build.gradle
+
+      - name: Build the bundle (phones only)
+        working-directory: mobile/android
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew bundleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a,x86_64 --no-daemon --stacktrace 2>&1 | tee gradle.log
+
+      - name: Show why the build failed
+        if: failure()
+        working-directory: mobile/android
+        shell: bash
+        run: |
+          [ -f gradle.log ] || { echo "::error title=No Gradle log::Stopped before Gradle."; exit 0; }
+          key=$(grep -n -E "What went wrong|Execution failed|error:|Could not|FAILURE|Caused by|not found|Unresolved|Error:" gradle.log | head -25 | cut -c1-300)
+          echo "::error title=Gradle key lines::${key//$'\n'/%0A}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DALIL-play-aab
+          path: mobile/android/app/build/outputs/bundle/release/app-release.aab
