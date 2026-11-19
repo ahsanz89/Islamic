@@ -2,9 +2,9 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useApp } from '@/components/Providers';
-import { BookmarkButton, Icon } from '@/components/ui';
+import { BookmarkButton, Icon, ReadingBar } from '@/components/ui';
 import { SD, catName, matches, titleOf, tx } from '@/lib/special-duas';
-import { GradeBadge } from './parts';
+import { GradeBadge, Translated } from './parts';
 
 export default function SpecialDuas() {
   const { settings } = useApp();
@@ -33,6 +33,7 @@ export default function SpecialDuas() {
         <button className="chip" aria-pressed={cat === 'all'} onClick={() => setCat('all')}>{t.all}</button>
         {SD.cats.map((c) => <button key={c.id} className="chip" aria-pressed={cat === c.id} onClick={() => setCat(c.id)}>{catName(c, ui)}</button>)}
       </div>
+      <div style={{ marginTop: 12 }}><ReadingBar choices={['ur', 'en', 'bn', 'hi', 'id', 'tr', 'fr', 'ru', 'ta']} /></div>
       <p className="muted small" style={{ margin: '12px 0' }} aria-live="polite">{t.count(list.length)}</p>
       {!list.length && <div className="empty">{t.none}</div>}
       <div className="stack" style={{ gap: 14 }}>
@@ -46,6 +47,7 @@ export default function SpecialDuas() {
             </div>
             <div className="hadith-body">
               <p className="ar" lang="ar" dir="rtl" style={{ margin: 0 }}>{d.ar.length > 220 ? d.ar.slice(0, 220).replace(/\s\S*$/, '') + '…' : d.ar}</p>
+              <Translated d={d} ui={ui} max={320} />
               <p className="muted small" style={{ margin: 0 }}>{d.src.book} {d.src.ref} · {(d.cats.filter((c) => c !== 'quran').slice(0, 2).map((c) => catName(SD.cats.find((x) => x.id === c), ui))).join(' · ')}</p>
               <Link href={`/duas/special/${d.id}/`} className="small">{ui === 'ur' ? 'تفصیل' : 'Details'} →</Link>
             </div>
