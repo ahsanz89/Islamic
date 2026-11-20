@@ -38,7 +38,8 @@ test('changing the method saves it', async () => {
 });
 
 describe('notification plan', () => {
-  const base = { place: { name: 'Karachi', lat: 24.86, lng: 67.01 }, prayer: { method: 'karachi', asr: 'standard' } };
+  // the place sits on the same meridian as the machine's clock, so the test gives the same answer in any time zone (CI runs in UTC)
+  const base = { place: { name: 'Test city', lat: 30, lng: (-new Date(2026, 10, 20, 12).getTimezoneOffset() / 60) * 15 }, prayer: { method: 'karachi', asr: 'standard' } };
   test('off means nothing is planned', () => {
     expect(planPrayerNotifications({ ...base, adhan: { on: false } }, new Date(2026, 10, 20, 9, 0))).toEqual([]);
   });
