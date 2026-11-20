@@ -1,9 +1,23 @@
 name: Build Play Store bundle (AAB)
 
-# Run by hand: GitHub > Actions > "Build Play Store bundle (AAB)" > Run workflow.
-# Produces a release-signed .aab to upload in Google Play Console. Needs the 4 signing secrets (see mobile/docs/PLAY_UPLOAD.md).
+# Runs automatically on every push to main that changes the phone app (mobile/**), or by hand
+# (GitHub > Actions > "Build Play Store bundle (AAB)" > Run workflow).
+# 1. runs the phone-app tests (a failing test stops the release)
+# 2. builds a release-signed .aab (needs the 4 signing secrets, see mobile/docs/PLAY_UPLOAD.md)
+# 3. uploads it to Google Play (needs the PLAY_SERVICE_ACCOUNT_JSON secret, see mobile/docs/AUTO_RELEASE.md).
+#    Track = repository variable PLAY_TRACK (internal by default; use closed/alpha or production when ready).
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/android-aab.yml'
+
+# One release at a time; a newer push waits for the running one instead of racing it.
+concurrency:
+  group: play-release
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -36,6 +50,9 @@ jobs:
 
       - name: Install packages
         run: npm ci
+
+      - name: Run the phone-app tests
+        run: npx jest --ci
 
       - name: Version code (must go up with every Play upload)
         run: |
@@ -96,3 +113,22 @@ jobs:
         with:
           name: DALIL-play-aab
           path: mobile/android/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Is automatic Play upload set up?
+        id: play
+        env:
+          J: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -n "$J" ]; then echo "ready=true" >> "$GITHUB_OUTPUT"; else echo "ready=false" >> "$GITHUB_OUTPUT"; echo "::notice title=Play upload skipped::PLAY_SERVICE_ACCOUNT_JSON is not set, so the signed .aab was only saved as a download. See mobile/docs/AUTO_RELEASE.md."; fi
+
+      - name: Upload to Google Play
+        if: steps.play.outputs.ready == 'true'
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: dalil.ahsanzaheer
+          releaseFiles: mobile/android/app/build/outputs/bundle/release/app-release.aab
+          track: ${{ vars.PLAY_TRACK || 'internal' }}
+          status: completed
+          releaseName: ${{ github.run_number }} (auto)
+          whatsNewDirectory: mobile/play-notes
