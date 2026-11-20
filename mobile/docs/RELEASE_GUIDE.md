@@ -19,7 +19,7 @@ The app is one Expo (React Native) codebase in `mobile/`. EAS Build compiles it 
 
 ## 2. Identifiers (already set)
 - iOS bundle identifier: `com.dalil.app`
-- Android package: `com.dalil.app`
+- Android package: `dalil.ahsanzaheer (fixed: it must match the Play Console app)`
 If either is taken, change it in `app.json` **before** the first store upload; it cannot be changed afterwards.
 
 ## 3. Android

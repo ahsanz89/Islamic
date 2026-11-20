@@ -28,7 +28,7 @@
       }
     },
     "android": {
-      "package": "com.dalil.app",
+      "package": "dalil.ahsanzaheer",
       "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#123F35",
