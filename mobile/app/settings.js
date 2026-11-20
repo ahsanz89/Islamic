@@ -10,6 +10,7 @@ import { T } from '../src/components/text';
 import { LeadingBadge, ListGroup, ListItem, Segmented, TopAppBar } from '../src/components/m3';
 import { useRouter } from 'expo-router';
 import { ReciterSheet, reciterLabel } from '../src/components/ReciterSheet';
+import { rescheduleAll } from '../src/lib/notify';
 
 export default function Settings() {
   const { colors, t, settings, update } = useApp();
@@ -37,7 +38,7 @@ export default function Settings() {
         </ListGroup>
 
         <ListGroup title={t('theme')}>
-          <View style={{ padding: 16 }}><Segmented value={settings.theme} onChange={(v) => update({ theme: v })} options={['system', 'light', 'dark'].map((m) => [m, t(m)])} /></View>
+          <View style={{ padding: 16 }}><Segmented value={settings.theme} onChange={(v) => update({ theme: v })} options={['system', 'light', 'dark'].map((m) => [m, t(m), { system: 'phone-portrait-outline', light: 'sunny-outline', dark: 'moon-outline' }[m]])} /></View>
         </ListGroup>
 
         <ListGroup title={t('reading')}>
@@ -52,9 +53,26 @@ export default function Settings() {
           <ListItem divider={false} headline={t('harakat')} trailing={sw(settings.harakat, (v) => update({ harakat: v }), t('harakat'))} style={{ borderTopWidth: 1, borderTopColor: colors.outlineVariant }} />
         </ListGroup>
 
+        <ListGroup title="Daily reading">
+          <ListItem leading={<LeadingBadge icon="notifications-outline" />} headline="Daily reminder" supporting="One gentle notification a day to keep your reading streak."
+            trailing={sw(!!settings.dailyReminder?.on, async (v) => { const dr = { ...(settings.dailyReminder || { hour: 8, minute: 0 }), on: v }; update({ dailyReminder: dr }); await rescheduleAll({ ...settings, dailyReminder: dr }); }, 'Daily reminder')} divider />
+          {settings.dailyReminder?.on ? (
+            <View style={{ padding: 16, gap: 8 }}>
+              <T variant="labelLarge" color={colors.muted}>Time</T>
+              <Segmented value={String(settings.dailyReminder.hour)} onChange={async (v) => { const dr = { ...settings.dailyReminder, hour: Number(v), minute: 0 }; update({ dailyReminder: dr }); await rescheduleAll({ ...settings, dailyReminder: dr }); }}
+                options={[['8', '8 AM', 'sunny-outline'], ['14', '2 PM', 'partly-sunny-outline'], ['20', '8 PM', 'moon-outline']]} />
+            </View>
+          ) : null}
+          <View style={{ padding: 16, gap: 8, borderTopWidth: 1, borderTopColor: colors.outlineVariant }}>
+            <T variant="labelLarge" color={colors.muted}>Daily goal (ayat or hadith)</T>
+            <Segmented value={String(settings.streak?.goal || 5)} onChange={(v) => update({ streak: { ...(settings.streak || { days: {} }), goal: Number(v) } })}
+              options={[['3', '3'], ['5', '5'], ['10', '10'], ['20', '20']]} />
+          </View>
+        </ListGroup>
+
         <ListGroup title="Quran reading layout">
           <View style={{ padding: 16, gap: 8 }}>
-            <Segmented value={settings.quranMode === 'mushaf' ? 'mushaf' : 'standard'} onChange={(v) => update({ quranMode: v })} options={[['standard', 'Standard view'], ['mushaf', '15-line Mushaf']]} />
+            <Segmented value={settings.quranMode === 'mushaf' ? 'mushaf' : 'standard'} onChange={(v) => update({ quranMode: v })} options={[['standard', 'Standard view', 'list-outline'], ['mushaf', '15-line Mushaf', 'book-outline']]} />
             <T variant="bodySmall" color={colors.muted}>The 15-line Mushaf shows the Quran page by page, line by line, like the printed Madinah Mushaf. Your place is kept when you switch.</T>
           </View>
         </ListGroup>

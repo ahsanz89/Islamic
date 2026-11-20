@@ -39,7 +39,15 @@
         "INTERNET",
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
-        "WAKE_LOCK"
+        "WAKE_LOCK",
+        "POST_NOTIFICATIONS",
+        "ACCESS_COARSE_LOCATION",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ],
+      "blockedPermissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION"
       ]
     },
     "web": {
@@ -70,6 +78,19 @@
         {
           "microphonePermission": "DALIL uses the microphone only while you recite an ayah, to check the words. Recordings are not saved.",
           "speechRecognitionPermission": "DALIL uses speech recognition to check the words of your recitation."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/adaptive-icon-mono.png",
+          "color": "#123F35"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "DALIL uses your location one time to work out prayer times and the Qibla direction. It is never stored on a server."
         }
       ]
     ],

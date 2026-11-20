@@ -36,8 +36,8 @@ export function TopAppBar({ title, subtitle, onBack, onMenu, actions, large, tra
         {onBack ? <IconButton icon={uiRtl ? 'arrow-forward' : 'arrow-back'} label="Back" onPress={onBack} /> : onMenu ? <IconButton icon="menu" label="Menu" onPress={onMenu} testID="menu-button" /> : <View style={{ width: 12 }} />}
         {!large ? (
           <View style={{ flex: 1, paddingHorizontal: 4 }}>
-            <T variant="titleLarge" color={colors.onPrimaryContainer === colors.ink ? colors.ink : colors.ink} numberOfLines={1}>{title}</T>
-            {subtitle ? <T variant="bodySmall" color={colors.muted} numberOfLines={1}>{subtitle}</T> : null}
+            <T variant="titleLarge" color={colors.ink} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</T>
+            {subtitle ? <T variant="bodySmall" color={colors.muted} numberOfLines={2}>{subtitle}</T> : null}
           </View>
         ) : <View style={{ flex: 1 }} />}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>{actions}</View>
@@ -56,10 +56,10 @@ export function TopAppBar({ title, subtitle, onBack, onMenu, actions, large, tra
 export function SearchBar({ value, onChangeText, placeholder, style, testID, onClear }) {
   const { colors } = useApp();
   return (
-    <View style={[{ flexDirection: 'row', alignItems: 'center', height: 56, borderRadius: SHAPE.full, backgroundColor: colors.surfaceHigh, paddingLeft: 18, paddingRight: 6, gap: 10 }, style]}>
+    <View style={[{ flexDirection: 'row', alignItems: 'center', minHeight: 56, borderRadius: SHAPE.full, backgroundColor: colors.surfaceHigh, paddingLeft: 18, paddingRight: 6, gap: 10 }, style]}>
       <Ionicons name="search" size={22} color={colors.muted} />
       <TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.muted} autoCorrect={false} testID={testID}
-        accessibilityLabel={placeholder} returnKeyType="search" style={{ flex: 1, fontFamily: FONTS.ui, fontSize: 16, color: colors.ink, paddingVertical: 0 }} />
+        accessibilityLabel={placeholder} returnKeyType="search" numberOfLines={1} style={{ flex: 1, minWidth: 0, fontFamily: FONTS.ui, fontSize: 15, color: colors.ink, paddingVertical: 0 }} />
       {value ? <IconButton icon="close" label="Clear" size={20} onPress={() => { onChangeText(''); onClear && onClear(); }} /> : null}
     </View>
   );
@@ -82,15 +82,15 @@ export function ChipRow({ children }) {
 
 /* ------------------------------------------------------------------ List item (the workhorse row) */
 export function ListItem({ leading, headline, supporting, trailing, onPress, label, style, divider, testID }) {
-  const { colors } = useApp();
+  const { colors, uiRtl } = useApp();
   const body = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, minHeight: 64, paddingHorizontal: 16, paddingVertical: 10 }}>
       {leading}
       <View style={{ flex: 1, gap: 2 }}>
-        {typeof headline === 'string' ? <T variant="titleMedium" numberOfLines={2}>{headline}</T> : headline}
-        {typeof supporting === 'string' ? <T variant="bodyMedium" color={colors.muted} numberOfLines={2}>{supporting}</T> : supporting}
+        {typeof headline === 'string' ? <T variant="titleMedium">{headline}</T> : headline}
+        {typeof supporting === 'string' ? <T variant="bodyMedium" color={colors.muted}>{supporting}</T> : supporting}
       </View>
-      {trailing}
+      {trailing || (onPress ? <Ionicons name={uiRtl ? 'chevron-back' : 'chevron-forward'} size={20} color={colors.muted} /> : null)}
     </View>
   );
   if (!onPress) return <View style={[divider && { borderBottomWidth: 1, borderBottomColor: colors.outlineVariant }, style]}>{body}</View>;
@@ -130,14 +130,14 @@ export function ProgressBar({ value, style }) {
 export function Segmented({ options, value, onChange }) {
   const { colors } = useApp();
   return (
-    <View style={{ flexDirection: 'row', height: 40, borderRadius: SHAPE.full, borderWidth: 1, borderColor: colors.outline, overflow: 'hidden' }} accessibilityRole="radiogroup">
-      {options.map(([k, label], i) => {
+    <View style={{ flexDirection: 'row', minHeight: 40, borderRadius: SHAPE.full, borderWidth: 1, borderColor: colors.outline, overflow: 'hidden' }} accessibilityRole="radiogroup">
+      {options.map(([k, label, icon], i) => {
         const on = value === k;
         return (
           <Pressable key={k} onPress={() => onChange(k)} accessibilityRole="radio" accessibilityState={{ selected: on }} accessibilityLabel={label} {...ripple(colors)}
             style={{ flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? colors.secondaryContainer : 'transparent', borderLeftWidth: i ? 1 : 0, borderLeftColor: colors.outline }}>
-            {on ? <Ionicons name="checkmark" size={16} color={colors.onSecondaryContainer} /> : null}
-            <T variant="labelLarge" color={on ? colors.onSecondaryContainer : colors.ink} numberOfLines={1}>{label}</T>
+            {on ? <Ionicons name="checkmark" size={16} color={colors.onSecondaryContainer} /> : icon ? <Ionicons name={icon} size={16} color={colors.muted} /> : null}
+            <T variant="labelLarge" color={on ? colors.onSecondaryContainer : colors.ink} numberOfLines={2} style={{ textAlign: 'center', flexShrink: 1, paddingHorizontal: 4 }}>{label}</T>
           </Pressable>
         );
       })}
@@ -172,7 +172,7 @@ export function NavigationBar({ items, activeKey, onSelect }) {
             <View style={{ width: 64, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? colors.secondaryContainer : 'transparent' }}>
               <Ionicons name={on ? it.icon : `${it.icon}-outline`} size={24} color={on ? colors.onSecondaryContainer : colors.muted} />
             </View>
-            <T variant="labelMedium" color={on ? colors.ink : colors.muted} numberOfLines={1}>{it.label}</T>
+            <T variant="labelMedium" color={on ? colors.ink : colors.muted} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={{ paddingHorizontal: 2 }}>{it.label}</T>
           </Pressable>
         );
       })}

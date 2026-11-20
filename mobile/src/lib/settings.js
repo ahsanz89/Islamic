@@ -3,6 +3,7 @@ import { useColorScheme } from 'react-native';
 import { load, save } from './storage';
 import { STRINGS, isRTLUi } from './strings';
 import { DARK, LIGHT } from './theme';
+import { streakPatch } from './streak';
 
 export const DEFAULTS = {
   onboarded: false,
@@ -20,7 +21,12 @@ export const DEFAULTS = {
   lastActivity: null, // 'quran' | 'hadith'
   quranMode: 'standard', // 'standard' | 'mushaf' (15-line)
   recitationDone: {},
-  mushafZoom: 1      // 1 = fit the page; larger = zoom, pan sideways
+  mushafZoom: 1,     // 1 = fit the page; larger = zoom, pan sideways
+  streak: null,      // { days: {YYYY-MM-DD: count}, goal } reading streak, kept on this phone only
+  place: null,       // { name, lat, lng, tz } chosen for prayer times; null until the user sets it
+  prayer: { method: 'mwl', asr: 'standard', use24: false },
+  adhan: { on: false, prayers: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true } },
+  dailyReminder: { on: false, hour: 8, minute: 0 }
 };
 const KEY = 'dalil.settings.v1';
 const Ctx = createContext(null);
@@ -32,7 +38,7 @@ export function SettingsProvider({ children }) {
 
   useEffect(() => { load(KEY, {}).then((s) => { setSettings({ ...DEFAULTS, ...s }); setReady(true); }); }, []);
   const update = useCallback((patch) => {
-    setSettings((prev) => { const next = { ...prev, ...patch }; save(KEY, next); return next; });
+    setSettings((prev) => { const next = { ...prev, ...patch, ...streakPatch(prev, patch) }; save(KEY, next); return next; });
   }, []);
 
   const value = useMemo(() => {

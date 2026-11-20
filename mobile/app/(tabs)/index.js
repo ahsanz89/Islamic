@@ -12,11 +12,39 @@ import HadithCard from '../../src/components/HadithCard';
 import { continueTarget, histories, quranRoute } from '../../src/lib/reading-progress';
 import DATA from '../../src/lib/arabic-data.json';
 import { playWordRef } from '../../src/lib/arabic-audio';
+import { lastWeek, streakStats } from '../../src/lib/streak';
 
 const DAILY = [1, 10, 13, 39, 52, 6011, 6018, 6094, 6114, 6412, 6416];
 const WORDS = DATA.vocab.flatMap((g) => g.words);
 /** Five words that change every day (same as the website). */
 export const wordsOfDay = (day, n = 5) => Array.from({ length: n }, (_, i) => WORDS[(day * n + i) % WORDS.length]);
+
+function StreakCard() {
+  const { colors, settings } = useApp();
+  const st = streakStats(settings.streak);
+  const week = lastWeek(settings.streak);
+  const label = st.current > 0 ? `${st.current}-day reading streak` : 'Start your reading streak';
+  return (
+    <View accessible accessibilityLabel={`${label}. Today ${st.todayCount} of ${st.goal}.`} style={{ borderRadius: SHAPE.l, padding: 16, gap: 12, backgroundColor: colors.surfaceHigh }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <Ionicons name="flame" size={28} color={st.current > 0 ? '#E8892B' : colors.muted} />
+        <View style={{ flex: 1 }}>
+          <T variant="titleMedium">{label}</T>
+          <T variant="bodySmall" color={colors.muted}>{st.goalMet ? 'Daily goal reached. Well done.' : `Today: ${st.todayCount} of ${st.goal} ayat or hadith`}{st.best > 1 ? ` · Best ${st.best}` : ''}</T>
+        </View>
+      </View>
+      <View style={{ height: 6, borderRadius: 3, backgroundColor: colors.outlineVariant, overflow: 'hidden' }}><View style={{ width: `${Math.round(st.progress * 100)}%`, height: 6, backgroundColor: colors.primary }} /></View>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        {week.map((d) => (
+          <View key={d.key} style={{ alignItems: 'center', gap: 4 }}>
+            <Ionicons name={d.met ? 'checkmark-circle' : d.count > 0 ? 'ellipse' : 'ellipse-outline'} size={20} color={d.met ? colors.primary : d.count > 0 ? colors.secondary || colors.primary : colors.outline} />
+            <T variant="labelSmall" color={d.today ? colors.ink : colors.muted}>{['S', 'M', 'T', 'W', 'T', 'F', 'S'][new Date(d.key + 'T12:00:00').getDay()]}</T>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
 
 function Shortcut({ icon, title, to, tone }) {
   const { colors } = useApp();
@@ -77,10 +105,12 @@ export default function Home() {
           </Pressable>
         ) : null}
         <TranslationButton />
+        <StreakCard />
 
         {/* Shortcuts: one swipeable row instead of a wall of tiles */}
         <View style={{ marginHorizontal: -16 }}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}>
+            <Shortcut icon="time" title="Prayer times" to="/prayer" />
             <Shortcut icon="school" title="Learn Quran" to="/learn" />
             <Shortcut icon="language" title="Learn Arabic" to="/learn-arabic" />
             <Shortcut icon="sparkles" title="Special Duas" to="/special-duas" tone="gold" />

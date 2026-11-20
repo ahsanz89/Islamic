@@ -6,7 +6,7 @@ const en = {
   welcomeNote: 'You can change this at any time in Settings, or from the button at the top of the Quran and Hadith screens.',
   arabicAlways: 'Arabic is always shown', continue: 'Continue', start: 'Start reading', skip: 'Arabic only for now',
   home: 'Home', quran: 'Quran', hadith: 'Hadith', duas: 'Duas', settings: 'Settings',
-  search: 'Search', searchSurah: 'Search surah by name or number', surah: 'Surah', verses: 'verses', ayah: 'Ayah', juz: 'Juz',
+  search: 'Search', searchSurah: 'Search surah name or number', surah: 'Surah', verses: 'verses', ayah: 'Ayah', juz: 'Juz',
   meccan: 'Meccan', medinan: 'Medinan', books: 'books', hadiths: 'hadith', book: 'Book', loading: 'Loading…',
   offline: 'You are offline and this has not been opened before.', retry: 'Try again', errorTitle: 'Could not load',
   translation: 'Translation', translations: 'Translations', changeTranslation: 'Change translation', translator: 'Translator',
