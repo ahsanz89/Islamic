@@ -5,7 +5,7 @@ export default function Page() {
     <div className="container narrow">
       <div className="page-head">
         <h1>Privacy policy</h1>
-        <p className="muted">DALIL website and mobile app. Last updated 15 November 2026.</p>
+        <p className="muted">DALIL website and mobile app. Last updated 20 November 2026.</p>
       </div>
       <section>
         <h2>The short version</h2>
@@ -21,7 +21,11 @@ export default function Page() {
       </section>
       <section>
         <h2>Permissions</h2>
-        <p>The app does not ask for location, contacts, camera, microphone, photos or notifications. Audio can continue playing when the screen is off.</p>
+        <p>The app does not ask for location, contacts, camera, photos or notifications. Audio can continue playing when the screen is off. The only sensitive permission is the microphone, and it is used only if you choose to use Recitation practice in the mobile app (see below).</p>
+      </section>
+      <section>
+        <h2>Recitation practice (microphone)</h2>
+        <p>If you press Start in Recitation practice, the app asks for permission to use your microphone and the speech recognition service of your phone. It listens only while you are reciting, turns your speech into text on the spot and compares that text with the verified words of the ayah. DALIL does not save, record, upload or share your voice, and has no access to it afterwards. Only the words checked and the ayat you have completed are remembered, on your own device. Android's speech recognition is provided by your phone's speech service (usually Google), which may process the audio on its servers under that provider's own privacy policy, outside our control. You can refuse or withdraw the microphone permission at any time in your phone settings; the rest of the app works without it. This feature checks recognised words only and does not judge tajweed.</p>
       </section>
       <section>
         <h2>Children</h2>
