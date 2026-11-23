@@ -10,6 +10,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SettingsProvider, useApp } from '../src/lib/settings';
 import * as audio from '../src/lib/audio';
+import * as offlineStore from '../src/lib/offline-store';
+import { downloader } from '../src/lib/downloads';
+import { isOnline, startNetwork, useOnline } from '../src/lib/net';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -17,6 +20,11 @@ function Gate() {
   const { settings, ready, colors, dark } = useApp();
   const router = useRouter();
   const segments = useSegments();
+  const online = useOnline();
+  // start watching the network and open the offline library; unfinished downloads come back paused
+  useEffect(() => { startNetwork(); offlineStore.init().then(() => downloader().restore()).catch(() => {}); }, []);
+  // when the internet comes back, downloads that stopped for lack of a connection carry on by themselves
+  useEffect(() => { if (online && isOnline()) downloader().resumeErrored(); }, [online]);
   useEffect(() => {
     audio.configure({ reciter: settings.reciter, urdu: settings.urduAudio });
   }, [settings.reciter, settings.urduAudio]);
@@ -32,6 +40,7 @@ function Gate() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg }, animation: 'slide_from_right' }}>
         <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="downloads" />
       </Stack>
     </View>
   );

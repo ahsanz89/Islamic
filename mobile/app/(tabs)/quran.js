@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { OfflineBanner, OfflineMark, useOfflineVersion } from '../../src/components/OfflineBits';
 import { useApp } from '../../src/lib/settings';
 import { getSurahs } from '../../src/lib/api';
 import { ErrorBox, Loader, Screen, TranslationButton, useAsync } from '../../src/components/ui';
@@ -10,6 +11,7 @@ import { histories, quranRoute } from '../../src/lib/reading-progress';
 import { pageOfSurah } from '../../src/lib/mushaf-core';
 import { FONTS } from '../../src/lib/theme';
 
+import * as store from '../../src/lib/offline-store';
 export default function QuranList() {
   const { colors, t, settings, update } = useApp();
   const mode = settings.quranMode === 'mushaf' ? 'mushaf' : 'standard';
@@ -24,10 +26,12 @@ export default function QuranList() {
   }, [data, q]);
   const saved = histories(settings).quran;
   const resume = saved ? quranRoute(saved, mode) : null;
+  useOfflineVersion();
   const open = (n) => router.push(mode === 'mushaf' ? `/mushaf/${pageOfSurah(n)}` : `/surah/${n}`);
   return (
     <Screen>
       <TopAppBar title={t('quran')} subtitle={t('quranDesc')} onMenu={openDrawer} />
+      <OfflineBanner />
       <View style={{ paddingHorizontal: 16, gap: 12, paddingBottom: 12 }}>
         <SearchBar value={q} onChangeText={setQ} placeholder={t('searchSurah')} testID="surah-search" />
         <Segmented value={mode} onChange={(v) => update({ quranMode: v })} options={[['standard', 'Standard view'], ['mushaf', '15-line Mushaf']]} />
@@ -40,7 +44,7 @@ export default function QuranList() {
               leading={<LeadingBadge>{s.n}</LeadingBadge>}
               headline={s.name}
               supporting={`${s.en} · ${s.verses} ${t('verses')} · ${s.place === 'Mecca' ? t('meccan') : t('medinan')}`}
-              trailing={<T style={{ fontFamily: FONTS.quran, writingDirection: 'rtl' }} size={24} color={colors.primary}>{s.ar.replace('سُوْرَةُ ', '').replace('سُورَةُ ', '')}</T>} />
+              trailing={<View style={{ alignItems: 'center', gap: 2 }}><T style={{ fontFamily: FONTS.quran, writingDirection: 'rtl' }} size={24} color={colors.primary}>{s.ar.replace('سُوْرَةُ ', '').replace('سُورَةُ ', '')}</T>{mode !== 'mushaf' ? <OfflineMark ready={store.has(`q/${s.n}.json`)} /> : null}</View>} />
           )} />
       )}
       {resume ? <Fab icon="play" label={`${t('continueReading')} · ${resume.detail}`} onPress={() => router.push(resume.href)} /> : null}

@@ -53,6 +53,10 @@ export default function Settings() {
           <ListItem divider={false} headline={t('harakat')} trailing={sw(settings.harakat, (v) => update({ harakat: v }), t('harakat'))} style={{ borderTopWidth: 1, borderTopColor: colors.outlineVariant }} />
         </ListGroup>
 
+        <ListGroup title="Offline">
+          <ListItem onPress={() => router.push('/downloads')} leading={<LeadingBadge icon="download-outline" />} headline="Download Manager" supporting="Download the Quran, hadith, recitations and more to use without internet." />
+        </ListGroup>
+
         <ListGroup title="Daily reading">
           <ListItem leading={<LeadingBadge icon="notifications-outline" />} headline="Daily reminder" supporting="One gentle notification a day to keep your reading streak."
             trailing={sw(!!settings.dailyReminder?.on, async (v) => { const dr = { ...(settings.dailyReminder || { hour: 8, minute: 0 }), on: v }; update({ dailyReminder: dr }); await rescheduleAll({ ...settings, dailyReminder: dr }); }, 'Daily reminder')} divider />

@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../../src/lib/settings';
 import { getSurah, getSurahs } from '../../src/lib/api';
+import { MissingLanguageNotice, OfflineBanner } from '../../src/components/OfflineBits';
 import * as audio from '../../src/lib/audio';
 import { useAudio } from '../../src/lib/audio';
 import { baseLang, choiceByKey } from '../../src/lib/languages';
@@ -46,7 +47,8 @@ export default function SurahScreen() {
   const ref = useRef(null);
   const [reciterOpen, setReciterOpen] = useState(false);
   const meta = useAsync(async () => (await getSurahs()).surahs[Number(n) - 1], [n]);
-  const verses = useAsync(() => getSurah(n), [n]);
+  const need = useMemo(() => [settings.tr, settings.tr2].filter(Boolean), [settings.tr, settings.tr2]);
+  const verses = useAsync(() => getSurah(n, need), [n, need.join(',')]);
   const playingV = useAudio((s) => (s.q && s.q.surah.n === Number(n) ? s.q.v : null));
   const status = useAudio((s) => s.status);
   const phase = useAudio((s) => s.phase);
@@ -107,6 +109,7 @@ export default function SurahScreen() {
     <Screen>
       <TopAppBar title={surah ? `${surah.n}. ${surah.name}` : t('quran')} subtitle={surah ? `${surah.en} · ${surah.verses} ${t('verses')}` : undefined} onBack={() => router.back()}
         actions={<><IconButton icon="mic-outline" label="Practice reciting this surah" testID="to-practice" onPress={() => router.push(`/practice/${n}`)} /><IconButton icon="book-outline" label="Open in the 15-line Mushaf view" testID="to-mushaf" onPress={() => { update({ quranMode: 'mushaf' }); router.replace(`/mushaf/${pageOfVerse(Number(n), topAyah.current)}`); }} /></>} />
+      <MissingLanguageNotice rel={`q/${n}.json`} need={need} />
       {verses.loading || meta.loading ? <Loader /> : verses.error ? <ErrorBox onRetry={verses.reload} /> : (
         <FlatList ref={ref} data={verses.data} keyExtractor={(v) => String(v.v)} contentContainerStyle={{ padding: 16, paddingTop: 4, gap: 12, paddingBottom: 30 }}
           ListHeaderComponent={Header} onViewableItemsChanged={onViewable} viewabilityConfig={{ itemVisiblePercentThreshold: 40 }} initialNumToRender={8} windowSize={9} onScrollToIndexFailed={() => {}}

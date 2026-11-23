@@ -8,6 +8,8 @@ import { TRANSLATION_CHOICES, choiceByKey } from '../lib/languages';
 import { useAudio } from '../lib/audio';
 import * as audio from '../lib/audio';
 import { reciterById } from '../lib/reciters';
+import { useRouter } from 'expo-router';
+import { useOnline } from '../lib/net';
 import { T } from './text';
 import { BottomSheet, FilterChip, TopAppBar, ripple } from './m3';
 export { T };
@@ -80,12 +82,15 @@ export function Loader({ label }) {
 
 export function ErrorBox({ onRetry }) {
   const { colors, t } = useApp();
+  const online = useOnline();
+  const router = useRouter();
   return (
     <View style={{ padding: 32, alignItems: 'center', gap: 14 }}>
       <Ionicons name="cloud-offline-outline" size={40} color={colors.muted} />
-      <T weight="uiSemi" size={18}>{t('errorTitle')}</T>
-      <T color={colors.muted} size={15} style={{ textAlign: 'center' }}>{t('offline')}</T>
+      <T weight="uiSemi" size={18}>{online ? t('errorTitle') : 'This needs the internet'}</T>
+      <T color={colors.muted} size={15} style={{ textAlign: 'center' }}>{online ? t('offline') : 'You are offline and this has not been downloaded yet. Download it in the Download Manager while you have internet, and it will open without a connection.'}</T>
       <Button kind="secondary" label={t('retry')} icon="refresh" onPress={onRetry} />
+      {!online ? <Button kind="tonal" label="Download Manager" icon="download-outline" onPress={() => router.push('/downloads')} /> : null}
     </View>
   );
 }
@@ -184,7 +189,7 @@ export function MiniPlayer() {
   if (!q) return null;
   const playing = status === 'playing' || status === 'loading';
   const where = q.whole ? q.surah.name : q.v === 0 ? `${q.surah.name} · Bismillah` : `${q.surah.name} · ${t('ayah')} ${q.v}/${q.surah.verses}`;
-  const sub = status === 'error' ? t('offline') : phase === 'urdu' ? t('urduNow') : reciterById(settings.reciter).en;
+  const sub = status === 'error' ? (err === 'offline' ? 'Offline: this recitation is not downloaded yet' : t('offline')) : phase === 'urdu' ? t('urduNow') : reciterById(settings.reciter).en;
   const Btn = ({ icon, onPress, label, big, disabled }) => (
     <Pressable onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityLabel={label} hitSlop={8}
       style={{ width: big ? 46 : 38, height: big ? 46 : 38, borderRadius: 23, alignItems: 'center', justifyContent: 'center', backgroundColor: big ? colors.brand : 'transparent', opacity: disabled ? 0.35 : 1 }}>

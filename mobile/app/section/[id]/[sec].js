@@ -6,13 +6,15 @@ import { getCollection, getSection } from '../../../src/lib/api';
 import { ErrorBox, Header, Loader, Screen, TranslationButton, useAsync, T } from '../../../src/components/ui';
 import HadithCard from '../../../src/components/HadithCard';
 import { saveHadith } from '../../../src/lib/reading-progress';
+import { MissingLanguageNotice } from '../../../src/components/OfflineBits';
 
 export default function Section() {
   const { id, sec, focus } = useLocalSearchParams();
   const { t, update, settings, colors } = useApp();
   const router = useRouter();
   const ref = useRef(null);
-  const { data, error, loading, reload } = useAsync(async () => ({ col: await getCollection(id), items: await getSection(id, sec) }), [id, sec]);
+  const need = [settings.tr, settings.tr2].filter(Boolean).map((k) => k.slice(0, 2)).filter((k, i, a) => a.indexOf(k) === i);
+  const { data, error, loading, reload } = useAsync(async () => ({ col: await getCollection(id), items: await getSection(id, sec, need) }), [id, sec, need.join(',')]);
   const section = data?.col.sections.find((s) => s.id === sec);
   // Hadith history: book, chapter and the hadith at the top of the screen. Separate from the Quran history.
   const topN = useRef(Number(focus) > 0 ? Number(focus) : 0);
@@ -37,6 +39,7 @@ export default function Section() {
   return (
     <Screen>
       <Header title={section?.title || ''} subtitle={section ? `${section.from}–${section.to}` : ''} onBack={() => router.back()} />
+      <MissingLanguageNotice rel={`c/${id}/${sec}.json`} need={need} what="language" />
       {loading ? <Loader /> : error ? <ErrorBox onRetry={reload} /> : (
         <FlatList ref={ref} data={data.items} keyExtractor={(h) => String(h.n)} initialNumToRender={6} windowSize={7}
           onScrollToIndexFailed={() => {}} onViewableItemsChanged={onViewable} viewabilityConfig={{ itemVisiblePercentThreshold: 40 }}

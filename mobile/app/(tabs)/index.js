@@ -13,6 +13,7 @@ import { continueTarget, histories, quranRoute } from '../../src/lib/reading-pro
 import DATA from '../../src/lib/arabic-data.json';
 import { playWordRef } from '../../src/lib/arabic-audio';
 import { lastWeek, streakStats } from '../../src/lib/streak';
+import { OfflineBanner } from '../../src/components/OfflineBits';
 
 const DAILY = [1, 10, 13, 39, 52, 6011, 6018, 6094, 6114, 6412, 6416];
 const WORDS = DATA.vocab.flatMap((g) => g.words);
@@ -77,6 +78,7 @@ export default function Home() {
         subtitle={t('tagline')}
         actions={<IconButton icon="settings-outline" label={t('settings')} onPress={() => router.push('/settings')} />}
       />
+      <OfflineBanner />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 16 }}>
         {/* Hero: the one thing to do next */}
         <Pressable onPress={() => router.push(go ? go.href : '/quran')} accessibilityRole="button" accessibilityLabel={go ? `${t('continueReading')}: ${go.title}. ${go.detail || ''}` : t('quran')} {...ripple(colors)}
@@ -111,6 +113,7 @@ export default function Home() {
         <View style={{ marginHorizontal: -16 }}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}>
             <Shortcut icon="time" title="Prayer times" to="/prayer" />
+            <Shortcut icon="download" title="Offline downloads" to="/downloads" />
             <Shortcut icon="school" title="Learn Quran" to="/learn" />
             <Shortcut icon="language" title="Learn Arabic" to="/learn-arabic" />
             <Shortcut icon="sparkles" title="Special Duas" to="/special-duas" tone="gold" />

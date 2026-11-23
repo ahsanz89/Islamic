@@ -3,6 +3,8 @@
 import { useSyncExternalStore } from 'react';
 import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { AUDIO, reciterById } from './reciters';
+import { localUri } from './offline-store';
+import { isOnline } from './net';
 
 export const state = { q: null, status: 'idle', phase: '', err: '' };   // status: idle | loading | playing | paused | ended | error
 const cfg = { reciter: 'alafasy', urdu: false, continuous: true, bismillah: true };
@@ -51,7 +53,9 @@ function start(url) {
   guard = Date.now() + 600;
   playId += 1;
   const id = playId;
-  p.replace({ uri: url });
+  const local = localUri(url);
+  const fromPhone = local !== url;
+  p.replace({ uri: local });
   p.play();
   clearTimeout(loadingTimer);
   const isUrdu = state.phase === 'urdu';
@@ -59,7 +63,7 @@ function start(url) {
     if (id !== playId || state.status !== 'loading') return;
     // a translation clip that never starts must not freeze the recitation: skip it
     if (isUrdu) { state.phase = ''; advance(); return; }
-    set({ status: 'error', err: 'unavailable' });
+    set({ status: 'error', err: !fromPhone && !isOnline() ? 'offline' : 'unavailable' });
   }, isUrdu ? URDU_START_TIMEOUT : 20000);
 }
 function load(surah, v, mode, autoplay = true) {

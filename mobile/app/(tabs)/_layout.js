@@ -40,8 +40,9 @@ function AppDrawer() {
       { key: 'hadith', icon: 'library-outline', label: t('hadith'), onPress: () => router.navigate('/hadith'), active: here === 'hadith' },
       { key: 'duas', icon: 'heart-outline', label: t('duas'), onPress: () => router.navigate('/duas'), active: here === 'duas' }
     ] },
-    { title: 'Worship', items: [
-      { key: 'prayer', icon: 'time-outline', label: 'Prayer times and Qibla', onPress: go('/prayer'), active: here === 'prayer' }
+    { title: 'Worship and offline', items: [
+      { key: 'prayer', icon: 'time-outline', label: 'Prayer times and Qibla', onPress: go('/prayer'), active: here === 'prayer' },
+      { key: 'downloads', icon: 'download-outline', label: 'Download Manager', onPress: go('/downloads'), active: here === 'downloads' }
     ] },
     { title: 'Learn', items: [
       { key: 'learn', icon: 'school-outline', label: 'Learn Quran', onPress: () => router.navigate('/learn'), active: here === 'learn' },
