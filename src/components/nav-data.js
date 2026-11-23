@@ -3,10 +3,11 @@
 // Labels: { en, ur, ar }. Missing languages fall back to English.
 export const NAV = [
   {
-    id: 'quran', match: ['/quran/', '/bookmarks/'], icon: 'quran', href: '/quran/', label: { en: 'Quran', ur: 'قرآن', ar: 'القرآن' },
+    id: 'quran', match: ['/quran/', '/bookmarks/', '/mushaf/'], icon: 'quran', href: '/quran/', label: { en: 'Quran', ur: 'قرآن', ar: 'القرآن' },
     groups: [
       { items: [
         { href: '/quran/', label: { en: 'Read the Quran', ur: 'قرآن پڑھیں', ar: 'اقرأ القرآن' }, desc: { en: 'All 114 surahs with audio, translations and word by word', ur: 'تمام 114 سورتیں، آڈیو، ترجمے اور لفظ بہ لفظ', ar: 'السور الـ114 مع الصوت والترجمة وكلمة بكلمة' } },
+        { href: '/mushaf/', label: { en: 'Mushaf pages', ur: 'مصحف کے صفحات', ar: 'صفحات المصحف' }, desc: { en: 'Read page by page, 15 lines to a page', ur: 'صفحہ بہ صفحہ پڑھیں، ہر صفحے پر 15 سطریں', ar: 'اقرأ صفحة صفحة، 15 سطرًا في الصفحة' } },
         { href: '/quran/roots/', label: { en: 'Quran word roots', ur: 'قرآنی الفاظ کی جڑیں', ar: 'جذور كلمات القرآن' }, desc: { en: 'Explore Arabic roots and where words appear', ur: 'عربی جڑیں اور الفاظ کہاں آتے ہیں', ar: 'استكشف الجذور ومواضع الكلمات' } },
         { href: '/bookmarks/', label: { en: 'Bookmarks', ur: 'محفوظ شدہ', ar: 'العلامات' }, desc: { en: 'Your saved verses and hadith', ur: 'آپ کی محفوظ کردہ آیات اور احادیث', ar: 'الآيات والأحاديث المحفوظة' } }
       ] }

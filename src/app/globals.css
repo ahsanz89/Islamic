@@ -1171,3 +1171,24 @@ html[dir='rtl'] .mm { animation-name: mm-in-rtl; }
 @media (max-width: 560px) { .wl-tile { min-width: 64px; } .wl-glyph { font-size: 32px; } }
 @media (prefers-reduced-motion: reduce) { .wl-tile { transition: none; } .wl-tile:hover { transform: none; } }
 .wl-modes-row { margin: 10px 0; display: flex; justify-content: center; }
+
+/* ---- Mushaf page reader (added) ---- */
+.mp-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.mp-jump { display: flex; gap: 6px; }
+.mp-jump input, .mp-surah select { min-height: 38px; border: 1px solid var(--line); border-radius: 999px; padding: 0 14px; background: var(--surface); color: var(--ink); font: inherit; font-size: 15px; }
+.mp-jump input { width: 120px; }
+.mp-title { margin: 6px 0 10px; text-align: center; }
+.mp-stage { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.mp-nav { flex: none; }
+.mp-page { position: relative; display: flex; flex-direction: column; align-items: center; background: var(--surface); border: 1px solid var(--gold-line); border-radius: 12px; box-shadow: var(--shadow); padding: 6px 0; overflow: hidden; font-family: var(--font-quran); color: var(--ink); }
+.mp-row { width: 100%; display: flex; align-items: center; justify-content: center; }
+.mp-line { display: flex; flex-direction: row; direction: rtl; align-items: center; white-space: nowrap; line-height: 1.7; }
+.mp-word { white-space: nowrap; }
+.mp-end { color: var(--brand); font-size: .78em; margin-inline-start: .06em; margin-inline-end: .12em; }
+.mp-header { margin: 0; width: 94%; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--brand); border-radius: 10px; background: var(--brand-soft); color: var(--brand-deep); font-family: inherit; font-weight: 400; line-height: 1.6; }
+.mp-bism { font-size: 1em; line-height: 1.7; }
+.mp-probe { position: absolute; visibility: hidden; left: 0; top: 0; pointer-events: none; font-family: var(--font-quran); }
+.mp-probe .mp-line.natural { display: inline-flex; width: auto; gap: .2em; }
+.mp-probe > div { display: block; width: max-content; }
+.mp-foot { display: none; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 90px; }
+@media (max-width: 700px) { .mp-side { display: none; } .mp-foot { display: flex; } }
