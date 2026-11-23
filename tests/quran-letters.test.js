@@ -1,0 +1,76 @@
+import { describe, expect, it } from 'vitest';
+import fs from 'fs';
+import path from 'path';
+import { breakdown, lettersLine, practiceRows, rebuild, segment } from '../src/lib/quran-letters';
+
+const show = (w) => breakdown(w).map((c) => [c.ch, c.marks.map((m) => m.name), c.sound, c.role]);
+
+describe('quran-letters', () => {
+  it('attaches every sign to the letter before it and never counts a sign as a letter', () => {
+    const c = segment('ٱلۡحَمۡدُ');
+    expect(c.map((x) => x.ch)).toEqual(['ٱ', 'ل', 'ح', 'م', 'د']);
+    expect(lettersLine('ٱلۡحَمۡدُ')).toBe('ٱ + ل + ح + م + د');
+    expect(c[2].marks.map((m) => m.name)).toEqual(['Fatha (Zabar)']);
+    expect(c[4].marks.map((m) => m.name)).toEqual(['Damma (Pesh)']);
+  });
+  it('reads letter + sign sounds', () => {
+    const b = breakdown('بِسۡمِ');
+    expect(b[0].sound).toBe('bi');
+    expect(b[1].sound).toBe('s');
+    expect(b[2].sound).toBe('mi');
+    expect(breakdown('بَّ')[0].sound).toBe('bba');
+    expect(breakdown('بٌ')[0].sound).toBe('bun');
+  });
+  it('treats Alif Wasla as silent and the unmarked Laam before a Shaddah as merged', () => {
+    const b = breakdown('ٱلشَّمۡسِ');
+    expect(b[0].role).toBe('silent');
+    expect(b[1].role).toBe('merged');
+    expect(b[2].marks.map((m) => m.kind)).toContain('shadda');
+    expect(breakdown('ٱلَّذِیۤ')[1].sound).toBe('lla'); // here the Laam itself is doubled
+  });
+  it('recognises long vowels, dagger alif and the madd sign', () => {
+    const b = breakdown('سُبۡحَـٰنَ'); // tatweel + dagger alif on the Haa
+    expect(b.find((c) => c.ch === 'ح').sound).toBe('ḥaa');
+    const m = breakdown('قَالَ');
+    expect(m[1].role).toBe('long-vowel');
+    expect(m[1].sound).toBe('aa');
+  });
+  it('names the stop sign, zero, tanween and iqlab marks', () => {
+    const all = (w) => breakdown(w).flatMap((c) => c.marks.map((m) => m.name));
+    expect(all('عَلِیمٌۚ').some((n) => n.startsWith('Stop sign: Jeem'))).toBe(true);
+    expect(all('تَتَّخِذُوا۟')).toContain('Small rounded zero');
+    expect(all('لَیۡلࣰا')).toContain('Fathatan, open form');
+    expect(all('مِنۢ')).toContain('Small high Meem (Iqlab)');
+  });
+  it('shows the hamza forms by their own names', () => {
+    const n = (w) => breakdown(w)[0].letter.name;
+    expect(n('أَ')).toBe('Hamza on Alif');
+    expect(n('إِ')).toBe('Hamza under Alif');
+    expect(n('ؤُ')).toBe('Hamza on Waw');
+    expect(n('ئِ')).toBe('Hamza on Yaa');
+  });
+  it('gives the practice strip for one letter', () => {
+    const rows = practiceRows('ب');
+    expect(rows.map((r) => r.roman)).toEqual(['Ba', 'Bi', 'Bu', 'B (no vowel)', 'Bba', 'Ban', 'Bin', 'Bun']);
+  });
+  it('splits every word of the whole Quran without losing a single character and with no unknown signs', () => {
+    const dir = path.join(__dirname, '../public/data/q');
+    let words = 0; const bad = []; const unknown = new Set();
+    for (const f of fs.readdirSync(dir)) {
+      if (!/^\d+\.json$/.test(f)) continue;
+      for (const a of JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'))) {
+        for (const w of a.w || []) {
+          words += 1;
+          if (rebuild(w.a) !== w.a.replace(/ـ/g, '')) bad.push(w.a);
+          for (const c of breakdown(w.a)) {
+            if (c.ch && !c.letter.known) unknown.add(c.ch);
+            for (const m of c.marks) if (m.name === 'Quranic sign') unknown.add(m.ch);
+          }
+        }
+      }
+    }
+    expect(words).toBeGreaterThan(70000);
+    expect(bad).toEqual([]);
+    expect([...unknown]).toEqual([]);
+  });
+});

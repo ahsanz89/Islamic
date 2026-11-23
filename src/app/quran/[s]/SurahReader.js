@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { WordCards } from './WordLearn';
 import { useApp } from '@/components/Providers';
 import { BookmarkButton, CopyButton, Icon, Loader, ReadingBar } from '@/components/ui';
 import { getJSON } from '@/lib/client-data';
@@ -40,18 +41,7 @@ const Verse = memo(function Verse({ v, surah, keys, translators, wbw, harakat, w
       </div>
       <div className="hadith-body">
         {wbw ? (
-          <div className="wbw">
-            {v.w.map((w, i) => (
-              <div className="word" key={i}>
-                {wordAudio && !v.na
-                  ? <span className="wa"><QuranWord s={surah.n} v={v.v} pos={i + 1} text={show(w.a)} /></span>
-                  : <span className="wa" lang="ar">{show(w.a)}</span>}
-                {w.tl && <span className="wt">{w.tl}</span>}
-                {w.en && <span className="we">{w.en}</span>}
-                {w.r && <Link className="wr" href={`/quran/roots/?r=${encodeURIComponent(w.r)}`}>{w.r}</Link>}
-              </div>
-            ))}
-          </div>
+          <WordCards verse={v} surah={surah} mode={wbw} show={show} wordAudio={wordAudio} />
         ) : (
           <p className="quran-ar" lang="ar" style={{ margin: 0 }}>
             {words
@@ -75,7 +65,21 @@ const Verse = memo(function Verse({ v, surah, keys, translators, wbw, harakat, w
 export default function SurahReader({ surah, translators, prev, next }) {
   const { t, settings, setLastRead } = useApp();
   const [verses, setVerses] = useState(null);
-  const [wbw, setWbw] = useState(false);
+  const [wbw, setWbwRaw] = useState(false); // false | 'word' | 'letter'
+  const anchor = useRef(null);
+  useEffect(() => { try { const m = localStorage.getItem('dalil.readmode'); if (m === 'word' || m === 'letter') setWbwRaw(m); } catch { /* ignore */ } }, []);
+  // switching mode keeps the ayah you are reading in the same place on the screen
+  const setWbw = (m) => {
+    const art = [...document.querySelectorAll('article[id^="v"]')].find((a) => a.getBoundingClientRect().bottom > 80);
+    anchor.current = art ? { id: art.id, top: art.getBoundingClientRect().top } : null;
+    setWbwRaw(m);
+    try { localStorage.setItem('dalil.readmode', m || 'normal'); } catch { /* ignore */ }
+  };
+  useLayoutEffect(() => {
+    const a = anchor.current; anchor.current = null;
+    const el = a && document.getElementById(a.id);
+    if (el) window.scrollBy(0, el.getBoundingClientRect().top - a.top);
+  }, [wbw]);
   const [second, setSecond] = useState(false);
   useEffect(() => {
     setVerses(null);
@@ -115,13 +119,19 @@ export default function SurahReader({ surah, translators, prev, next }) {
         </div>
         <WholeNote />
       </header>
+      <div className="wl-modes-row">
+        <span className="wl-modes" role="group" aria-label={t('readMode')}>
+          <button className="btn small" aria-pressed={!wbw} onClick={() => setWbw(false)}>{t('modeNormal')}</button>
+          <button className="btn small" aria-pressed={wbw === 'word'} onClick={() => setWbw('word')}>{t('wordByWord')}</button>
+          <button className="btn small" aria-pressed={wbw === 'letter'} onClick={() => setWbw('letter')}>{t('modeLetter')}</button>
+        </span>
+      </div>
       <ReadingBar
         field="qtr"
         arabicFixed
         choices={Object.keys(translators).filter((k) => !k.endsWith('2'))}
         extra={<>
           <UrduAudioToggle />
-          <button className="btn small" aria-pressed={wbw} onClick={() => setWbw(!wbw)}>{t('wordByWord')}</button>
           <button className="btn small" aria-pressed={second} onClick={() => setSecond(!second)}>+ {t('translationBy')}</button>
           <Link className="btn small ghost" href="/quran/roots/">{t('roots')}</Link>
         </>}
