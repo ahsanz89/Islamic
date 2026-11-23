@@ -7,12 +7,14 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useApp } from '@/components/Providers';
 import { Icon, Loader } from '@/components/ui';
-import { getJSON } from '@/lib/client-data';
 import { recordRead } from '@/lib/reading-log';
 import {
   PAGES, clampPage, firstVerseOfPage, lineSpeech, pageLines, pageOfSurah, parseToken, setMushaf, surahsOnPage, toArabicDigits
 } from '@/lib/mushaf-core';
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
+let layout = null;
+const loadLayout = () => layout || (layout = fetch(`${BASE}/mushaf/layout.json`).then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); }).catch((e) => { layout = null; throw e; }));
 const REF = 24;
 const BASMALA = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ';
 
@@ -76,7 +78,7 @@ export default function MushafReader({ surahs }) {
   const wrap = useRef(null);
   const touch = useRef(null);
 
-  useEffect(() => { getJSON('mushaf15.json').then((d) => { setMushaf(d); setReady(true); }).catch(() => setError('The page layout could not be loaded. Check your connection and reload.')); }, []);
+  useEffect(() => { loadLayout().then((d) => { setMushaf(d); setReady(true); }).catch(() => setError('The page layout could not be loaded. Check your connection and reload.')); }, []);
   // a link such as /mushaf/?p=12 (or ?s=18 for a surah) jumps there, once the layout is ready
   useEffect(() => {
     if (!ready) return;

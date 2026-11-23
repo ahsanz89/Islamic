@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { PAGES, clampPage, firstVerseOfPage, lineSpeech, pageLines, pageOfSurah, pageOfVerse, parseToken, setMushaf, surahsOnPage, toArabicDigits } from '../src/lib/mushaf-core';
 
-beforeAll(() => setMushaf(JSON.parse(fs.readFileSync(path.join(__dirname, '../public/data/mushaf15.json'), 'utf8'))));
+beforeAll(() => setMushaf(JSON.parse(fs.readFileSync(path.join(__dirname, '../public/mushaf/layout.json'), 'utf8'))));
 
 describe('mushaf-core (web)', () => {
   it('has 604 pages and 15 lines on the ordinary pages', () => {
