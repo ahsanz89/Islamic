@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "fetch": "node scripts/fetch-sources.mjs",
-    "data": "node --max-old-space-size=12000 scripts/build-data.mjs",
+    "data": "node --max-old-space-size=12000 scripts/build-data.mjs && node scripts/build-grades.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "npx serve out",

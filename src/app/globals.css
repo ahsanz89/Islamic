@@ -283,6 +283,7 @@ select.btn { padding-inline-end: 30px; max-width: 190px; appearance: auto; borde
 .badge.gold { background: var(--gold-soft); color: var(--gold); }
 .badge.weak { background: var(--weak-soft); color: var(--weak); }
 .badge.grey { background: var(--surface-3); color: var(--muted); }
+.badge.fab { background: var(--weak); color: var(--surface); }
 
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
 .card.pad { padding: 24px; }

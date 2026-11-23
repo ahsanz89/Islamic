@@ -13,8 +13,8 @@ const PAGE = 30;
 const KEEP = 3000; // matches kept for display; counts cover everything
 const QURAN_KEYS = { ar: 'simple', ur: 'ur', en: 'en', bn: 'bn', id: 'id', tr: 'tr', fr: 'fr', ru: 'ru', ta: 'ta', hi: 'hi' };
 const HADITH_LANGS = ['ar', 'ur', 'en', 'bn', 'id', 'tr', 'fr', 'ru', 'ta'];
-const GRADES = [['s', 'sahih'], ['h', 'hasan'], ['d', 'daif'], ['', 'ungraded']];
-const GRADE_WORD = { s: 'Sahih', h: 'Hasan', d: "Da'if" };
+const GRADES = [['s', 'sahih'], ['h', 'hasan'], ['d', 'daif'], ['m', 'mawdu'], ['', 'ungraded']];
+const GRADE_WORD = { s: 'Sahih', h: 'Hasan', d: "Da'if", m: "Mawdu'" };
 const hasArabic = (s) => /[؀-ۿ]/.test(s);
 const looksUrdu = (s) => /[ٹڈڑںہےۓکگی]/.test(s);
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -63,7 +63,7 @@ export default function Search({ collections }) {
   const [mode, setMode] = useState('all');
   const [selected, setSelected] = useState(() =>
     preCol ? [preCol] : collections.filter((c) => c.source === 'hadith-api').map((c) => c.id));
-  const [grades, setGrades] = useState(['s', 'h', 'd', '']);
+  const [grades, setGrades] = useState(['s', 'h', 'd', 'm', '']);
   const [chapter, setChapter] = useState('');
   const [narrator, setNarrator] = useState('');
   const [numFrom, setNumFrom] = useState('');
@@ -95,7 +95,7 @@ export default function Search({ collections }) {
   }, [single]);
 
   const activeFilters =
-    (mode !== 'all') + (grades.length !== 4) + !!chapter + !!narrator.trim() + !!(numFrom || numTo) +
+    (mode !== 'all') + (grades.length !== 5) + !!chapter + !!narrator.trim() + !!(numFrom || numTo) +
     (scope === 'quran' ? !!surah + (place !== 'all') + (juzFrom !== 1 || juzTo !== 30) : 0);
 
   async function doSearch(e) {
@@ -185,7 +185,7 @@ export default function Search({ collections }) {
   const toggleBook = (c) => setSelected((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]));
   const toggleGrade = (g) => setGrades((s) => (s.includes(g) ? s.filter((x) => x !== g) : [...s, g]));
   const reset = () => {
-    setMode('all'); setGrades(['s', 'h', 'd', '']); setChapter(''); setNarrator(''); setNumFrom(''); setNumTo('');
+    setMode('all'); setGrades(['s', 'h', 'd', 'm', '']); setChapter(''); setNarrator(''); setNumFrom(''); setNumTo('');
     setSurah(''); setPlace('all'); setJuzFrom(1); setJuzTo(30); setSort('order');
   };
   const langs = scope === 'quran' ? Object.keys(QURAN_KEYS) : HADITH_LANGS;

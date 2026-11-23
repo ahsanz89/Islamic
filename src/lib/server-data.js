@@ -19,3 +19,6 @@ export const readCollection = (id) => {
 export const readSurahs = () => read('q/surahs.json');
 export const readGlossary = () => read('glossary.json');
 export const readDuas = () => read('duas.json');
+
+/** Per-book grade counts from scripts/build-grades.mjs ({} if the file has not been generated). */
+export const readGrades = () => { try { return read('grades.json'); } catch { return {}; } };

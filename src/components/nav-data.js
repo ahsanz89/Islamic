@@ -31,10 +31,11 @@ export const NAV = [
   },
   { id: 'arabic', match: ['/learn-arabic/'], icon: 'arabic', href: '/learn-arabic/', label: { en: 'Learn Arabic', ur: 'عربی سیکھیں', ar: 'تعلّم العربية' }, feature: true },
   {
-    id: 'hadith', match: ['/collections/', '/c/', '/hadith/', '/search/', '/narrators/'], icon: 'books', href: '/collections/', label: { en: 'Hadith', ur: 'حدیث', ar: 'الحديث' },
+    id: 'hadith', match: ['/collections/', '/c/', '/hadith/', '/search/', '/narrators/', '/grades/'], icon: 'books', href: '/collections/', label: { en: 'Hadith', ur: 'حدیث', ar: 'الحديث' },
     groups: [
       { items: [
         { href: '/collections/', label: { en: 'Hadith collections', ur: 'حدیث کے مجموعے', ar: 'كتب الحديث' }, desc: { en: 'Bukhari, Muslim and more', ur: 'بخاری، مسلم اور مزید', ar: 'البخاري ومسلم وغيرهما' } },
+        { href: '/grades/', label: { en: 'Hadith by grade', ur: 'درجے کے مطابق احادیث', ar: 'الأحاديث حسب الدرجة' }, desc: { en: "Sahih, Hasan, Da'if and Mawdu' across the books", ur: 'صحیح، حسن، ضعیف اور موضوع کتابوں میں', ar: 'الصحيح والحسن والضعيف والموضوع في الكتب' } },
         { href: '/search/', label: { en: 'Search hadith', ur: 'حدیث تلاش کریں', ar: 'ابحث في الحديث' }, desc: { en: 'Search in English, Urdu or Arabic', ur: 'انگریزی، اردو یا عربی میں تلاش', ar: 'ابحث بالإنجليزية أو الأردية أو العربية' } },
         { href: '/narrators/', label: { en: 'Narrators', ur: 'راوی', ar: 'الرواة' }, desc: { en: 'Who narrated the hadith', ur: 'احادیث کے راوی', ar: 'رواة الأحاديث' } }
       ] }

@@ -6,14 +6,20 @@ import { BookmarkButton, CName, CopyButton, ShareButton } from './ui';
 import { stripDiacritics } from '@/lib/arabic.mjs';
 import { LANG_NAMES } from '@/lib/i18n';
 import { getCollections } from '@/lib/client-data';
-import { gradeOf } from '@/lib/grades.mjs';
+import { gradeClass, gradeOf, pickGrade } from '@/lib/grades.mjs';
 
 export const hadithHref = (c, n) => `/hadith/?c=${c}&n=${n}`;
 
 export function gradeTone(g) {
   const c = gradeOf(g);
-  return c === 'd' ? 'weak' : c === 'h' ? 'gold' : c === 's' ? '' : 'grey';
+  return classTone(c);
 }
+/** Badge colour for a grade class: s sahih (green), h hasan (gold), d da'if (amber-red), m mawdu' (solid red), '' not graded (grey). */
+export function classTone(c) {
+  return c === 'm' ? 'fab' : c === 'd' ? 'weak' : c === 'h' ? 'gold' : c === 's' ? '' : 'grey';
+}
+const CLASS_KEY = { s: 'sahih', h: 'hasan', d: 'daif', m: 'mawduShort' };
+const plain = (x) => String(x || '').toLowerCase().replace(/[’'`]/g, '');
 
 function ArabicText({ text, mi, highlight }) {
   const { settings } = useApp();
@@ -45,7 +51,8 @@ export default function HadithCard({ col, h, full = false }) {
   const { t, settings } = useApp();
   const name = settings.ui === 'ur' ? col.ur : settings.ui === 'ar' ? col.ar : col.en;
   const title = `${name} ${h.n}`;
-  const firstGrade = h.g && h.g[0];
+  const firstGrade = pickGrade(h.g);
+  const cls = gradeClass(h.g, col.id);
   const copyText = [title, h.ar, ...settings.tr.filter((l) => h.t?.[l]).map((l) => h.t[l])].join('\n\n');
 
   return (
@@ -53,7 +60,10 @@ export default function HadithCard({ col, h, full = false }) {
       <div className="hadith-head">
         <Link href={hadithHref(col.id, h.n)} className="num">{title}</Link>
         {h.p ? <span className="badge grey">{t('printedNo')} {h.p}</span> : null}
-        {firstGrade ? <span className={`badge ${gradeTone(firstGrade[1])}`} title={firstGrade[0]}>{firstGrade[1]}</span> : null}
+        {cls
+          ? <span className={`badge ${classTone(cls)}`} title={firstGrade ? `${firstGrade[0]}: ${firstGrade[1]}` : t('gradeConsensus')}>{t(CLASS_KEY[cls])}</span>
+          : <span className="badge grey" title={t('noGrades')}>{t('ungraded')}</span>}
+        {cls && firstGrade && plain(firstGrade[1]) !== plain(t(CLASS_KEY[cls])) ? <span className="badge grey" title={firstGrade[0]}>{firstGrade[1]}</span> : null}
         {col.source === 'openiti' ? <span className="badge grey">{t('arabicOnly')}</span> : null}
         <span className="spacer" />
         <BookmarkButton small iconOnly={!full} item={{ key: `h:${col.id}:${h.n}`, type: 'hadith', c: col.id, n: h.n, title, preview: (h.t?.en || h.t?.ur || stripDiacritics(h.ar)).slice(0, 160) }} />
