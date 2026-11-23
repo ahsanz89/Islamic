@@ -6,6 +6,7 @@ import { useApp } from '@/components/Providers';
 import { CName, Icon, Loader } from '@/components/ui';
 import HadithCard from '@/components/HadithCard';
 import PrayerTimes from '@/components/PrayerTimes';
+import StreakCard from '@/components/StreakCard';
 import LearnArabicPromo from '@/components/LearnArabicPromo';
 import { getHadith } from '@/lib/client-data';
 import { LANGUAGES } from '@/lib/i18n';
@@ -164,6 +165,10 @@ export default function Home({ collections }) {
           </Link>
         </section>
       )}
+
+      <section>
+        <StreakCard />
+      </section>
 
       <section>
         <div className="section-head"><p className="eyebrow">{t('hadithOfDay')}</p></div>

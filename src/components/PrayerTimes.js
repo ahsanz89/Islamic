@@ -4,7 +4,7 @@ import { CalculationMethod, Coordinates, Madhab, PrayerTimes as Adhan } from 'ad
 import { useApp } from '@/components/Providers';
 
 // [name, country, lat, lon, IANA time zone, calculation method, Asr school]
-const CITIES = [
+export const CITIES = [
   ['Karachi', 'Pakistan', 24.8607, 67.0011, 'Asia/Karachi', 'Karachi', 'hanafi'],
   ['Lahore', 'Pakistan', 31.5204, 74.3587, 'Asia/Karachi', 'Karachi', 'hanafi'],
   ['Islamabad', 'Pakistan', 33.6844, 73.0479, 'Asia/Karachi', 'Karachi', 'hanafi'],

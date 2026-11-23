@@ -1,6 +1,7 @@
 'use client';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { isRTL, translate } from '@/lib/i18n';
+import { recordRead } from '@/lib/reading-log';
 
 const DEFAULTS = {
   ui: 'en',
@@ -88,6 +89,7 @@ export function Providers({ children }) {
   const setLastRead = useCallback((item) => {
     setLastReadState(item);
     store('hl.lastRead', item);
+    if (item && /^\/c\//.test(item.path || '')) recordRead(`h:${item.path}`); // opening a hadith counts toward the daily reading goal
   }, []);
 
   const addRecent = useCallback((q) => {

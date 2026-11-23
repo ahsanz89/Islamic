@@ -50,9 +50,11 @@ export const NAV = [
     ]
   },
   {
-    id: 'guidance', match: ['/namaz/', '/glossary/', '/about/', '/privacy/'], icon: 'glossary', href: '/namaz/', label: { en: 'Guidance', ur: 'رہنمائی', ar: 'إرشاد' },
+    id: 'guidance', match: ['/namaz/', '/glossary/', '/about/', '/privacy/', '/prayer/', '/progress/'], icon: 'glossary', href: '/namaz/', label: { en: 'Guidance', ur: 'رہنمائی', ar: 'إرشاد' },
     groups: [
       { items: [
+        { href: '/prayer/', label: { en: 'Prayer times and Qibla', ur: 'اوقاتِ نماز اور قبلہ', ar: 'مواقيت الصلاة والقبلة' }, desc: { en: 'Times for your city, Qibla compass, reminders', ur: 'آپ کے شہر کے اوقات، قبلہ نما، یاددہانیاں', ar: 'مواقيت مدينتك وبوصلة القبلة والتذكيرات' } },
+        { href: '/progress/', label: { en: 'My progress and backup', ur: 'میری پیش رفت اور بیک اپ', ar: 'تقدّمي ونسخي الاحتياطي' }, desc: { en: 'Reading streak, daily goal, backup', ur: 'پڑھنے کا تسلسل، روزانہ ہدف، بیک اپ', ar: 'سلسلة القراءة والهدف اليومي ونسخة احتياطية' } },
         { href: '/namaz/', label: { en: 'Prayer book', ur: 'نماز کی کتاب', ar: 'كتاب الصلاة' }, desc: { en: 'Printable prayer guide, takbir to salam', ur: 'تکبیر سے سلام تک قابلِ پرنٹ کتاب', ar: 'دليل الصلاة من التكبير إلى التسليم' } },
         { href: '/glossary/', label: { en: 'Glossary', ur: 'اصطلاحات', ar: 'المصطلحات' }, desc: { en: 'Islamic terms explained', ur: 'اسلامی اصطلاحات کی وضاحت', ar: 'شرح المصطلحات الإسلامية' } },
         { href: '/about/', label: { en: 'About DALIL', ur: 'دلیل کے بارے میں', ar: 'عن دليل' }, desc: { en: 'Our purpose and sources', ur: 'ہمارا مقصد اور ماخذ', ar: 'هدفنا ومصادرنا' } }

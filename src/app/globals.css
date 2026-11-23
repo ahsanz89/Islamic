@@ -1192,3 +1192,28 @@ html[dir='rtl'] .mm { animation-name: mm-in-rtl; }
 .mp-probe > div { display: block; width: max-content; }
 .mp-foot { display: none; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 90px; }
 @media (max-width: 700px) { .mp-side { display: none; } .mp-foot { display: flex; } }
+
+/* ---- Reading streak, prayer and progress pages (added) ---- */
+.sk-card { display: grid; gap: 10px; color: inherit; text-decoration: none; }
+.sk-link:hover { border-color: var(--brand); }
+.sk-main { display: flex; align-items: center; gap: 12px; }
+.sk-flame { font-size: 34px; }
+.sk-num { font-size: 32px; line-height: 1; }
+.sk-label { font-weight: 600; }
+.sk-sub { display: block; }
+.sk-bar { height: 10px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.sk-bar i { display: block; height: 100%; background: var(--brand); border-radius: inherit; transition: width .4s var(--ease); }
+.sk-week { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; justify-content: space-between; }
+.sk-week li { flex: 1; text-align: center; padding: 6px 0; border-radius: 12px; background: var(--surface-3); font-size: 13px; color: var(--muted); }
+.sk-week li.part { background: var(--gold-soft); color: var(--gold); }
+.sk-week li.met { background: var(--brand); color: var(--brand-ink); }
+.sk-week li.today { outline: 2px solid var(--brand-deep); outline-offset: 1px; }
+.sk-done { margin: 0; color: var(--brand); font-weight: 600; }
+.qb-compass { position: relative; width: 220px; height: 220px; margin: 8px auto; border: 2px solid var(--line); border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; }
+.qb-n { position: absolute; top: 8px; font-size: 13px; color: var(--muted); }
+.qb-arrow { width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 80px solid var(--brand); transform-origin: 50% 100%; position: absolute; bottom: 50%; transition: transform .2s linear; }
+.qb-kaaba { position: absolute; bottom: 14px; font-size: 13px; color: var(--muted); }
+.pr-grid { display: grid; gap: 18px; }
+.pr-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.pr-row select, .pr-row input[type='time'], .pr-row input[type='number'] { min-height: 38px; border: 1px solid var(--line); border-radius: 12px; padding: 0 10px; background: var(--surface); color: var(--ink); font: inherit; }
+.bk-area { width: 100%; min-height: 120px; border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: var(--surface); color: var(--ink); font: 13px/1.4 ui-monospace, monospace; }

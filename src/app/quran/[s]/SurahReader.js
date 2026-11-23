@@ -9,6 +9,7 @@ import { stripDiacritics } from '@/lib/arabic.mjs';
 import { LANG_NAMES } from '@/lib/i18n';
 import { AyahPlayButton, PlaySurahButton, QuranWord, ReciterSelect, UrduAudioToggle, WholeNote } from '@/components/AudioPlayer';
 import { useAudioState } from '@/lib/audio-engine';
+import { recordRead } from '@/lib/reading-log';
 
 /** One verse. Re-renders only when its own playback state, text options or translations change. */
 const Verse = memo(function Verse({ v, surah, keys, translators, wbw, harakat, wordAudio }) {
@@ -18,6 +19,18 @@ const Verse = memo(function Verse({ v, surah, keys, translators, wbw, harakat, w
   const surahMode = useAudioState((x) => !!(x.q && x.q.mode === 'surah'));
   const ref = useRef(null);
   const show = (t) => (harakat ? t : stripDiacritics(t));
+  // an ayah counts toward the daily reading goal once it has been on screen for a couple of seconds
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    let timer = 0;
+    const io = new IntersectionObserver(([e]) => {
+      clearTimeout(timer);
+      if (e.isIntersecting) timer = setTimeout(() => recordRead(`q:${key}`), 2500);
+    }, { threshold: 0.6 });
+    io.observe(el);
+    return () => { clearTimeout(timer); io.disconnect(); };
+  }, [key]);
   const words = wordAudio && !v.na; // verses whose word count disagrees with the recordings keep plain text
 
   // while a whole surah plays, keep the current ayah in view

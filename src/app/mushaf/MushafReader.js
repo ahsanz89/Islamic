@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useApp } from '@/components/Providers';
 import { Icon, Loader } from '@/components/ui';
 import { getJSON } from '@/lib/client-data';
+import { recordRead } from '@/lib/reading-log';
 import {
   PAGES, clampPage, firstVerseOfPage, lineSpeech, pageLines, pageOfSurah, parseToken, setMushaf, surahsOnPage, toArabicDigits
 } from '@/lib/mushaf-core';
@@ -105,6 +106,8 @@ export default function MushafReader({ surahs }) {
     const id = setTimeout(() => setLastRead({ path: `/mushaf/?p=${page}`, title: `Mushaf · page ${page}`, sub: title }), 700);
     return () => clearTimeout(id);
   }, [ready, page]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { if (!ready) return undefined; const id = setTimeout(() => recordRead(`m:${page}`), 3000); return () => clearTimeout(id); }, [ready, page]);
 
   // keyboard: in a right-to-left book the next page is to the LEFT
   useEffect(() => {
